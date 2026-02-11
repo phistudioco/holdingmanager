@@ -1,14 +1,16 @@
 import { createBrowserClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
+import { getSupabaseEnv } from '@/lib/env'
 
 /**
  * Client Supabase pour les composants client (navigateur)
  * Utilise les cookies du navigateur pour la session
  */
 export function createClient() {
+  const env = getSupabaseEnv()
   return createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    env.url,
+    env.anonKey
   )
 }
 
@@ -19,9 +21,10 @@ export function createClient() {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createUntypedClient(): any {
+  const env = getSupabaseEnv()
   return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    env.url,
+    env.anonKey
   )
 }
 

@@ -111,7 +111,8 @@ export function useNotifications() {
           schema: 'public',
           table: 'alertes',
         },
-        (payload) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (payload: any) => {
           const newNotification = payload.new as Notification
           setNotifications(prev => [newNotification, ...prev.slice(0, 19)])
           if (!newNotification.lue) {
@@ -126,7 +127,8 @@ export function useNotifications() {
           schema: 'public',
           table: 'alertes',
         },
-        (payload) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (payload: any) => {
           const updated = payload.new as Notification
           if (updated.traitee) {
             setNotifications(prev => prev.filter(n => n.id !== updated.id))

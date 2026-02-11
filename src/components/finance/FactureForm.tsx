@@ -19,6 +19,11 @@ import {
 } from 'lucide-react'
 import { tauxTVA, typesFacture } from '@/lib/validations/facture'
 import type { Tables } from '@/types/database'
+import {
+  calculateLigneFacture as calculateLigneMontants,
+  sumMontants,
+  formatCurrency as formatMontant,
+} from '@/lib/utils/currency'
 
 type Facture = Tables<'factures'>
 type Client = Tables<'clients'>
@@ -136,9 +141,12 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
   }
 
   const calculateLigne = (ligne: LigneFacture): LigneFacture => {
-    const montant_ht = ligne.quantite * ligne.prix_unitaire
-    const montant_tva = montant_ht * (ligne.taux_tva / 100)
-    const montant_ttc = montant_ht + montant_tva
+    // Utilise les calculs décimaux précis pour éviter les erreurs d'arrondi
+    const { montant_ht, montant_tva, montant_ttc } = calculateLigneMontants(
+      ligne.quantite,
+      ligne.prix_unitaire,
+      ligne.taux_tva
+    )
     return { ...ligne, montant_ht, montant_tva, montant_ttc }
   }
 
@@ -179,20 +187,11 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
     }
   }
 
-  const totaux = lignes.reduce(
-    (acc, ligne) => ({
-      ht: acc.ht + ligne.montant_ht,
-      tva: acc.tva + ligne.montant_tva,
-      ttc: acc.ttc + ligne.montant_ttc,
-    }),
-    { ht: 0, tva: 0, ttc: 0 }
-  )
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR',
-    }).format(amount)
+  // Calcul des totaux avec précision décimale
+  const totaux = {
+    ht: sumMontants(...lignes.map(l => l.montant_ht)),
+    tva: sumMontants(...lignes.map(l => l.montant_tva)),
+    ttc: sumMontants(...lignes.map(l => l.montant_ttc)),
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -533,7 +532,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
               <div className="col-span-10 lg:col-span-2 text-right">
                 <Label>Total TTC</Label>
                 <p className="mt-1 py-2 font-semibold text-gray-900">
-                  {formatCurrency(ligne.montant_ttc)}
+                  {formatMontant(ligne.montant_ttc)}
                 </p>
               </div>
               <div className="col-span-2 lg:col-span-1">
@@ -557,15 +556,15 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
           <div className="max-w-xs ml-auto space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Total HT</span>
-              <span className="font-medium">{formatCurrency(totaux.ht)}</span>
+              <span className="font-medium">{formatMontant(totaux.ht)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Total TVA</span>
-              <span className="font-medium">{formatCurrency(totaux.tva)}</span>
+              <span className="font-medium">{formatMontant(totaux.tva)}</span>
             </div>
             <div className="flex justify-between text-lg font-bold border-t border-gray-200 pt-2">
               <span>Total TTC</span>
-              <span className="text-phi-primary">{formatCurrency(totaux.ttc)}</span>
+              <span className="text-phi-primary">{formatMontant(totaux.ttc)}</span>
             </div>
           </div>
         </div>

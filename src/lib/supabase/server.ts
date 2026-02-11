@@ -1,6 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import type { Database } from '@/types/database'
+import { getSupabaseEnv } from '@/lib/env'
 
 type CookieToSet = {
   name: string
@@ -14,10 +15,11 @@ type CookieToSet = {
  */
 export async function createClient() {
   const cookieStore = await cookies()
+  const env = getSupabaseEnv()
 
   return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    env.url,
+    env.anonKey,
     {
       cookies: {
         getAll() {
@@ -46,10 +48,21 @@ export async function createClient() {
  */
 export async function createAdminClient() {
   const cookieStore = await cookies()
+  const env = getSupabaseEnv()
+
+  // Validation obligatoire de la service role key
+  if (!env.serviceRoleKey) {
+    throw new Error(
+      '❌ SUPABASE_SERVICE_ROLE_KEY est requise pour createAdminClient()\n\n' +
+      'Cette clé est nécessaire pour les opérations admin côté serveur.\n' +
+      'Ajoutez SUPABASE_SERVICE_ROLE_KEY dans votre fichier .env.local\n\n' +
+      'IMPORTANT: Cette clé ne doit JAMAIS être exposée côté client !'
+    )
+  }
 
   return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    env.url,
+    env.serviceRoleKey,
     {
       cookies: {
         getAll() {
