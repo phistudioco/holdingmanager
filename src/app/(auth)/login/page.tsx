@@ -53,7 +53,7 @@ export default function LoginPage() {
       <CardHeader className="space-y-1 text-center">
         <div className="lg:hidden mb-4 flex justify-center">
           <Image
-            src="/logo-phi-studios.png"
+            src="/logo.png"
             alt="PHI Studios Logo"
             width={180}
             height={80}

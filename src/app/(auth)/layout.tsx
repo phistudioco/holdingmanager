@@ -17,7 +17,7 @@ export default function AuthLayout({
         <div className="text-center text-white max-w-md">
           <div className="mb-8 flex justify-center">
             <Image
-              src="/logo-phi-studios.png"
+              src="/logo.png"
               alt="PHI Studios Logo"
               width={280}
               height={120}
