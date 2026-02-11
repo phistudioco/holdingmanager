@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -84,10 +85,15 @@ export default function ForgotPasswordPage() {
   return (
     <Card className="border-0 shadow-xl">
       <CardHeader className="space-y-1 text-center">
-        <div className="lg:hidden mb-4">
-          <h1 className="text-2xl font-heading font-bold text-phi-primary">
-            PHI <span className="text-phi-accent">Studios</span>
-          </h1>
+        <div className="lg:hidden mb-4 flex justify-center">
+          <Image
+            src="/logo-phi-studios.png"
+            alt="PHI Studios Logo"
+            width={180}
+            height={80}
+            className="object-contain"
+            priority
+          />
         </div>
         <CardTitle className="text-2xl font-heading">Mot de passe oublié</CardTitle>
         <CardDescription>

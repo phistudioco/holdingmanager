@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 
 export const metadata: Metadata = {
   title: 'Authentification',
@@ -14,9 +15,16 @@ export default function AuthLayout({
       {/* Partie gauche - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-phi-primary via-phi-accent to-phi-highlight items-center justify-center p-12">
         <div className="text-center text-white max-w-md">
-          <h1 className="text-5xl font-heading font-bold mb-4">
-            PHI <span className="text-phi-highlight">Studios</span>
-          </h1>
+          <div className="mb-8 flex justify-center">
+            <Image
+              src="/logo-phi-studios.png"
+              alt="PHI Studios Logo"
+              width={280}
+              height={120}
+              className="object-contain"
+              priority
+            />
+          </div>
           <p className="text-xl italic mb-8 opacity-90">
             Promote Human Intelligence
           </p>

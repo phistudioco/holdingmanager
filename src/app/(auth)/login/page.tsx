@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2, Mail, Lock, AlertCircle } from 'lucide-react'
+import { Loader2, Mail, Lock, AlertCircle, ExternalLink } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -50,10 +51,15 @@ export default function LoginPage() {
   return (
     <Card className="border-0 shadow-xl">
       <CardHeader className="space-y-1 text-center">
-        <div className="lg:hidden mb-4">
-          <h1 className="text-2xl font-heading font-bold text-phi-primary">
-            PHI <span className="text-phi-accent">Studios</span>
-          </h1>
+        <div className="lg:hidden mb-4 flex justify-center">
+          <Image
+            src="/logo-phi-studios.png"
+            alt="PHI Studios Logo"
+            width={180}
+            height={80}
+            className="object-contain"
+            priority
+          />
         </div>
         <CardTitle className="text-2xl font-heading">Connexion</CardTitle>
         <CardDescription>
@@ -134,6 +140,16 @@ export default function LoginPage() {
               Créer un compte
             </Link>
           </p>
+
+          <div className="pt-4 border-t border-gray-100">
+            <Link
+              href="/portail/login"
+              className="flex items-center justify-center gap-2 text-sm text-phi-primary hover:text-phi-primary/80 font-medium transition-colors"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Accès Portail Client
+            </Link>
+          </div>
         </CardFooter>
       </form>
     </Card>

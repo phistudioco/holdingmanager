@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -106,10 +107,15 @@ export default function ResetPasswordPage() {
     return (
       <Card className="border-0 shadow-xl">
         <CardHeader className="space-y-1 text-center">
-          <div className="lg:hidden mb-4">
-            <h1 className="text-2xl font-heading font-bold text-phi-primary">
-              PHI <span className="text-phi-accent">Studios</span>
-            </h1>
+          <div className="lg:hidden mb-4 flex justify-center">
+            <Image
+              src="/logo-phi-studios.png"
+              alt="PHI Studios Logo"
+              width={180}
+              height={80}
+              className="object-contain"
+              priority
+            />
           </div>
           <CardTitle className="text-2xl font-heading">Vérification...</CardTitle>
           <CardDescription>
@@ -128,10 +134,15 @@ export default function ResetPasswordPage() {
     return (
       <Card className="border-0 shadow-xl">
         <CardHeader className="space-y-1 text-center">
-          <div className="lg:hidden mb-4">
-            <h1 className="text-2xl font-heading font-bold text-phi-primary">
-              PHI <span className="text-phi-accent">Studios</span>
-            </h1>
+          <div className="lg:hidden mb-4 flex justify-center">
+            <Image
+              src="/logo-phi-studios.png"
+              alt="PHI Studios Logo"
+              width={180}
+              height={80}
+              className="object-contain"
+              priority
+            />
           </div>
           <div className="flex justify-center mb-4">
             <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
@@ -169,10 +180,15 @@ export default function ResetPasswordPage() {
     return (
       <Card className="border-0 shadow-xl">
         <CardHeader className="space-y-1 text-center">
-          <div className="lg:hidden mb-4">
-            <h1 className="text-2xl font-heading font-bold text-phi-primary">
-              PHI <span className="text-phi-accent">Studios</span>
-            </h1>
+          <div className="lg:hidden mb-4 flex justify-center">
+            <Image
+              src="/logo-phi-studios.png"
+              alt="PHI Studios Logo"
+              width={180}
+              height={80}
+              className="object-contain"
+              priority
+            />
           </div>
           <div className="flex justify-center mb-4">
             <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
@@ -205,9 +221,14 @@ export default function ResetPasswordPage() {
     <Card className="border-0 shadow-xl">
       <CardHeader className="space-y-1 text-center">
         <div className="lg:hidden mb-4">
-          <h1 className="text-2xl font-heading font-bold text-phi-primary">
-            PHI <span className="text-phi-accent">Studios</span>
-          </h1>
+          <Image
+            src="/logo-phi-studios.png"
+            alt="PHI Studios Logo"
+            width={180}
+            height={80}
+            className="object-contain"
+            priority
+          />
         </div>
         <CardTitle className="text-2xl font-heading">Nouveau mot de passe</CardTitle>
         <CardDescription>
