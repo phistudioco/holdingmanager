@@ -248,23 +248,8 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
 
         if (lignesError) throw lignesError
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: updateError } = await (supabase as any)
-          .from('factures')
-          .update(factureData)
-          .eq('id', facture?.id)
-
-        if (updateError) throw updateError
-
-        // Supprimer les anciennes lignes et réinsérer
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase as any)
-          .from('facture_lignes')
-          .delete()
-          .eq('facture_id', facture?.id)
-
+        // Mise à jour via API route sécurisée (transaction atomique)
         const lignesData = lignes.map((ligne, index) => ({
-          facture_id: facture?.id,
           description: ligne.description,
           quantite: ligne.quantite,
           prix_unitaire: ligne.prix_unitaire,
@@ -275,12 +260,22 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
           ordre: index,
         }))
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: lignesError } = await (supabase as any)
-          .from('facture_lignes')
-          .insert(lignesData)
+        const response = await fetch(`/api/factures/${facture?.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            facture: factureData,
+            lignes: lignesData,
+          }),
+        })
 
-        if (lignesError) throw lignesError
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.message || data.error || 'Erreur lors de la mise à jour')
+        }
       }
 
       router.push('/finance/factures')

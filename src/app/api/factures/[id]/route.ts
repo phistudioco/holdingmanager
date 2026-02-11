@@ -151,3 +151,147 @@ export async function DELETE(
     )
   }
 }
+
+/**
+ * PUT /api/factures/[id]
+ *
+ * Met à jour une facture et ses lignes de manière atomique
+ * Utilise une fonction PostgreSQL pour garantir la transaction
+ */
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    const factureId = parseInt(id)
+
+    if (isNaN(factureId)) {
+      return NextResponse.json(
+        { error: 'ID de facture invalide' },
+        { status: 400 }
+      )
+    }
+
+    // Récupérer les données de la requête
+    const body = await request.json()
+    const { facture, lignes } = body as {
+      facture: Record<string, unknown>
+      lignes: Array<Record<string, unknown>>
+    }
+
+    if (!facture || !lignes || !Array.isArray(lignes)) {
+      return NextResponse.json(
+        { error: 'Données invalides. Attendu: { facture: {...}, lignes: [...] }' },
+        { status: 400 }
+      )
+    }
+
+    // Vérifier l'authentification
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Non authentifié' },
+        { status: 401 }
+      )
+    }
+
+    // Vérifier les permissions (edit permission)
+    const db = createUntypedClient()
+    const { data: userProfile, error: profileError } = await db
+      .from('users')
+      .select(`
+        *,
+        role:role_id (
+          nom,
+          niveau
+        )
+      `)
+      .eq('id', user.id)
+      .single()
+
+    if (profileError || !userProfile) {
+      return NextResponse.json(
+        { error: 'Profil utilisateur non trouvé' },
+        { status: 403 }
+      )
+    }
+
+    // Vérifier permission d'édition (manager+ peut éditer)
+    const roleNiveau = userProfile.role?.niveau || 0
+    const canEdit = roleNiveau >= 40 // manager (40) et au-dessus
+
+    if (!canEdit) {
+      return NextResponse.json(
+        {
+          error: 'Permission refusée',
+          message: 'Vous n\'avez pas les droits pour modifier des factures.',
+        },
+        { status: 403 }
+      )
+    }
+
+    // Appeler la fonction PostgreSQL pour mise à jour atomique
+    const { data: result, error: rpcError } = await db.rpc('update_facture_with_lignes', {
+      p_facture_id: factureId,
+      p_facture_data: facture,
+      p_lignes: lignes,
+    })
+
+    if (rpcError) {
+      console.error('Erreur RPC update_facture_with_lignes:', rpcError)
+
+      // Vérifier si la fonction existe
+      if (rpcError.message?.includes('function') && rpcError.message?.includes('does not exist')) {
+        return NextResponse.json(
+          {
+            error: 'Fonction de mise à jour non disponible',
+            message: 'La migration PostgreSQL n\'a pas été appliquée. Consultez supabase/APPLY_MIGRATIONS.md',
+            details: rpcError.message,
+          },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json(
+        {
+          error: 'Erreur lors de la mise à jour',
+          message: rpcError.message || 'Erreur inconnue',
+        },
+        { status: 500 }
+      )
+    }
+
+    // Log de l'action
+    await db
+      .from('activity_logs')
+      .insert({
+        user_id: user.id,
+        action: 'update',
+        entity_type: 'facture',
+        entity_id: factureId,
+        details: `Mise à jour de la facture ${factureId} avec ${lignes.length} lignes`,
+      })
+      .catch((err: unknown) => {
+        console.error('Erreur log activité:', err)
+      })
+
+    return NextResponse.json({
+      success: true,
+      data: result,
+      message: 'Facture mise à jour avec succès',
+    })
+
+  } catch (error) {
+    console.error('Erreur mise à jour facture:', error)
+    return NextResponse.json(
+      {
+        error: 'Erreur serveur lors de la mise à jour',
+        message: error instanceof Error ? error.message : 'Erreur inconnue',
+      },
+      { status: 500 }
+    )
+  }
+}
