@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Trash2, Loader2, AlertTriangle } from 'lucide-react'
 
@@ -22,20 +21,25 @@ export function DeleteContratButton({ contratId, contratNumero }: DeleteContratB
     setError(null)
 
     try {
-      const supabase = createClient()
+      // Appel à l'API route sécurisée
+      const response = await fetch(`/api/contrats/${contratId}`, {
+        method: 'DELETE',
+      })
 
-      const { error: deleteError } = await supabase
-        .from('contrats')
-        .delete()
-        .eq('id', contratId)
+      const data = await response.json()
 
-      if (deleteError) throw deleteError
+      if (!response.ok) {
+        // Afficher le message d'erreur spécifique de l'API
+        throw new Error(data.message || data.error || 'Erreur lors de la suppression')
+      }
 
+      // Succès - rediriger vers la liste des contrats
       router.push('/finance/contrats')
       router.refresh()
     } catch (err) {
       console.error('Erreur suppression:', err)
-      setError('Impossible de supprimer ce contrat. Il est peut-être lié à des factures.')
+      const errorMessage = err instanceof Error ? err.message : 'Impossible de supprimer ce contrat.'
+      setError(errorMessage)
       setLoading(false)
     }
   }

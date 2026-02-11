@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Trash2, Loader2, AlertTriangle } from 'lucide-react'
 
@@ -24,32 +23,28 @@ export function DeleteFactureButton({
   const handleDelete = async () => {
     setLoading(true)
     try {
-      const supabase = createClient()
+      // Appel à l'API route sécurisée
+      const response = await fetch(`/api/factures/${factureId}`, {
+        method: 'DELETE',
+      })
 
-      // Supprimer d'abord les lignes (même si ON DELETE CASCADE devrait le faire)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase as any)
-        .from('facture_lignes')
-        .delete()
-        .eq('facture_id', factureId)
+      const data = await response.json()
 
-      // Supprimer la facture
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase as any)
-        .from('factures')
-        .delete()
-        .eq('id', factureId)
+      if (!response.ok) {
+        // Afficher le message d'erreur spécifique de l'API
+        throw new Error(data.message || data.error || 'Erreur lors de la suppression')
+      }
 
-      if (error) throw error
-
+      // Succès - rediriger vers la liste des factures
       router.push('/finance/factures')
       router.refresh()
     } catch (error) {
       console.error('Erreur lors de la suppression:', error)
-      alert('Erreur lors de la suppression de la facture')
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la suppression de la facture'
+      alert(errorMessage)
+      setShowConfirm(false) // Fermer le dialogue en cas d'erreur
     } finally {
       setLoading(false)
-      setShowConfirm(false)
     }
   }
 
