@@ -25,10 +25,7 @@ export default function AuthLayout({
               priority
             />
           </div>
-          <p className="text-xl italic mb-8 opacity-90">
-            Promote Human Intelligence
-          </p>
-          <div className="space-y-4 text-left bg-white/10 backdrop-blur-sm rounded-xl p-6">
+          <div className="space-y-4 text-left bg-white/10 backdrop-blur-sm rounded-xl p-6 mt-8">
             <div className="flex items-center gap-3">
               <div className="w-3 h-3 rounded-full bg-robotique" />
               <span>Robotique - Automatisation intelligente</span>
