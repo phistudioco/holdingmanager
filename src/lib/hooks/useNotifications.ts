@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createUntypedClient } from '@/lib/supabase/client'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
 export type Notification = {
@@ -24,7 +24,7 @@ export function useNotifications() {
 
   // Récupérer les notifications
   const fetchNotifications = useCallback(async () => {
-    const supabase = createClient()
+    const supabase = createUntypedClient()
 
     const { data, error } = await supabase
       .from('alertes')
@@ -42,10 +42,9 @@ export function useNotifications() {
 
   // Marquer comme lue
   const markAsRead = useCallback(async (id: number) => {
-    const supabase = createClient()
+    const supabase = createUntypedClient()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('alertes')
       .update({ lue: true })
       .eq('id', id)
@@ -60,14 +59,13 @@ export function useNotifications() {
 
   // Marquer toutes comme lues
   const markAllAsRead = useCallback(async () => {
-    const supabase = createClient()
+    const supabase = createUntypedClient()
 
     const unreadIds = notifications.filter(n => !n.lue).map(n => n.id)
 
     if (unreadIds.length === 0) return
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('alertes')
       .update({ lue: true })
       .in('id', unreadIds)
@@ -80,10 +78,9 @@ export function useNotifications() {
 
   // Marquer comme traitée (supprimer de la liste)
   const markAsDone = useCallback(async (id: number) => {
-    const supabase = createClient()
+    const supabase = createUntypedClient()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('alertes')
       .update({ traitee: true })
       .eq('id', id)
@@ -101,7 +98,7 @@ export function useNotifications() {
   useEffect(() => {
     fetchNotifications()
 
-    const supabase = createClient()
+    const supabase = createUntypedClient()
     let channel: RealtimeChannel | null = null
 
     // S'abonner aux changements sur la table alertes
