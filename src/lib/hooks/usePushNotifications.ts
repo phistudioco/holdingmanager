@@ -194,13 +194,19 @@ export function usePushNotifications() {
 
         // Remove from database
         const supabase = createClient()
+        const db = createUntypedClient()
         const { data: { user } } = await supabase.auth.getUser()
 
         if (user) {
-          await supabase
+          const { error: dbError } = await db
             .from('push_subscriptions')
             .delete()
             .eq('user_id', user.id)
+
+          if (dbError) {
+            // eslint-disable-next-line no-console
+            console.error('Erreur suppression subscription:', dbError)
+          }
         }
       }
 
