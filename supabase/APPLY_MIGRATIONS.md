@@ -116,13 +116,90 @@ SELECT update_facture_with_lignes(
 
 ---
 
+### `20260211_enable_rls_policies.sql`
+**Objectif:** Activer Row Level Security (RLS) et créer des politiques de sécurité pour toutes les tables critiques.
+
+**Ce qui est créé:**
+- Activation de RLS sur 11 tables (factures, contrats, clients, filiales, employes, users, etc.)
+- 3 fonctions helper: `is_super_admin()`, `get_user_role_level()`, `get_user_filiales()`
+- 50+ politiques RLS garantissant l'accès selon les affectations et permissions
+
+**Politiques principales:**
+- **Lecture:** Accès uniquement aux données des filiales assignées (sauf super_admin)
+- **Création:** Selon niveau de rôle (employé+ pour clients, manager+ pour transactions)
+- **Modification:** Manager+ pour ses filiales
+- **Suppression:** Admin+ uniquement
+
+**Niveaux de rôle:**
+- `super_admin` (100): Accès complet à toutes les données
+- `admin` (80): Peut créer/modifier/supprimer dans toutes les filiales
+- `directeur` (60): Lecture toutes filiales, modification ses filiales
+- `manager` (40): Gestion complète de ses filiales assignées
+- `responsable` (30): Lecture/création dans ses filiales
+- `employe` (20): Lecture/création limitée
+
+**Impact:**
+- 🔴 Critical: Empêche l'accès non autorisé aux données sensibles AU NIVEAU DE LA BASE
+- 🔴 Critical: Protection même si l'application a des failles de sécurité
+- ✅ Les permissions sont appliquées automatiquement sur toutes les requêtes
+- ✅ Impossible de contourner via des requêtes SQL directes
+
+**Test après application:**
+```sql
+-- Vérifier que RLS est activé
+SELECT tablename, rowsecurity
+FROM pg_tables
+WHERE schemaname = 'public'
+AND tablename IN ('factures', 'clients', 'contrats', 'filiales');
+
+-- Lister toutes les politiques créées
+SELECT schemaname, tablename, policyname, cmd
+FROM pg_policies
+WHERE schemaname = 'public'
+ORDER BY tablename, policyname;
+
+-- Tester en tant qu'utilisateur (remplacer user_id)
+SET request.jwt.claims TO '{"sub": "user-id-here"}';
+SELECT * FROM factures; -- Ne doit retourner que les factures des filiales assignées
+```
+
+**⚠️ IMPORTANT:**
+- Appliquer cette migration en **DERNIER** (après avoir vérifié que l'app fonctionne)
+- Une fois RLS activé, toutes les requêtes sont filtrées
+- Si l'application ne fonctionne plus, c'est probablement un problème de politiques RLS
+
+---
+
 ## Rollback
 
 Si vous devez annuler une migration :
 
+### Rollback `20260211_update_facture_atomic.sql`
 ```sql
 -- Supprimer la fonction
 DROP FUNCTION IF EXISTS update_facture_with_lignes(INTEGER, JSONB, JSONB[]);
+```
+
+### Rollback `20260211_enable_rls_policies.sql`
+```sql
+-- Désactiver RLS sur toutes les tables
+ALTER TABLE factures DISABLE ROW LEVEL SECURITY;
+ALTER TABLE facture_lignes DISABLE ROW LEVEL SECURITY;
+ALTER TABLE contrats DISABLE ROW LEVEL SECURITY;
+ALTER TABLE clients DISABLE ROW LEVEL SECURITY;
+ALTER TABLE transactions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE paiements DISABLE ROW LEVEL SECURITY;
+ALTER TABLE filiales DISABLE ROW LEVEL SECURITY;
+ALTER TABLE employes DISABLE ROW LEVEL SECURITY;
+ALTER TABLE users DISABLE ROW LEVEL SECURITY;
+ALTER TABLE alertes DISABLE ROW LEVEL SECURITY;
+ALTER TABLE activity_logs DISABLE ROW LEVEL SECURITY;
+
+-- Supprimer les politiques (automatique avec DROP POLICY CASCADE)
+-- Supprimer les fonctions
+DROP FUNCTION IF EXISTS is_super_admin();
+DROP FUNCTION IF EXISTS get_user_role_level();
+DROP FUNCTION IF EXISTS get_user_filiales();
 ```
 
 ---
