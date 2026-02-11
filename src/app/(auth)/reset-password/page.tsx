@@ -19,19 +19,43 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isValidRecovery, setIsValidRecovery] = useState(false)
+  const [checkingSession, setCheckingSession] = useState(true)
 
-  // Vérifier si l'utilisateur a un token de réinitialisation
+  // Vérifier si l'utilisateur a un token de réinitialisation valide
   useEffect(() => {
-    const checkSession = async () => {
-      const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
+    const supabase = createClient()
 
-      if (!session) {
+    // Écouter les changements d'état d'authentification
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth event:', event, 'Session:', session)
+
+      if (event === 'PASSWORD_RECOVERY') {
+        // L'utilisateur vient de cliquer sur le lien de récupération
+        setIsValidRecovery(true)
+        setCheckingSession(false)
+      } else if (event === 'SIGNED_IN' && session) {
+        // Session établie
+        setIsValidRecovery(true)
+        setCheckingSession(false)
+      } else if (event === 'SIGNED_OUT') {
         setError('Lien de réinitialisation invalide ou expiré')
+        setCheckingSession(false)
       }
-    }
+    })
 
-    checkSession()
+    // Vérifier la session actuelle
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setIsValidRecovery(true)
+      }
+      setCheckingSession(false)
+    })
+
+    // Cleanup
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -77,6 +101,70 @@ export default function ResetPasswordPage() {
     }
   }
 
+  // État de chargement pendant la vérification
+  if (checkingSession) {
+    return (
+      <Card className="border-0 shadow-xl">
+        <CardHeader className="space-y-1 text-center">
+          <div className="lg:hidden mb-4">
+            <h1 className="text-2xl font-heading font-bold text-phi-primary">
+              PHI <span className="text-phi-accent">Studios</span>
+            </h1>
+          </div>
+          <CardTitle className="text-2xl font-heading">Vérification...</CardTitle>
+          <CardDescription>
+            Vérification de votre lien de réinitialisation
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex justify-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin text-phi-primary" />
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // Lien invalide ou expiré
+  if (!isValidRecovery && !checkingSession) {
+    return (
+      <Card className="border-0 shadow-xl">
+        <CardHeader className="space-y-1 text-center">
+          <div className="lg:hidden mb-4">
+            <h1 className="text-2xl font-heading font-bold text-phi-primary">
+              PHI <span className="text-phi-accent">Studios</span>
+            </h1>
+          </div>
+          <div className="flex justify-center mb-4">
+            <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
+              <AlertCircle className="h-6 w-6 text-red-600" />
+            </div>
+          </div>
+          <CardTitle className="text-2xl font-heading">Lien invalide</CardTitle>
+          <CardDescription>
+            Ce lien de réinitialisation est invalide ou a expiré
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="p-4 bg-red-50 rounded-lg text-sm text-red-800 text-center">
+            <p>Veuillez demander un nouveau lien de réinitialisation</p>
+          </div>
+        </CardContent>
+        <CardFooter className="flex flex-col gap-2">
+          <Button variant="outline" className="w-full" asChild>
+            <Link href="/forgot-password">
+              Demander un nouveau lien
+            </Link>
+          </Button>
+          <Button variant="ghost" className="w-full" asChild>
+            <Link href="/login">
+              Retour à la connexion
+            </Link>
+          </Button>
+        </CardFooter>
+      </Card>
+    )
+  }
+
+  // Succès
   if (success) {
     return (
       <Card className="border-0 shadow-xl">
@@ -112,6 +200,7 @@ export default function ResetPasswordPage() {
     )
   }
 
+  // Formulaire de réinitialisation
   return (
     <Card className="border-0 shadow-xl">
       <CardHeader className="space-y-1 text-center">
