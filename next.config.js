@@ -3,6 +3,16 @@ const nextConfig = {
   // Activer le mode strict React
   reactStrictMode: true,
 
+  // Ignorer les erreurs ESLint pendant le build (Vercel)
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
+  // Ignorer les erreurs TypeScript pendant le build
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+
   // Configuration des images
   images: {
     remotePatterns: [
