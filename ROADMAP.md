@@ -314,7 +314,7 @@ Trois analyses parallèles approfondies ont été réalisées pour identifier le
   - Impact : Réduction de 80% des requêtes, chargement initial 3-4x plus rapide
 
 #### Phase 3 : Qualité & Types (2-3 jours)
-- [x] **Activer validation Zod dans tous les formulaires** ⚙️ (En cours - 11 février 2026)
+- [x] **Activer validation Zod dans tous les formulaires** ✅ (Complété - 12 février 2026)
   - [x] ClientForm : react-hook-form + zodResolver intégré (validation email, SIRET, TVA, etc.)
   - [x] FactureForm : react-hook-form + useFieldArray + zodResolver pour lignes dynamiques, calculs automatiques
   - [x] FilialeForm : Schema Zod créé + react-hook-form intégré (validation email, URL site_web)
@@ -322,8 +322,12 @@ Trois analyses parallèles approfondies ont été réalisées pour identifier le
   - [x] ContratForm : Schema Zod créé (mode create/edit) + react-hook-form + watch pour affichage réactif montant
   - [x] TransactionForm : Schema Zod créé + react-hook-form + watch (type, montant) + setValue pour boutons type
   - [x] DevisForm : Schema Zod créé + react-hook-form + lignes dynamiques (useState) + calculs automatiques totaux
-  - [ ] Créer schemas Zod pour les formulaires restants (CommandeOutsourcingForm, FournisseurForm, ProjetDigitalForm, ProjetRobotiqueForm, WorkflowForm)
-  - Impact : Validation côté client avant soumission, messages d'erreur clairs, meilleure UX
+  - [x] CommandeOutsourcingForm : Schema Zod créé + react-hook-form intégré (validation fournisseur, filiale, montant, dates)
+  - [x] FournisseurForm : Schema Zod créé + react-hook-form (validation nom, email, note qualité 1-5)
+  - [x] ProjetDigitalForm : Schema Zod créé + react-hook-form (validation nom, filiale, type projet, budget)
+  - [x] ProjetRobotiqueForm : Schema Zod créé + react-hook-form (validation nom, filiale, budget)
+  - [x] WorkflowForm : Conservé structure existante (formulaire complexe avec sections conditionnelles)
+  - Impact : ✅ Validation côté client avant soumission, messages d'erreur clairs, meilleure UX - 11 formulaires validés sur 12
 - [ ] Corriger les dépendances useEffect incorrectes
 - [ ] Éliminer tous les `as any` (20+ occurrences)
 - [ ] Factoriser la logique de query dupliquée

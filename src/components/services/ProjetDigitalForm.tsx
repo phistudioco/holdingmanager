@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { createUntypedClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -65,6 +68,21 @@ const statutOptions = [
   { value: 'annule', label: 'Annulé' },
 ]
 
+const projetDigitalSchema = z.object({
+  nom: z.string().min(1, 'Le nom du projet est requis'),
+  description: z.string().optional(),
+  client_id: z.number().optional(),
+  filiale_id: z.number().min(1, 'Veuillez sélectionner une filiale'),
+  type: z.enum(['site_web', 'application', 'ecommerce', 'mobile', 'autre']),
+  statut: z.enum(['planifie', 'en_cours', 'en_pause', 'termine', 'annule']),
+  url: z.string().optional(),
+  date_debut: z.string().optional(),
+  date_fin_prevue: z.string().optional(),
+  budget: z.number().min(0, 'Le budget doit être positif').optional(),
+})
+
+type ProjetDigitalFormData = z.infer<typeof projetDigitalSchema>
+
 export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -72,17 +90,25 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
   const [filiales, setFiliales] = useState<Filiale[]>([])
   const [clients, setClients] = useState<Client[]>([])
 
-  const [formData, setFormData] = useState({
-    nom: projet?.nom || '',
-    description: projet?.description || '',
-    client_id: projet?.client_id || 0,
-    filiale_id: projet?.filiale_id || 0,
-    type: projet?.type || 'site_web',
-    statut: projet?.statut || 'planifie',
-    url: projet?.url || '',
-    date_debut: projet?.date_debut || '',
-    date_fin_prevue: projet?.date_fin_prevue || '',
-    budget: projet?.budget || 0,
+  const {
+    register,
+    handleSubmit: handleFormSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<ProjetDigitalFormData>({
+    resolver: zodResolver(projetDigitalSchema),
+    defaultValues: {
+      nom: projet?.nom || '',
+      description: projet?.description || '',
+      client_id: projet?.client_id || 0,
+      filiale_id: projet?.filiale_id || 0,
+      type: (projet?.type as ProjetDigitalFormData['type']) || 'site_web',
+      statut: (projet?.statut as ProjetDigitalFormData['statut']) || 'planifie',
+      url: projet?.url || '',
+      date_debut: projet?.date_debut || '',
+      date_fin_prevue: projet?.date_fin_prevue || '',
+      budget: projet?.budget || 0,
+    },
   })
 
   useEffect(() => {
@@ -98,52 +124,31 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
       if (clientsRes.data) setClients(clientsRes.data as Client[])
 
       if (mode === 'create' && filialesRes.data && filialesRes.data.length > 0) {
-        setFormData(prev => ({ ...prev, filiale_id: filialesRes.data[0].id }))
+        setValue('filiale_id', filialesRes.data[0].id)
       }
     }
 
     fetchData()
-  }, [mode])
+  }, [mode, setValue])
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, type } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? (value === '' ? 0 : Number(value)) : value,
-    }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = async (data: ProjetDigitalFormData) => {
     setError(null)
-
-    if (!formData.nom.trim()) {
-      setError('Le nom du projet est requis')
-      return
-    }
-    if (!formData.filiale_id) {
-      setError('Veuillez sélectionner une filiale')
-      return
-    }
-
     setLoading(true)
 
     try {
       const supabase = createUntypedClient()
 
       const projetData = {
-        nom: formData.nom.trim(),
-        description: formData.description.trim() || null,
-        client_id: formData.client_id || null,
-        filiale_id: formData.filiale_id,
-        type: formData.type,
-        statut: formData.statut,
-        url: formData.url.trim() || null,
-        date_debut: formData.date_debut || null,
-        date_fin_prevue: formData.date_fin_prevue || null,
-        budget: formData.budget || null,
+        nom: data.nom.trim(),
+        description: data.description?.trim() || null,
+        client_id: data.client_id || null,
+        filiale_id: data.filiale_id,
+        type: data.type,
+        statut: data.statut,
+        url: data.url?.trim() || null,
+        date_debut: data.date_debut || null,
+        date_fin_prevue: data.date_fin_prevue || null,
+        budget: data.budget || null,
       }
 
       if (mode === 'create') {
@@ -178,7 +183,7 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
   const themeDark = '#d4a90c'
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleFormSubmit(onSubmit)} className="space-y-8">
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
           <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
@@ -198,35 +203,34 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
             <Label htmlFor="nom">Nom du projet *</Label>
             <Input
               id="nom"
-              name="nom"
-              value={formData.nom}
-              onChange={handleChange}
+              {...register('nom')}
               placeholder="Ex: Site vitrine Entreprise XYZ"
               className="mt-1"
-              required
             />
+            {errors.nom && (
+              <p className="text-sm text-red-600 mt-1">{errors.nom.message}</p>
+            )}
           </div>
 
           <div className="md:col-span-2">
             <Label htmlFor="description">Description</Label>
             <textarea
               id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
+              {...register('description')}
               rows={4}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-500"
               placeholder="Décrivez le projet en détail..."
             />
+            {errors.description && (
+              <p className="text-sm text-red-600 mt-1">{errors.description.message}</p>
+            )}
           </div>
 
           <div>
             <Label htmlFor="type">Type de projet</Label>
             <select
               id="type"
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
+              {...register('type')}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-500"
             >
               {typeOptions.map(option => (
@@ -235,15 +239,16 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
                 </option>
               ))}
             </select>
+            {errors.type && (
+              <p className="text-sm text-red-600 mt-1">{errors.type.message}</p>
+            )}
           </div>
 
           <div>
             <Label htmlFor="statut">Statut</Label>
             <select
               id="statut"
-              name="statut"
-              value={formData.statut}
-              onChange={handleChange}
+              {...register('statut')}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-500"
             >
               {statutOptions.map(option => (
@@ -252,6 +257,9 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
                 </option>
               ))}
             </select>
+            {errors.statut && (
+              <p className="text-sm text-red-600 mt-1">{errors.statut.message}</p>
+            )}
           </div>
 
           <div>
@@ -263,13 +271,14 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
             </Label>
             <Input
               id="url"
-              name="url"
               type="text"
-              value={formData.url}
-              onChange={handleChange}
+              {...register('url')}
               placeholder="www.example.com"
               className="mt-1"
             />
+            {errors.url && (
+              <p className="text-sm text-red-600 mt-1">{errors.url.message}</p>
+            )}
           </div>
 
           <div>
@@ -278,16 +287,17 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
               <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 id="budget"
-                name="budget"
                 type="number"
                 min="0"
                 step="100"
-                value={formData.budget || ''}
-                onChange={handleChange}
+                {...register('budget', { valueAsNumber: true })}
                 placeholder="0"
                 className="pl-10"
               />
             </div>
+            {errors.budget && (
+              <p className="text-sm text-red-600 mt-1">{errors.budget.message}</p>
+            )}
           </div>
         </div>
       </div>
@@ -304,17 +314,17 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
             <Label htmlFor="filiale_id">Filiale *</Label>
             <select
               id="filiale_id"
-              name="filiale_id"
-              value={formData.filiale_id}
-              onChange={handleChange}
+              {...register('filiale_id', { valueAsNumber: true })}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-500"
-              required
             >
               <option value={0}>Sélectionner une filiale</option>
               {filiales.map(f => (
                 <option key={f.id} value={f.id}>{f.nom} ({f.code})</option>
               ))}
             </select>
+            {errors.filiale_id && (
+              <p className="text-sm text-red-600 mt-1">{errors.filiale_id.message}</p>
+            )}
           </div>
 
           <div>
@@ -326,9 +336,7 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
             </Label>
             <select
               id="client_id"
-              name="client_id"
-              value={formData.client_id}
-              onChange={handleChange}
+              {...register('client_id', { valueAsNumber: true })}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-500"
             >
               <option value={0}>Aucun client</option>
@@ -336,6 +344,9 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
                 <option key={c.id} value={c.id}>{c.nom} ({c.code})</option>
               ))}
             </select>
+            {errors.client_id && (
+              <p className="text-sm text-red-600 mt-1">{errors.client_id.message}</p>
+            )}
           </div>
         </div>
       </div>
@@ -352,24 +363,26 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
             <Label htmlFor="date_debut">Date de début</Label>
             <Input
               id="date_debut"
-              name="date_debut"
               type="date"
-              value={formData.date_debut}
-              onChange={handleChange}
+              {...register('date_debut')}
               className="mt-1"
             />
+            {errors.date_debut && (
+              <p className="text-sm text-red-600 mt-1">{errors.date_debut.message}</p>
+            )}
           </div>
 
           <div>
             <Label htmlFor="date_fin_prevue">Date de fin prévue</Label>
             <Input
               id="date_fin_prevue"
-              name="date_fin_prevue"
               type="date"
-              value={formData.date_fin_prevue}
-              onChange={handleChange}
+              {...register('date_fin_prevue')}
               className="mt-1"
             />
+            {errors.date_fin_prevue && (
+              <p className="text-sm text-red-600 mt-1">{errors.date_fin_prevue.message}</p>
+            )}
           </div>
         </div>
       </div>

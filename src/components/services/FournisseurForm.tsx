@@ -2,6 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { createUntypedClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -52,63 +55,70 @@ const statutOptions = [
   { value: 'en_evaluation', label: 'En évaluation' },
 ]
 
+const fournisseurSchema = z.object({
+  nom: z.string().min(1, 'Le nom du fournisseur est requis'),
+  type: z.enum(['materiel', 'service', 'logistique', 'autre']),
+  contact_nom: z.string().optional(),
+  contact_email: z.string().email('Email invalide').optional().or(z.literal('')),
+  contact_telephone: z.string().optional(),
+  adresse: z.string().optional(),
+  ville: z.string().optional(),
+  code_postal: z.string().optional(),
+  pays: z.string().optional(),
+  statut: z.enum(['actif', 'inactif', 'en_evaluation']),
+  note_qualite: z.number().min(0).max(5).optional(),
+  notes: z.string().optional(),
+})
+
+type FournisseurFormData = z.infer<typeof fournisseurSchema>
+
 export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const [formData, setFormData] = useState({
-    nom: fournisseur?.nom || '',
-    type: fournisseur?.type || 'materiel',
-    contact_nom: fournisseur?.contact_nom || '',
-    contact_email: fournisseur?.contact_email || '',
-    contact_telephone: fournisseur?.contact_telephone || '',
-    adresse: fournisseur?.adresse || '',
-    ville: fournisseur?.ville || '',
-    code_postal: fournisseur?.code_postal || '',
-    pays: fournisseur?.pays || 'France',
-    statut: fournisseur?.statut || 'en_evaluation',
-    note_qualite: fournisseur?.note_qualite || 0,
-    notes: fournisseur?.notes || '',
+  const {
+    register,
+    handleSubmit: handleFormSubmit,
+    formState: { errors },
+  } = useForm<FournisseurFormData>({
+    resolver: zodResolver(fournisseurSchema),
+    defaultValues: {
+      nom: fournisseur?.nom || '',
+      type: (fournisseur?.type as FournisseurFormData['type']) || 'materiel',
+      contact_nom: fournisseur?.contact_nom || '',
+      contact_email: fournisseur?.contact_email || '',
+      contact_telephone: fournisseur?.contact_telephone || '',
+      adresse: fournisseur?.adresse || '',
+      ville: fournisseur?.ville || '',
+      code_postal: fournisseur?.code_postal || '',
+      pays: fournisseur?.pays || 'France',
+      statut: (fournisseur?.statut as FournisseurFormData['statut']) || 'en_evaluation',
+      note_qualite: fournisseur?.note_qualite || 0,
+      notes: fournisseur?.notes || '',
+    },
   })
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, type } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? (value === '' ? 0 : Number(value)) : value,
-    }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = async (data: FournisseurFormData) => {
     setError(null)
-
-    if (!formData.nom.trim()) {
-      setError('Le nom du fournisseur est requis')
-      return
-    }
-
     setLoading(true)
 
     try {
       const supabase = createUntypedClient()
 
       const fournisseurData = {
-        nom: formData.nom.trim(),
-        type: formData.type,
-        contact_nom: formData.contact_nom.trim() || null,
-        contact_email: formData.contact_email.trim() || null,
-        contact_telephone: formData.contact_telephone.trim() || null,
-        adresse: formData.adresse.trim() || null,
-        ville: formData.ville.trim() || null,
-        code_postal: formData.code_postal.trim() || null,
-        pays: formData.pays.trim() || null,
-        statut: formData.statut,
-        note_qualite: formData.note_qualite || null,
-        notes: formData.notes.trim() || null,
+        nom: data.nom.trim(),
+        type: data.type,
+        contact_nom: data.contact_nom?.trim() || null,
+        contact_email: data.contact_email?.trim() || null,
+        contact_telephone: data.contact_telephone?.trim() || null,
+        adresse: data.adresse?.trim() || null,
+        ville: data.ville?.trim() || null,
+        code_postal: data.code_postal?.trim() || null,
+        pays: data.pays?.trim() || null,
+        statut: data.statut,
+        note_qualite: data.note_qualite || null,
+        notes: data.notes?.trim() || null,
       }
 
       if (mode === 'create') {
@@ -142,7 +152,7 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
   const themeColor = '#0f2080'
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleFormSubmit(onSubmit)} className="space-y-8">
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
           <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
@@ -162,22 +172,20 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
             <Label htmlFor="nom">Nom du fournisseur *</Label>
             <Input
               id="nom"
-              name="nom"
-              value={formData.nom}
-              onChange={handleChange}
+              {...register('nom')}
               placeholder="Ex: Acme Industries"
               className="mt-1"
-              required
             />
+            {errors.nom && (
+              <p className="text-sm text-red-600 mt-1">{errors.nom.message}</p>
+            )}
           </div>
 
           <div>
             <Label htmlFor="type">Type</Label>
             <select
               id="type"
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
+              {...register('type')}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             >
               {typeOptions.map(option => (
@@ -186,15 +194,16 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
                 </option>
               ))}
             </select>
+            {errors.type && (
+              <p className="text-sm text-red-600 mt-1">{errors.type.message}</p>
+            )}
           </div>
 
           <div>
             <Label htmlFor="statut">Statut</Label>
             <select
               id="statut"
-              name="statut"
-              value={formData.statut}
-              onChange={handleChange}
+              {...register('statut')}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             >
               {statutOptions.map(option => (
@@ -203,6 +212,9 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
                 </option>
               ))}
             </select>
+            {errors.statut && (
+              <p className="text-sm text-red-600 mt-1">{errors.statut.message}</p>
+            )}
           </div>
 
           <div>
@@ -214,16 +226,17 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
             </Label>
             <Input
               id="note_qualite"
-              name="note_qualite"
               type="number"
               min="0"
               max="5"
               step="1"
-              value={formData.note_qualite || ''}
-              onChange={handleChange}
+              {...register('note_qualite', { valueAsNumber: true })}
               placeholder="0"
               className="mt-1"
             />
+            {errors.note_qualite && (
+              <p className="text-sm text-red-600 mt-1">{errors.note_qualite.message}</p>
+            )}
           </div>
         </div>
       </div>
@@ -240,12 +253,13 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
             <Label htmlFor="contact_nom">Nom du contact</Label>
             <Input
               id="contact_nom"
-              name="contact_nom"
-              value={formData.contact_nom}
-              onChange={handleChange}
+              {...register('contact_nom')}
               placeholder="Jean Dupont"
               className="mt-1"
             />
+            {errors.contact_nom && (
+              <p className="text-sm text-red-600 mt-1">{errors.contact_nom.message}</p>
+            )}
           </div>
 
           <div>
@@ -257,13 +271,14 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
             </Label>
             <Input
               id="contact_email"
-              name="contact_email"
               type="email"
-              value={formData.contact_email}
-              onChange={handleChange}
+              {...register('contact_email')}
               placeholder="contact@fournisseur.com"
               className="mt-1"
             />
+            {errors.contact_email && (
+              <p className="text-sm text-red-600 mt-1">{errors.contact_email.message}</p>
+            )}
           </div>
 
           <div>
@@ -275,13 +290,14 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
             </Label>
             <Input
               id="contact_telephone"
-              name="contact_telephone"
               type="tel"
-              value={formData.contact_telephone}
-              onChange={handleChange}
+              {...register('contact_telephone')}
               placeholder="+33 1 23 45 67 89"
               className="mt-1"
             />
+            {errors.contact_telephone && (
+              <p className="text-sm text-red-600 mt-1">{errors.contact_telephone.message}</p>
+            )}
           </div>
         </div>
       </div>
@@ -298,48 +314,52 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
             <Label htmlFor="adresse">Adresse</Label>
             <Input
               id="adresse"
-              name="adresse"
-              value={formData.adresse}
-              onChange={handleChange}
+              {...register('adresse')}
               placeholder="123 rue de l'Industrie"
               className="mt-1"
             />
+            {errors.adresse && (
+              <p className="text-sm text-red-600 mt-1">{errors.adresse.message}</p>
+            )}
           </div>
 
           <div>
             <Label htmlFor="code_postal">Code postal</Label>
             <Input
               id="code_postal"
-              name="code_postal"
-              value={formData.code_postal}
-              onChange={handleChange}
+              {...register('code_postal')}
               placeholder="75001"
               className="mt-1"
             />
+            {errors.code_postal && (
+              <p className="text-sm text-red-600 mt-1">{errors.code_postal.message}</p>
+            )}
           </div>
 
           <div>
             <Label htmlFor="ville">Ville</Label>
             <Input
               id="ville"
-              name="ville"
-              value={formData.ville}
-              onChange={handleChange}
+              {...register('ville')}
               placeholder="Paris"
               className="mt-1"
             />
+            {errors.ville && (
+              <p className="text-sm text-red-600 mt-1">{errors.ville.message}</p>
+            )}
           </div>
 
           <div>
             <Label htmlFor="pays">Pays</Label>
             <Input
               id="pays"
-              name="pays"
-              value={formData.pays}
-              onChange={handleChange}
+              {...register('pays')}
               placeholder="France"
               className="mt-1"
             />
+            {errors.pays && (
+              <p className="text-sm text-red-600 mt-1">{errors.pays.message}</p>
+            )}
           </div>
         </div>
       </div>
@@ -349,13 +369,14 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
         <Label htmlFor="notes">Notes internes</Label>
         <textarea
           id="notes"
-          name="notes"
-          value={formData.notes}
-          onChange={handleChange}
+          {...register('notes')}
           rows={4}
           className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
           placeholder="Notes sur ce fournisseur..."
         />
+        {errors.notes && (
+          <p className="text-sm text-red-600 mt-1">{errors.notes.message}</p>
+        )}
       </div>
 
       {/* Actions */}

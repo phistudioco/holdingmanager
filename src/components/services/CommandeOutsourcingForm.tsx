@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { createUntypedClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -53,6 +56,19 @@ const statutOptions = [
   { value: 'annulee', label: 'Annulée' },
 ]
 
+const commandeSchema = z.object({
+  numero: z.string().min(1, 'Le numéro de commande est requis'),
+  fournisseur_id: z.number().min(1, 'Veuillez sélectionner un fournisseur'),
+  filiale_id: z.number().min(1, 'Veuillez sélectionner une filiale'),
+  montant_total: z.number().min(0, 'Le montant doit être positif'),
+  statut: z.enum(['brouillon', 'envoyee', 'confirmee', 'livree', 'annulee']),
+  date_commande: z.string().min(1, 'La date de commande est requise'),
+  date_livraison_prevue: z.string().optional(),
+  notes: z.string().optional(),
+})
+
+type CommandeFormData = z.infer<typeof commandeSchema>
+
 export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -66,16 +82,27 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
     return `CMD-${year}-${random}`
   }
 
-  const [formData, setFormData] = useState({
-    numero: commande?.numero || generateNumero(),
-    fournisseur_id: commande?.fournisseur_id || 0,
-    filiale_id: commande?.filiale_id || 0,
-    montant_total: commande?.montant_total || 0,
-    statut: commande?.statut || 'brouillon',
-    date_commande: commande?.date_commande || new Date().toISOString().split('T')[0],
-    date_livraison_prevue: commande?.date_livraison_prevue || '',
-    notes: commande?.notes || '',
+  const {
+    register,
+    handleSubmit: handleFormSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm<CommandeFormData>({
+    resolver: zodResolver(commandeSchema),
+    defaultValues: {
+      numero: commande?.numero || generateNumero(),
+      fournisseur_id: commande?.fournisseur_id || 0,
+      filiale_id: commande?.filiale_id || 0,
+      montant_total: commande?.montant_total || 0,
+      statut: (commande?.statut as CommandeFormData['statut']) || 'brouillon',
+      date_commande: commande?.date_commande || new Date().toISOString().split('T')[0],
+      date_livraison_prevue: commande?.date_livraison_prevue || '',
+      notes: commande?.notes || '',
+    },
   })
+
+  const formData = watch()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -90,50 +117,29 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
       if (fournisseursRes.data) setFournisseurs(fournisseursRes.data as Fournisseur[])
 
       if (mode === 'create' && filialesRes.data && filialesRes.data.length > 0) {
-        setFormData(prev => ({ ...prev, filiale_id: filialesRes.data[0].id }))
+        setValue('filiale_id', filialesRes.data[0].id)
       }
     }
 
     fetchData()
-  }, [mode])
+  }, [mode, setValue])
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, type } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? (value === '' ? 0 : Number(value)) : value,
-    }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = async (data: CommandeFormData) => {
     setError(null)
-
-    if (!formData.fournisseur_id) {
-      setError('Veuillez sélectionner un fournisseur')
-      return
-    }
-    if (!formData.filiale_id) {
-      setError('Veuillez sélectionner une filiale')
-      return
-    }
-
     setLoading(true)
 
     try {
       const supabase = createUntypedClient()
 
       const commandeData = {
-        numero: formData.numero.trim(),
-        fournisseur_id: formData.fournisseur_id,
-        filiale_id: formData.filiale_id,
-        montant_total: formData.montant_total,
-        statut: formData.statut,
-        date_commande: formData.date_commande,
-        date_livraison_prevue: formData.date_livraison_prevue || null,
-        notes: formData.notes.trim() || null,
+        numero: data.numero.trim(),
+        fournisseur_id: data.fournisseur_id,
+        filiale_id: data.filiale_id,
+        montant_total: data.montant_total,
+        statut: data.statut,
+        date_commande: data.date_commande,
+        date_livraison_prevue: data.date_livraison_prevue || null,
+        notes: data.notes?.trim() || null,
       }
 
       if (mode === 'create') {
@@ -167,7 +173,7 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
   const themeColor = '#0f2080'
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleFormSubmit(onSubmit)} className="space-y-8">
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
           <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
@@ -187,22 +193,21 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
             <Label htmlFor="numero">Numéro de commande</Label>
             <Input
               id="numero"
-              name="numero"
-              value={formData.numero}
-              onChange={handleChange}
+              {...register('numero')}
               placeholder="CMD-2026-0001"
               className="mt-1"
               readOnly={mode === 'edit'}
             />
+            {errors.numero && (
+              <p className="text-sm text-red-600 mt-1">{errors.numero.message}</p>
+            )}
           </div>
 
           <div>
             <Label htmlFor="statut">Statut</Label>
             <select
               id="statut"
-              name="statut"
-              value={formData.statut}
-              onChange={handleChange}
+              {...register('statut')}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             >
               {statutOptions.map(option => (
@@ -211,23 +216,26 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
                 </option>
               ))}
             </select>
+            {errors.statut && (
+              <p className="text-sm text-red-600 mt-1">{errors.statut.message}</p>
+            )}
           </div>
 
           <div>
             <Label htmlFor="fournisseur_id">Fournisseur *</Label>
             <select
               id="fournisseur_id"
-              name="fournisseur_id"
-              value={formData.fournisseur_id}
-              onChange={handleChange}
+              {...register('fournisseur_id', { valueAsNumber: true })}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-              required
             >
               <option value={0}>Sélectionner un fournisseur</option>
               {fournisseurs.map(f => (
                 <option key={f.id} value={f.id}>{f.nom}</option>
               ))}
             </select>
+            {errors.fournisseur_id && (
+              <p className="text-sm text-red-600 mt-1">{errors.fournisseur_id.message}</p>
+            )}
           </div>
 
           <div>
@@ -239,17 +247,17 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
             </Label>
             <select
               id="filiale_id"
-              name="filiale_id"
-              value={formData.filiale_id}
-              onChange={handleChange}
+              {...register('filiale_id', { valueAsNumber: true })}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-              required
             >
               <option value={0}>Sélectionner une filiale</option>
               {filiales.map(f => (
                 <option key={f.id} value={f.id}>{f.nom} ({f.code})</option>
               ))}
             </select>
+            {errors.filiale_id && (
+              <p className="text-sm text-red-600 mt-1">{errors.filiale_id.message}</p>
+            )}
           </div>
 
           <div>
@@ -261,15 +269,15 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
             </Label>
             <Input
               id="montant_total"
-              name="montant_total"
               type="number"
-              min="0"
               step="0.01"
-              value={formData.montant_total || ''}
-              onChange={handleChange}
+              {...register('montant_total', { valueAsNumber: true })}
               placeholder="0.00"
               className="mt-1"
             />
+            {errors.montant_total && (
+              <p className="text-sm text-red-600 mt-1">{errors.montant_total.message}</p>
+            )}
           </div>
         </div>
       </div>
@@ -286,13 +294,13 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
             <Label htmlFor="date_commande">Date de commande *</Label>
             <Input
               id="date_commande"
-              name="date_commande"
               type="date"
-              value={formData.date_commande}
-              onChange={handleChange}
+              {...register('date_commande')}
               className="mt-1"
-              required
             />
+            {errors.date_commande && (
+              <p className="text-sm text-red-600 mt-1">{errors.date_commande.message}</p>
+            )}
           </div>
 
           <div>
@@ -304,12 +312,13 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
             </Label>
             <Input
               id="date_livraison_prevue"
-              name="date_livraison_prevue"
               type="date"
-              value={formData.date_livraison_prevue}
-              onChange={handleChange}
+              {...register('date_livraison_prevue')}
               className="mt-1"
             />
+            {errors.date_livraison_prevue && (
+              <p className="text-sm text-red-600 mt-1">{errors.date_livraison_prevue.message}</p>
+            )}
           </div>
         </div>
       </div>
@@ -319,13 +328,14 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
         <Label htmlFor="notes">Notes</Label>
         <textarea
           id="notes"
-          name="notes"
-          value={formData.notes}
-          onChange={handleChange}
+          {...register('notes')}
           rows={4}
           className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
           placeholder="Notes sur cette commande..."
         />
+        {errors.notes && (
+          <p className="text-sm text-red-600 mt-1">{errors.notes.message}</p>
+        )}
       </div>
 
       {/* Actions */}
