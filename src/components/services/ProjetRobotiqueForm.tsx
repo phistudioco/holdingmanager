@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { createUntypedClient } from '@/lib/supabase/client'
+import { useFiliales, useClients, type Filiale, type Client } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -30,18 +31,6 @@ type ProjetRobotique = {
   date_debut: string | null
   date_fin_prevue: string | null
   budget: number | null
-}
-
-type Client = {
-  id: number
-  nom: string
-  code: string
-}
-
-type Filiale = {
-  id: number
-  nom: string
-  code: string
 }
 
 type ProjetRobotiqueFormProps = {
@@ -74,8 +63,10 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [filiales, setFiliales] = useState<Filiale[]>([])
-  const [clients, setClients] = useState<Client[]>([])
+
+  // Utiliser les hooks réutilisables
+  const { data: filiales } = useFiliales({ fields: 'id, nom, code' })
+  const { data: clients } = useClients({ fields: 'id, nom, code' })
 
   const {
     register,
@@ -96,25 +87,12 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
     },
   })
 
+  // Définir la filiale par défaut en mode création
   useEffect(() => {
-    const fetchData = async () => {
-      const supabase = createUntypedClient()
-
-      const [filialesRes, clientsRes] = await Promise.all([
-        supabase.from('filiales').select('id, nom, code').eq('statut', 'actif').order('nom'),
-        supabase.from('clients').select('id, nom, code').in('statut', ['actif', 'prospect']).order('nom'),
-      ])
-
-      if (filialesRes.data) setFiliales(filialesRes.data as Filiale[])
-      if (clientsRes.data) setClients(clientsRes.data as Client[])
-
-      if (mode === 'create' && filialesRes.data && filialesRes.data.length > 0) {
-        setValue('filiale_id', filialesRes.data[0].id)
-      }
+    if (mode === 'create' && filiales.length > 0) {
+      setValue('filiale_id', filiales[0].id)
     }
-
-    fetchData()
-  }, [mode, setValue])
+  }, [mode, filiales, setValue])
 
   const onSubmit = async (data: ProjetRobotiqueFormData) => {
     setError(null)

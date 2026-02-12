@@ -335,9 +335,23 @@ Trois analyses parallèles approfondies ont été réalisées pour identifier le
 - [x] **Éliminer les `as any` dans hooks critiques** ⚙️ (En cours - 12 février 2026)
   - [x] useNotifications.ts : 2 occurrences éliminées (payloads Realtime typés)
   - [x] useUser.ts : 1 occurrence éliminée (remplacement par createUntypedClient)
-  - [ ] 69 occurrences restantes dans 21 fichiers (PDF, workflows, formulaires)
-  - Impact : ✅ Type-safety améliorée, moins d'erreurs runtime
-- [ ] Factoriser la logique de query dupliquée
+  - [x] DevisForm : 2 occurrences éliminées (hooks typés)
+  - [x] FactureForm : 2 occurrences éliminées (hooks typés)
+  - [x] TransactionForm : 2 occurrences éliminées (hooks typés)
+  - [ ] 63 occurrences restantes dans 19 fichiers (PDF, workflows, autres formulaires)
+  - Impact : ✅ Type-safety améliorée, moins d'erreurs runtime, 9 `as any` éliminés au total
+- [x] **Factoriser la logique de query dupliquée** ⚙️ (En cours - 12 février 2026)
+  - [x] Création hooks réutilisables : useFiliales, useClients, useServices, useFournisseurs
+  - [x] Hooks avec génériques TypeScript pour typage flexible (Tables<> compatible)
+  - [x] ProjetRobotiqueForm : Utilise useFiliales + useClients
+  - [x] ProjetDigitalForm : Utilise useFiliales + useClients
+  - [x] DevisForm : Utilise useFiliales<Filiale> + useClients<Client>
+  - [x] FactureForm : Utilise useFiliales<Filiale> + useClients<Client>
+  - [x] ContratForm : Utilise useFiliales<Filiale> + useClients<Client>
+  - [x] TransactionForm : Utilise useFiliales<Filiale> + useClients<Client>
+  - [x] CommandeOutsourcingForm : Utilise useFiliales + useFournisseurs
+  - [ ] ClientForm, EmployeForm, WorkflowForm : À refactoriser (3 fichiers restants)
+  - Impact : ✅ Réduction duplication, loading states centralisés, 7 formulaires refactorisés, code plus maintenable
 - [ ] Remplacer `createUntypedClient()` par client typé (après régénération types)
 
 #### Phase 4 : Accessibilité (1-2 jours)

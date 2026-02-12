@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { createUntypedClient } from '@/lib/supabase/client'
+import { useFiliales, useFournisseurs, type Filiale, type Fournisseur } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -30,17 +31,6 @@ type CommandeOutsourcing = {
   date_commande: string
   date_livraison_prevue: string | null
   notes: string | null
-}
-
-type Fournisseur = {
-  id: number
-  nom: string
-}
-
-type Filiale = {
-  id: number
-  nom: string
-  code: string
 }
 
 type CommandeOutsourcingFormProps = {
@@ -73,8 +63,10 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [filiales, setFiliales] = useState<Filiale[]>([])
-  const [fournisseurs, setFournisseurs] = useState<Fournisseur[]>([])
+
+  // Utiliser les hooks réutilisables
+  const { data: filiales } = useFiliales({ fields: 'id, nom, code' })
+  const { data: fournisseurs } = useFournisseurs({ fields: 'id, nom' })
 
   const generateNumero = () => {
     const year = new Date().getFullYear()
@@ -104,25 +96,12 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
 
   const formData = watch()
 
+  // Définir la filiale par défaut en mode création
   useEffect(() => {
-    const fetchData = async () => {
-      const supabase = createUntypedClient()
-
-      const [filialesRes, fournisseursRes] = await Promise.all([
-        supabase.from('filiales').select('id, nom, code').eq('statut', 'actif').order('nom'),
-        supabase.from('fournisseurs').select('id, nom').in('statut', ['actif', 'en_evaluation']).order('nom'),
-      ])
-
-      if (filialesRes.data) setFiliales(filialesRes.data as Filiale[])
-      if (fournisseursRes.data) setFournisseurs(fournisseursRes.data as Fournisseur[])
-
-      if (mode === 'create' && filialesRes.data && filialesRes.data.length > 0) {
-        setValue('filiale_id', filialesRes.data[0].id)
-      }
+    if (mode === 'create' && filiales.length > 0) {
+      setValue('filiale_id', filiales[0].id)
     }
-
-    fetchData()
-  }, [mode, setValue])
+  }, [mode, filiales, setValue])
 
   const onSubmit = async (data: CommandeFormData) => {
     setError(null)

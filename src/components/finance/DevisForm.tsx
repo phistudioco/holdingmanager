@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createClient, createUntypedClient } from '@/lib/supabase/client'
+import { createUntypedClient } from '@/lib/supabase/client'
+import { useFiliales, useClients } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -61,8 +62,10 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
   const clientIdFromUrl = searchParams.get('client')
 
   const [error, setError] = useState<string | null>(null)
-  const [filiales, setFiliales] = useState<Filiale[]>([])
-  const [clients, setClients] = useState<Client[]>([])
+
+  // Utiliser les hooks réutilisables
+  const { data: filiales } = useFiliales<Filiale>()
+  const { data: clients } = useClients<Client>()
 
   const {
     register,
@@ -103,30 +106,12 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
     ]
   )
 
+  // Définir la filiale par défaut en mode création
   useEffect(() => {
-    const fetchData = async () => {
-      const supabase = createClient()
-
-      const [filialesRes, clientsRes] = await Promise.all([
-        supabase.from('filiales').select('*').eq('statut', 'actif').order('nom'),
-        supabase.from('clients').select('*').in('statut', ['actif', 'prospect']).order('nom'),
-      ])
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const filialesData = (filialesRes as any).data as Filiale[] | null
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const clientsData = (clientsRes as any).data as Client[] | null
-
-      if (filialesData) setFiliales(filialesData)
-      if (clientsData) setClients(clientsData)
-
-      if (mode === 'create' && filialesData && filialesData.length > 0 && !devis?.filiale_id) {
-        setValue('filiale_id', filialesData[0].id)
-      }
+    if (mode === 'create' && filiales.length > 0 && !devis?.filiale_id) {
+      setValue('filiale_id', filiales[0].id)
     }
-
-    fetchData()
-  }, [mode, devis?.filiale_id, setValue])
+  }, [mode, filiales, devis?.filiale_id, setValue])
 
   // Mettre à jour la date de validité quand la date d'émission change
   useEffect(() => {

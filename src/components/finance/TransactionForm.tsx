@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createUntypedClient } from '@/lib/supabase/client'
+import { useFiliales, useClients } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -39,8 +40,10 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
   const router = useRouter()
 
   const [error, setError] = useState<string | null>(null)
-  const [filiales, setFiliales] = useState<Filiale[]>([])
-  const [clients, setClients] = useState<Client[]>([])
+
+  // Utiliser les hooks réutilisables
+  const { data: filiales } = useFiliales<Filiale>()
+  const { data: clients } = useClients<Client>({ statuts: ['actif'] })
 
   const {
     register,
@@ -67,30 +70,12 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
   const montant = watch('montant')
   const filialeId = watch('filiale_id')
 
+  // Définir la filiale par défaut en mode création
   useEffect(() => {
-    const fetchData = async () => {
-      const supabase = createUntypedClient()
-
-      const [filialesRes, clientsRes] = await Promise.all([
-        supabase.from('filiales').select('*').eq('statut', 'actif').order('nom'),
-        supabase.from('clients').select('*').in('statut', ['actif']).order('nom'),
-      ])
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const filialesData = (filialesRes as any).data as Filiale[] | null
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const clientsData = (clientsRes as any).data as Client[] | null
-
-      if (filialesData) setFiliales(filialesData)
-      if (clientsData) setClients(clientsData)
-
-      if (mode === 'create' && filialesData && filialesData.length > 0 && !transaction?.filiale_id) {
-        setValue('filiale_id', filialesData[0].id)
-      }
+    if (mode === 'create' && filiales.length > 0 && !transaction?.filiale_id) {
+      setValue('filiale_id', filiales[0].id)
     }
-
-    fetchData()
-  }, [mode, transaction?.filiale_id, setValue])
+  }, [mode, filiales, transaction?.filiale_id, setValue])
 
   const onSubmit = async (data: TransactionFormData) => {
     setError(null)

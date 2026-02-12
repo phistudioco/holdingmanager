@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createUntypedClient } from '@/lib/supabase/client'
+import { useFiliales, useClients } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -42,8 +43,10 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
   const clientIdFromUrl = searchParams.get('client')
 
   const [error, setError] = useState<string | null>(null)
-  const [filiales, setFiliales] = useState<Filiale[]>([])
-  const [clients, setClients] = useState<Client[]>([])
+
+  // Utiliser les hooks réutilisables
+  const { data: filiales } = useFiliales<Filiale>()
+  const { data: clients } = useClients<Client>()
 
   const {
     register,
@@ -72,28 +75,12 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
   const periodicite = watch('periodicite')
   const montant = watch('montant')
 
+  // Définir la filiale par défaut en mode création
   useEffect(() => {
-    const fetchData = async () => {
-      const supabase = createUntypedClient()
-
-      const [filialesRes, clientsRes] = await Promise.all([
-        supabase.from('filiales').select('*').eq('statut', 'actif').order('nom'),
-        supabase.from('clients').select('*').in('statut', ['actif', 'prospect']).order('nom'),
-      ])
-
-      const filialesData = filialesRes.data as Filiale[] | null
-      const clientsData = clientsRes.data as Client[] | null
-
-      if (filialesData) setFiliales(filialesData)
-      if (clientsData) setClients(clientsData)
-
-      if (mode === 'create' && filialesData && filialesData.length > 0 && !contrat?.filiale_id) {
-        setValue('filiale_id', filialesData[0].id)
-      }
+    if (mode === 'create' && filiales.length > 0 && !contrat?.filiale_id) {
+      setValue('filiale_id', filiales[0].id)
     }
-
-    fetchData()
-  }, [mode, contrat?.filiale_id, setValue])
+  }, [mode, filiales, contrat?.filiale_id, setValue])
 
   const generateNumero = () => {
     const year = new Date().getFullYear()

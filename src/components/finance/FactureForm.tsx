@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm, useFieldArray, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createUntypedClient } from '@/lib/supabase/client'
+import { useFiliales, useClients } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -61,8 +62,9 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
   const searchParams = useSearchParams()
   const clientIdFromUrl = searchParams.get('client')
 
-  const [filiales, setFiliales] = useState<Filiale[]>([])
-  const [clients, setClients] = useState<Client[]>([])
+  // Utiliser les hooks réutilisables
+  const { data: filiales } = useFiliales<Filiale>()
+  const { data: clients } = useClients<Client>()
 
   // Configuration react-hook-form avec zodResolver et lignes dynamiques
   const {
@@ -117,30 +119,12 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
   const watchedDateEmission = useWatch({ control, name: 'date_emission' })
   const watchedTauxTVA = useWatch({ control, name: 'taux_tva' })
 
+  // Définir la filiale par défaut en mode création
   useEffect(() => {
-    const fetchData = async () => {
-      const supabase = createUntypedClient()
-
-      const [filialesRes, clientsRes] = await Promise.all([
-        supabase.from('filiales').select('*').eq('statut', 'actif').order('nom'),
-        supabase.from('clients').select('*').in('statut', ['actif', 'prospect']).order('nom'),
-      ])
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const filialesData = (filialesRes as any).data as Filiale[] | null
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const clientsData = (clientsRes as any).data as Client[] | null
-
-      if (filialesData) setFiliales(filialesData)
-      if (clientsData) setClients(clientsData)
-
-      if (mode === 'create' && filialesData && filialesData.length > 0) {
-        setValue('filiale_id', filialesData[0].id)
-      }
+    if (mode === 'create' && filiales.length > 0) {
+      setValue('filiale_id', filiales[0].id)
     }
-
-    fetchData()
-  }, [mode, setValue])
+  }, [mode, filiales, setValue])
 
   // Calculer l'échéance automatiquement selon le client
   useEffect(() => {
