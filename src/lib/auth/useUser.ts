@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient, createUntypedClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { RoleType, hasPermission, canAccessRoute, getRoleLevel, ModuleType, ActionType } from './permissions'
 
@@ -95,7 +95,7 @@ export function useUser(): UseUserReturn {
         throw error
       }
 
-      return data as unknown as UserProfile
+      return data as UserProfile
     } catch (err) {
       console.error('Erreur fetchProfile:', err)
       return null
@@ -122,8 +122,8 @@ export function useUser(): UseUserReturn {
 
         // Mettre à jour la dernière connexion
         if (userProfile) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabase as any)
+          const untypedSupabase = createUntypedClient()
+          await untypedSupabase
             .from('users')
             .update({ derniere_connexion: new Date().toISOString() })
             .eq('id', user.id)
@@ -174,7 +174,8 @@ export function useUser(): UseUserReturn {
     return () => {
       subscription.unsubscribe()
     }
-  }, [loadUser, supabase, fetchProfile])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Extraire le rôle
   const role = profile?.role?.nom as RoleType | null

@@ -61,20 +61,28 @@ export function useNotifications() {
   const markAllAsRead = useCallback(async () => {
     const supabase = createUntypedClient()
 
-    const unreadIds = notifications.filter(n => !n.lue).map(n => n.id)
+    // Utiliser la forme fonctionnelle pour éviter la dépendance à notifications
+    setNotifications(prev => {
+      const unreadIds = prev.filter(n => !n.lue).map(n => n.id)
 
-    if (unreadIds.length === 0) return
+      if (unreadIds.length === 0) return prev
 
-    const { error } = await supabase
-      .from('alertes')
-      .update({ lue: true })
-      .in('id', unreadIds)
+      // Lancer la requête de manière asynchrone
+      supabase
+        .from('alertes')
+        .update({ lue: true })
+        .in('id', unreadIds)
+        .then((result: { error: Error | null }) => {
+          if (result.error) {
+            console.error('Error marking all as read:', result.error)
+          }
+        })
 
-    if (!error) {
-      setNotifications(prev => prev.map(n => ({ ...n, lue: true })))
-      setUnreadCount(0)
-    }
-  }, [notifications])
+      // Mettre à jour immédiatement l'UI
+      return prev.map(n => ({ ...n, lue: true }))
+    })
+    setUnreadCount(0)
+  }, [])
 
   // Marquer comme traitée (supprimer de la liste)
   const markAsDone = useCallback(async (id: number) => {
@@ -86,13 +94,16 @@ export function useNotifications() {
       .eq('id', id)
 
     if (!error) {
-      setNotifications(prev => prev.filter(n => n.id !== id))
-      const notification = notifications.find(n => n.id === id)
-      if (notification && !notification.lue) {
-        setUnreadCount(prev => Math.max(0, prev - 1))
-      }
+      // Utiliser la forme fonctionnelle pour éviter la dépendance à notifications
+      setNotifications(prev => {
+        const notification = prev.find(n => n.id === id)
+        if (notification && !notification.lue) {
+          setUnreadCount(count => Math.max(0, count - 1))
+        }
+        return prev.filter(n => n.id !== id)
+      })
     }
-  }, [notifications])
+  }, [])
 
   // Configuration du Realtime
   useEffect(() => {
@@ -111,9 +122,8 @@ export function useNotifications() {
           schema: 'public',
           table: 'alertes',
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (payload: any) => {
-          const newNotification = payload.new as Notification
+        (payload: { new: Notification }) => {
+          const newNotification = payload.new
           setNotifications(prev => [newNotification, ...prev.slice(0, 19)])
           if (!newNotification.lue) {
             setUnreadCount(prev => prev + 1)
@@ -127,9 +137,8 @@ export function useNotifications() {
           schema: 'public',
           table: 'alertes',
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (payload: any) => {
-          const updated = payload.new as Notification
+        (payload: { new: Notification }) => {
+          const updated = payload.new
           if (updated.traitee) {
             setNotifications(prev => prev.filter(n => n.id !== updated.id))
           } else {
