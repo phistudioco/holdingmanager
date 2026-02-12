@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createUntypedClient } from '@/lib/supabase/client'
+import { useFiliales } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -71,9 +72,11 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const [filiales, setFiliales] = useState<Filiale[]>([])
   const [employes, setEmployes] = useState<Employe[]>([])
   const [submitAction, setSubmitAction] = useState<'brouillon' | 'soumettre'>('brouillon')
+
+  // Utiliser le hook réutilisable pour filiales
+  const { data: filiales } = useFiliales<Filiale>()
 
   const donnees = demande?.donnees || {}
 
@@ -94,18 +97,17 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
   })
 
   useEffect(() => {
-    loadData()
+    const loadEmployes = async () => {
+      const supabase = createUntypedClient()
+      const { data: employesData } = await supabase
+        .from('employes')
+        .select('*')
+        .eq('statut', 'actif')
+        .order('nom')
+      if (employesData) setEmployes(employesData)
+    }
+    loadEmployes()
   }, [])
-
-  const loadData = async () => {
-    const supabase = createUntypedClient()
-    const [filialesRes, employesRes] = await Promise.all([
-      supabase.from('filiales').select('*').eq('statut', 'actif').order('nom'),
-      supabase.from('employes').select('*').eq('statut', 'actif').order('nom'),
-    ])
-    if (filialesRes.data) setFiliales(filialesRes.data)
-    if (employesRes.data) setEmployes(employesRes.data)
-  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createUntypedClient } from '@/lib/supabase/client'
+import { useFiliales, useServices } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -42,8 +43,10 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const [filiales, setFiliales] = useState<Filiale[]>([])
-  const [services, setServices] = useState<Service[]>([])
+
+  // Utiliser les hooks réutilisables
+  const { data: filiales } = useFiliales<Filiale>()
+  const { data: services } = useServices<Service>()
 
   const {
     register,
@@ -70,19 +73,6 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
     },
   })
 
-  useEffect(() => {
-    loadData()
-  }, [])
-
-  const loadData = async () => {
-    const supabase = createUntypedClient()
-    const [filialesRes, servicesRes] = await Promise.all([
-      supabase.from('filiales').select('*').eq('statut', 'actif').order('nom'),
-      supabase.from('services').select('*').order('nom'),
-    ])
-    if (filialesRes.data) setFiliales(filialesRes.data)
-    if (servicesRes.data) setServices(servicesRes.data)
-  }
 
   const generateMatricule = () => {
     const prefix = 'EMP'

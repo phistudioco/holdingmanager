@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createUntypedClient } from '@/lib/supabase/client'
+import { useFiliales } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -40,8 +41,10 @@ type ClientFormProps = {
 
 export function ClientForm({ client, mode }: ClientFormProps) {
   const router = useRouter()
-  const [filiales, setFiliales] = useState<Filiale[]>([])
   const [pays, setPays] = useState<Pays[]>([])
+
+  // Utiliser le hook réutilisable pour filiales
+  const { data: filiales } = useFiliales<Filiale>()
 
   // Configuration react-hook-form avec zodResolver
   const {
@@ -78,30 +81,20 @@ export function ClientForm({ client, mode }: ClientFormProps) {
   const clientType = watch('type')
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchPays = async () => {
       const supabase = createUntypedClient()
-
-      const [filialesRes, paysRes] = await Promise.all([
-        supabase.from('filiales').select('*').eq('statut', 'actif').order('nom'),
-        supabase.from('pays').select('*').order('nom'),
-      ])
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const filialesData = (filialesRes as any).data as Filiale[] | null
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const paysData = (paysRes as any).data as Pays[] | null
-
-      if (filialesData) setFiliales(filialesData)
-      if (paysData) setPays(paysData)
-
-      // Auto-sélectionner la première filiale si création
-      if (mode === 'create' && filialesData && filialesData.length > 0) {
-        setValue('filiale_id', filialesData[0].id)
-      }
+      const { data: paysData } = await supabase.from('pays').select('*').order('nom')
+      if (paysData) setPays(paysData as Pays[])
     }
+    fetchPays()
+  }, [])
 
-    fetchData()
-  }, [mode, setValue])
+  // Auto-sélectionner la première filiale si création
+  useEffect(() => {
+    if (mode === 'create' && filiales.length > 0) {
+      setValue('filiale_id', filiales[0].id)
+    }
+  }, [mode, filiales, setValue])
 
   const generateCode = (type: 'entreprise' | 'particulier') => {
     const prefix = type === 'entreprise' ? 'ENT' : 'PAR'

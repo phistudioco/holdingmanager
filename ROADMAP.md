@@ -338,9 +338,10 @@ Trois analyses parallèles approfondies ont été réalisées pour identifier le
   - [x] DevisForm : 2 occurrences éliminées (hooks typés)
   - [x] FactureForm : 2 occurrences éliminées (hooks typés)
   - [x] TransactionForm : 2 occurrences éliminées (hooks typés)
-  - [ ] 63 occurrences restantes dans 19 fichiers (PDF, workflows, autres formulaires)
-  - Impact : ✅ Type-safety améliorée, moins d'erreurs runtime, 9 `as any` éliminés au total
-- [x] **Factoriser la logique de query dupliquée** ⚙️ (En cours - 12 février 2026)
+  - [x] ClientForm : 2 occurrences éliminées (hooks typés)
+  - [ ] 61 occurrences restantes dans 18 fichiers (PDF, autres composants)
+  - Impact : ✅ Type-safety améliorée, moins d'erreurs runtime, 11 `as any` éliminés au total
+- [x] **Factoriser la logique de query dupliquée** ✅ (Complété - 12 février 2026)
   - [x] Création hooks réutilisables : useFiliales, useClients, useServices, useFournisseurs
   - [x] Hooks avec génériques TypeScript pour typage flexible (Tables<> compatible)
   - [x] ProjetRobotiqueForm : Utilise useFiliales + useClients
@@ -350,8 +351,10 @@ Trois analyses parallèles approfondies ont été réalisées pour identifier le
   - [x] ContratForm : Utilise useFiliales<Filiale> + useClients<Client>
   - [x] TransactionForm : Utilise useFiliales<Filiale> + useClients<Client>
   - [x] CommandeOutsourcingForm : Utilise useFiliales + useFournisseurs
-  - [ ] ClientForm, EmployeForm, WorkflowForm : À refactoriser (3 fichiers restants)
-  - Impact : ✅ Réduction duplication, loading states centralisés, 7 formulaires refactorisés, code plus maintenable
+  - [x] ClientForm : Utilise useFiliales<Filiale>
+  - [x] EmployeForm : Utilise useFiliales<Filiale> + useServices<Service>
+  - [x] WorkflowForm : Utilise useFiliales<Filiale>
+  - Impact : ✅ Réduction duplication, loading states centralisés, 10 formulaires refactorisés, ~250 lignes dupliquées éliminées
 - [ ] Remplacer `createUntypedClient()` par client typé (après régénération types)
 
 #### Phase 4 : Accessibilité (1-2 jours)
