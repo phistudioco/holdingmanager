@@ -105,15 +105,13 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
       }
 
       if (mode === 'create') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: insertError } = await (supabase as any)
+        const { error: insertError } = await supabase
           .from('employes')
           .insert(employeData)
 
         if (insertError) throw insertError
       } else if (employe) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: updateError } = await (supabase as any)
+        const { error: updateError } = await supabase
           .from('employes')
           .update(employeData)
           .eq('id', employe.id)

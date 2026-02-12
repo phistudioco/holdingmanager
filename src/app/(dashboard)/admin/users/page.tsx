@@ -118,8 +118,7 @@ export default function AdminUsersPage() {
   const updateUserRole = async (userId: string, roleId: number) => {
     setUpdating(userId)
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('users')
       .update({ role_id: roleId })
       .eq('id', userId)

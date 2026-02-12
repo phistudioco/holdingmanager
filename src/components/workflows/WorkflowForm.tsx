@@ -177,15 +177,13 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
       }
 
       if (mode === 'create') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: insertError } = await (supabase as any)
+        const { error: insertError } = await supabase
           .from('workflow_demandes')
           .insert(demandeData)
 
         if (insertError) throw insertError
       } else if (demande) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: updateError } = await (supabase as any)
+        const { error: updateError } = await supabase
           .from('workflow_demandes')
           .update(demandeData)
           .eq('id', demande.id)

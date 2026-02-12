@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { createClient, createUntypedClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Button } from '@/components/ui/button'
 import { downloadDevisPDF } from '@/lib/pdf/devis-pdf'
@@ -188,9 +188,8 @@ export default function DevisDetailPage() {
 
     setUpdating(true)
     try {
-      const supabase = createClient()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase as any)
+      const supabase = createUntypedClient()
+      const { error } = await supabase
         .from('devis')
         .update({ statut: newStatut })
         .eq('id', devis.id)

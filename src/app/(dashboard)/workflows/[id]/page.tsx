@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { createClient, createUntypedClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Button } from '@/components/ui/button'
 import { ApprovalDialog } from '@/components/workflows/ApprovalDialog'
@@ -106,10 +106,9 @@ export default function WorkflowDetailPage() {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette demande ?')) return
 
     setDeleting(true)
-    const supabase = createClient()
+    const supabase = createUntypedClient()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('workflow_demandes')
       .delete()
       .eq('id', id)

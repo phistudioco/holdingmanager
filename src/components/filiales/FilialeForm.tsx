@@ -93,15 +93,13 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
       }
 
       if (mode === 'create') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: insertError } = await (supabase as any)
+        const { error: insertError } = await supabase
           .from('filiales')
           .insert(filialeData)
 
         if (insertError) throw insertError
       } else if (filiale) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: updateError } = await (supabase as any)
+        const { error: updateError } = await supabase
           .from('filiales')
           .update(filialeData)
           .eq('id', filiale.id)

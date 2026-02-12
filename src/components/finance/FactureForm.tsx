@@ -209,8 +209,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
       }
 
       if (mode === 'create') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: newFacture, error: insertError } = await (supabase as any)
+        const { data: newFacture, error: insertError } = await supabase
           .from('factures')
           .insert(factureData)
           .select()
@@ -224,8 +223,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
           ...ligne,
         }))
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: lignesError } = await (supabase as any)
+        const { error: lignesError } = await supabase
           .from('facture_lignes')
           .insert(lignesData)
 

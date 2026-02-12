@@ -122,14 +122,12 @@ export function ClientForm({ client, mode }: ClientFormProps) {
       }
 
       if (mode === 'create') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: insertError } = await (supabase as any)
+        const { error: insertError } = await supabase
           .from('clients')
           .insert(clientData)
         if (insertError) throw insertError
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: updateError } = await (supabase as any)
+        const { error: updateError } = await supabase
           .from('clients')
           .update(clientData)
           .eq('id', client?.id)

@@ -7,7 +7,7 @@
  * - Transitions de statut
  */
 
-import { createClient } from '@/lib/supabase/client'
+import { createUntypedClient } from '@/lib/supabase/client'
 
 // Types
 export type WorkflowType = 'achat' | 'conge' | 'formation' | 'autre'
@@ -97,12 +97,11 @@ export function generateNumero(type: WorkflowType): string {
  * Soumet une demande pour approbation
  */
 export async function submitWorkflow(demandeId: number): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient()
+  const supabase = createUntypedClient()
 
   try {
     // Mettre à jour le statut de la demande
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('workflow_demandes')
       .update({
         statut: 'en_cours',
@@ -131,12 +130,11 @@ export async function approveWorkflowStep(
   approbateurId: number,
   commentaire?: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient()
+  const supabase = createUntypedClient()
 
   try {
     // Enregistrer l'approbation
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: approvalError } = await (supabase as any)
+    const { error: approvalError } = await supabase
       .from('workflow_approbations')
       .insert({
         demande_id: demandeId,
@@ -166,8 +164,7 @@ export async function approveWorkflowStep(
 
     if (etapesRestantes.length === 0) {
       // Toutes les étapes sont approuvées - finaliser la demande
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: updateError } = await (supabase as any)
+      const { error: updateError } = await supabase
         .from('workflow_demandes')
         .update({
           statut: 'approuve',
@@ -178,8 +175,7 @@ export async function approveWorkflowStep(
       if (updateError) throw updateError
     } else {
       // Passer à l'étape suivante
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: updateError } = await (supabase as any)
+      const { error: updateError } = await supabase
         .from('workflow_demandes')
         .update({
           etape_actuelle: etape + 1,
@@ -207,12 +203,11 @@ export async function rejectWorkflow(
   approbateurId: number,
   commentaire: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient()
+  const supabase = createUntypedClient()
 
   try {
     // Enregistrer le rejet
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: approvalError } = await (supabase as any)
+    const { error: approvalError } = await supabase
       .from('workflow_approbations')
       .insert({
         demande_id: demandeId,
@@ -226,8 +221,7 @@ export async function rejectWorkflow(
     if (approvalError) throw approvalError
 
     // Mettre à jour le statut de la demande
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: updateError } = await (supabase as any)
+    const { error: updateError } = await supabase
       .from('workflow_demandes')
       .update({
         statut: 'rejete',
@@ -250,11 +244,10 @@ export async function rejectWorkflow(
  * Annule une demande
  */
 export async function cancelWorkflow(demandeId: number): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient()
+  const supabase = createUntypedClient()
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('workflow_demandes')
       .update({
         statut: 'annule',
@@ -288,7 +281,7 @@ export async function getPendingApprovals(_userId: number): Promise<{
   }>
   error?: string
 }> {
-  const supabase = createClient()
+  const supabase = createUntypedClient()
 
   try {
     // TODO: Implémenter la logique de récupération des demandes

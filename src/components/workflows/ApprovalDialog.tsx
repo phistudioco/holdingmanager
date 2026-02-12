@@ -47,8 +47,7 @@ export function ApprovalDialog({
       const supabase = createUntypedClient()
 
       // Enregistrer l'approbation
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: approvalError } = await (supabase as any)
+      const { error: approvalError } = await supabase
         .from('workflow_approbations')
         .insert({
           demande_id: demandeId,
@@ -63,8 +62,7 @@ export function ApprovalDialog({
 
       // Mettre à jour le statut de la demande
       const newStatut = decision === 'approuve' ? 'approuve' : 'rejete'
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: updateError } = await (supabase as any)
+      const { error: updateError } = await supabase
         .from('workflow_demandes')
         .update({
           statut: newStatut,

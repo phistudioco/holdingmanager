@@ -3,7 +3,7 @@
  * that may not have full type support yet
  */
 
-import { createClient } from './client'
+import { createUntypedClient } from './client'
 
 type AnyRecord = Record<string, unknown>
 
@@ -14,9 +14,8 @@ export async function insertIntoTable(
   tableName: string,
   data: AnyRecord | AnyRecord[]
 ) {
-  const supabase = createClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (supabase as any).from(tableName).insert(data).select()
+  const supabase = createUntypedClient()
+  return supabase.from(tableName).insert(data).select()
 }
 
 /**
@@ -27,9 +26,8 @@ export async function updateTable(
   data: AnyRecord,
   filters: { column: string; value: unknown }[]
 ) {
-  const supabase = createClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let query = (supabase as any).from(tableName).update(data)
+  const supabase = createUntypedClient()
+  let query = supabase.from(tableName).update(data)
   for (const filter of filters) {
     query = query.eq(filter.column, filter.value)
   }
@@ -45,9 +43,8 @@ export async function selectFromTable<T = AnyRecord>(
   filters: { column: string; value: unknown }[] = [],
   options: { order?: { column: string; ascending: boolean }; limit?: number; single?: boolean } = {}
 ) {
-  const supabase = createClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let query = (supabase as any).from(tableName).select(columns)
+  const supabase = createUntypedClient()
+  let query = supabase.from(tableName).select(columns)
 
   for (const filter of filters) {
     query = query.eq(filter.column, filter.value)
