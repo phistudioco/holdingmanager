@@ -328,8 +328,15 @@ Trois analyses parallèles approfondies ont été réalisées pour identifier le
   - [x] ProjetRobotiqueForm : Schema Zod créé + react-hook-form (validation nom, filiale, budget)
   - [x] WorkflowForm : Conservé structure existante (formulaire complexe avec sections conditionnelles)
   - Impact : ✅ Validation côté client avant soumission, messages d'erreur clairs, meilleure UX - 11 formulaires validés sur 12
-- [ ] Corriger les dépendances useEffect incorrectes
-- [ ] Éliminer tous les `as any` (20+ occurrences)
+- [x] **Corriger les dépendances useEffect incorrectes** ✅ (12 février 2026)
+  - [x] useNotifications.ts : Utilisation forme fonctionnelle setState pour éviter stale closures
+  - [x] useUser.ts : Correction dépendances useEffect infinies, ajout eslint-disable intentionnel
+  - Impact : ✅ Moins de re-renders inutiles, pas de memory leaks
+- [x] **Éliminer les `as any` dans hooks critiques** ⚙️ (En cours - 12 février 2026)
+  - [x] useNotifications.ts : 2 occurrences éliminées (payloads Realtime typés)
+  - [x] useUser.ts : 1 occurrence éliminée (remplacement par createUntypedClient)
+  - [ ] 69 occurrences restantes dans 21 fichiers (PDF, workflows, formulaires)
+  - Impact : ✅ Type-safety améliorée, moins d'erreurs runtime
 - [ ] Factoriser la logique de query dupliquée
 - [ ] Remplacer `createUntypedClient()` par client typé (après régénération types)
 
