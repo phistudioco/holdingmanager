@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { createClient, createUntypedClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,6 +20,12 @@ import {
   Calculator,
 } from 'lucide-react'
 import type { Tables } from '@/types/database'
+import {
+  devisSchema,
+  devisCreateSchema,
+  type DevisFormData,
+  tauxTVA as tauxTVAOptions,
+} from '@/lib/validations/devis'
 
 type Devis = Tables<'devis'>
 type Client = Tables<'clients'>
@@ -40,43 +48,46 @@ type DevisFormProps = {
   mode: 'create' | 'edit'
 }
 
-const tauxTVA = [
-  { value: 20, label: '20% (Normal)' },
-  { value: 10, label: '10% (Intermédiaire)' },
-  { value: 5.5, label: '5.5% (Réduit)' },
-  { value: 2.1, label: '2.1% (Super réduit)' },
-  { value: 0, label: '0% (Exonéré)' },
-]
+// Date de validité par défaut: 30 jours après émission
+const getDefaultValidite = (dateEmission: string) => {
+  const date = new Date(dateEmission)
+  date.setDate(date.getDate() + 30)
+  return date.toISOString().split('T')[0]
+}
 
 export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const clientIdFromUrl = searchParams.get('client')
 
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [filiales, setFiliales] = useState<Filiale[]>([])
   const [clients, setClients] = useState<Client[]>([])
 
-  // Date de validité par défaut: 30 jours après émission
-  const getDefaultValidite = (dateEmission: string) => {
-    const date = new Date(dateEmission)
-    date.setDate(date.getDate() + 30)
-    return date.toISOString().split('T')[0]
-  }
-
-  const [formData, setFormData] = useState({
-    filiale_id: devis?.filiale_id || 0,
-    client_id: devis?.client_id || (clientIdFromUrl ? parseInt(clientIdFromUrl) : 0),
-    numero: devis?.numero || '',
-    date_emission: devis?.date_emission || new Date().toISOString().split('T')[0],
-    date_validite: devis?.date_validite || getDefaultValidite(new Date().toISOString().split('T')[0]),
-    objet: devis?.objet || '',
-    taux_tva: devis?.taux_tva || 20,
-    statut: devis?.statut || 'brouillon',
-    notes: devis?.notes || '',
-    conditions: devis?.conditions || '',
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<DevisFormData>({
+    resolver: zodResolver(mode === 'create' ? devisCreateSchema : devisSchema),
+    defaultValues: {
+      filiale_id: devis?.filiale_id || undefined,
+      client_id: devis?.client_id || (clientIdFromUrl ? parseInt(clientIdFromUrl) : undefined),
+      numero: devis?.numero || '',
+      date_emission: devis?.date_emission || new Date().toISOString().split('T')[0],
+      date_validite: devis?.date_validite || getDefaultValidite(new Date().toISOString().split('T')[0]),
+      objet: devis?.objet || '',
+      taux_tva: devis?.taux_tva || 20,
+      statut: devis?.statut || 'brouillon',
+      notes: devis?.notes || '',
+      conditions: devis?.conditions || '',
+    },
   })
+
+  const dateEmission = watch('date_emission')
+  const tauxTvaDefault = watch('taux_tva')
 
   const [lignes, setLignes] = useState<LigneDevis[]>(
     initialLignes || [
@@ -109,39 +120,26 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
       if (filialesData) setFiliales(filialesData)
       if (clientsData) setClients(clientsData)
 
-      if (mode === 'create' && filialesData && filialesData.length > 0) {
-        setFormData(prev => ({ ...prev, filiale_id: filialesData[0].id }))
+      if (mode === 'create' && filialesData && filialesData.length > 0 && !devis?.filiale_id) {
+        setValue('filiale_id', filialesData[0].id)
       }
     }
 
     fetchData()
-  }, [mode])
+  }, [mode, devis?.filiale_id, setValue])
 
   // Mettre à jour la date de validité quand la date d'émission change
   useEffect(() => {
-    if (mode === 'create' && formData.date_emission) {
-      setFormData(prev => ({
-        ...prev,
-        date_validite: getDefaultValidite(formData.date_emission),
-      }))
+    if (mode === 'create' && dateEmission) {
+      setValue('date_validite', getDefaultValidite(dateEmission))
     }
-  }, [formData.date_emission, mode])
+  }, [dateEmission, mode, setValue])
 
   const generateNumero = () => {
     const year = new Date().getFullYear()
     const month = String(new Date().getMonth() + 1).padStart(2, '0')
     const timestamp = Date.now().toString().slice(-4)
     return `DEV-${year}${month}-${timestamp}`
-  }
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, type } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? Number(value) : value,
-    }))
   }
 
   const calculateLigne = (ligne: LigneDevis): LigneDevis => {
@@ -174,7 +172,7 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
         description: '',
         quantite: 1,
         prix_unitaire: 0,
-        taux_tva: formData.taux_tva,
+        taux_tva: tauxTvaDefault,
         montant_ht: 0,
         montant_tva: 0,
         montant_ttc: 0,
@@ -204,46 +202,34 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
     }).format(amount)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = async (data: DevisFormData) => {
     setError(null)
 
-    // Validation
-    if (!formData.filiale_id) {
-      setError('Veuillez sélectionner une filiale')
-      return
-    }
-    if (!formData.client_id) {
-      setError('Veuillez sélectionner un client')
-      return
-    }
+    // Validation des lignes
     if (lignes.every(l => !l.description.trim())) {
       setError('Veuillez ajouter au moins une ligne avec une description')
       return
     }
 
-    setLoading(true)
-
     try {
-      const supabase = createClient()
       const db = createUntypedClient()
 
-      const numero = formData.numero || generateNumero()
+      const numero = mode === 'create' ? generateNumero() : data.numero
 
       const devisData = {
-        filiale_id: formData.filiale_id,
-        client_id: formData.client_id,
+        filiale_id: data.filiale_id,
+        client_id: data.client_id,
         numero,
-        date_emission: formData.date_emission,
-        date_validite: formData.date_validite,
-        objet: formData.objet || null,
+        date_emission: data.date_emission,
+        date_validite: data.date_validite,
+        objet: data.objet || null,
         total_ht: totaux.ht,
-        taux_tva: formData.taux_tva,
+        taux_tva: data.taux_tva,
         total_tva: totaux.tva,
         total_ttc: totaux.ttc,
-        statut: formData.statut,
-        notes: formData.notes || null,
-        conditions: formData.conditions || null,
+        statut: data.statut,
+        notes: data.notes || null,
+        conditions: data.conditions || null,
       }
 
       if (mode === 'create') {
@@ -320,13 +306,11 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
     } catch (err) {
       console.error('Erreur:', err)
       setError('Une erreur est survenue lors de l\'enregistrement')
-    } finally {
-      setLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
           <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
@@ -346,44 +330,46 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
             <Label htmlFor="filiale_id">Filiale émettrice *</Label>
             <select
               id="filiale_id"
-              name="filiale_id"
-              value={formData.filiale_id}
-              onChange={handleChange}
-              className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-phi-primary/20 focus:border-phi-primary"
-              required
+              {...register('filiale_id', {
+                setValueAs: (v) => v === '' || v === null || v === undefined || v === 0 ? undefined : Number(v)
+              })}
+              className={`mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-phi-primary/20 focus:border-phi-primary ${
+                errors.filiale_id ? 'border-red-500' : ''
+              }`}
             >
               <option value={0}>Sélectionner une filiale</option>
               {filiales.map(f => (
                 <option key={f.id} value={f.id}>{f.nom}</option>
               ))}
             </select>
+            {errors.filiale_id && <p className="text-sm text-red-600 mt-1">{errors.filiale_id.message}</p>}
           </div>
 
-          <div>
-            <Label htmlFor="numero">Numéro du devis</Label>
-            <Input
-              id="numero"
-              name="numero"
-              value={formData.numero}
-              onChange={handleChange}
-              placeholder="Auto-généré si vide"
-              className="mt-1"
-            />
-          </div>
+          {mode === 'edit' && (
+            <div>
+              <Label htmlFor="numero">Numéro du devis</Label>
+              <Input
+                id="numero"
+                {...register('numero')}
+                disabled
+                placeholder="Auto-généré"
+                className="mt-1 bg-gray-50"
+              />
+            </div>
+          )}
 
           <div>
             <Label htmlFor="taux_tva">Taux TVA par défaut</Label>
             <select
               id="taux_tva"
-              name="taux_tva"
-              value={formData.taux_tva}
-              onChange={handleChange}
+              {...register('taux_tva', { valueAsNumber: true })}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-phi-primary/20 focus:border-phi-primary"
             >
-              {tauxTVA.map(t => (
+              {tauxTVAOptions.map(t => (
                 <option key={t.value} value={t.value}>{t.label}</option>
               ))}
             </select>
+            {errors.taux_tva && <p className="text-sm text-red-600 mt-1">{errors.taux_tva.message}</p>}
           </div>
         </div>
       </div>
@@ -400,29 +386,30 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
             <Label htmlFor="client_id">Client *</Label>
             <select
               id="client_id"
-              name="client_id"
-              value={formData.client_id}
-              onChange={handleChange}
-              className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-phi-primary/20 focus:border-phi-primary"
-              required
+              {...register('client_id', {
+                setValueAs: (v) => v === '' || v === null || v === undefined || v === 0 ? undefined : Number(v)
+              })}
+              className={`mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-phi-primary/20 focus:border-phi-primary ${
+                errors.client_id ? 'border-red-500' : ''
+              }`}
             >
               <option value={0}>Sélectionner un client</option>
               {clients.map(c => (
                 <option key={c.id} value={c.id}>{c.nom} ({c.code})</option>
               ))}
             </select>
+            {errors.client_id && <p className="text-sm text-red-600 mt-1">{errors.client_id.message}</p>}
           </div>
 
           <div>
             <Label htmlFor="objet">Objet du devis</Label>
             <Input
               id="objet"
-              name="objet"
-              value={formData.objet}
-              onChange={handleChange}
+              {...register('objet')}
               placeholder="Description courte du devis"
               className="mt-1"
             />
+            {errors.objet && <p className="text-sm text-red-600 mt-1">{errors.objet.message}</p>}
           </div>
         </div>
       </div>
@@ -439,29 +426,25 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
             <Label htmlFor="date_emission">Date d&apos;émission *</Label>
             <Input
               id="date_emission"
-              name="date_emission"
               type="date"
-              value={formData.date_emission}
-              onChange={handleChange}
-              className="mt-1"
-              required
+              {...register('date_emission')}
+              className={`mt-1 ${errors.date_emission ? 'border-red-500' : ''}`}
             />
+            {errors.date_emission && <p className="text-sm text-red-600 mt-1">{errors.date_emission.message}</p>}
           </div>
 
           <div>
             <Label htmlFor="date_validite">Date de validité *</Label>
             <Input
               id="date_validite"
-              name="date_validite"
               type="date"
-              value={formData.date_validite}
-              onChange={handleChange}
-              className="mt-1"
-              required
+              {...register('date_validite')}
+              className={`mt-1 ${errors.date_validite ? 'border-red-500' : ''}`}
             />
             <p className="text-xs text-gray-500 mt-1">
               Par défaut: 30 jours après émission
             </p>
+            {errors.date_validite && <p className="text-sm text-red-600 mt-1">{errors.date_validite.message}</p>}
           </div>
         </div>
       </div>
@@ -519,7 +502,7 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
                   onChange={(e) => handleLigneChange(index, 'taux_tva', e.target.value)}
                   className="mt-1 w-full border border-gray-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-phi-primary/20"
                 >
-                  {tauxTVA.map(t => (
+                  {tauxTVAOptions.map(t => (
                     <option key={t.value} value={t.value}>{t.value}%</option>
                   ))}
                 </select>
@@ -576,26 +559,24 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
             <Label htmlFor="notes">Notes internes</Label>
             <textarea
               id="notes"
-              name="notes"
-              value={formData.notes}
-              onChange={handleChange}
+              {...register('notes')}
               rows={3}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-phi-primary/20 focus:border-phi-primary"
               placeholder="Notes visibles sur le devis..."
             />
+            {errors.notes && <p className="text-sm text-red-600 mt-1">{errors.notes.message}</p>}
           </div>
 
           <div>
             <Label htmlFor="conditions">Conditions particulières</Label>
             <textarea
               id="conditions"
-              name="conditions"
-              value={formData.conditions}
-              onChange={handleChange}
+              {...register('conditions')}
               rows={4}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-phi-primary/20 focus:border-phi-primary"
               placeholder="Conditions spécifiques (laisser vide pour les conditions par défaut)..."
             />
+            {errors.conditions && <p className="text-sm text-red-600 mt-1">{errors.conditions.message}</p>}
           </div>
         </div>
       </div>
@@ -606,16 +587,16 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
           type="button"
           variant="outline"
           onClick={() => router.back()}
-          disabled={loading}
+          disabled={isSubmitting}
         >
           Annuler
         </Button>
         <Button
           type="submit"
-          disabled={loading}
+          disabled={isSubmitting}
           className="bg-phi-highlight text-gray-900 hover:bg-phi-highlight/90"
         >
-          {loading ? (
+          {isSubmitting ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               Enregistrement...
