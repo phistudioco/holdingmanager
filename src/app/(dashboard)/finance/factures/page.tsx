@@ -93,21 +93,19 @@ export default function FacturesPage() {
   const fetchStats = useCallback(async () => {
     const supabase = createClient()
 
-    const [
-      { count: total },
-      { count: brouillon },
-      { count: envoyees },
-      { count: payees },
-      { data: allFactures },
-    ] = await Promise.all([
-      supabase.from('factures').select('*', { count: 'exact', head: true }),
-      supabase.from('factures').select('*', { count: 'exact', head: true }).eq('statut', 'brouillon'),
-      supabase.from('factures').select('*', { count: 'exact', head: true }).eq('statut', 'envoyee'),
-      supabase.from('factures').select('*', { count: 'exact', head: true }).eq('statut', 'payee'),
-      supabase.from('factures').select('total_ttc, montant_paye, statut'),
-    ])
+    // Optimisation : 1 seule requête au lieu de 5
+    // Charge uniquement les colonnes nécessaires pour calculer les stats
+    const { data: allFactures, count: total } = await supabase
+      .from('factures')
+      .select('statut, total_ttc, montant_paye', { count: 'exact' })
 
     const facturesStats = (allFactures || []) as FactureStats[]
+
+    // Calcul de tous les stats à partir d'une seule requête
+    const brouillon = facturesStats.filter(f => f.statut === 'brouillon').length
+    const envoyees = facturesStats.filter(f => f.statut === 'envoyee').length
+    const payees = facturesStats.filter(f => f.statut === 'payee').length
+
     const totalMontant = facturesStats.reduce((sum, f) => sum + (f.total_ttc || 0), 0)
     const totalImpaye = facturesStats
       .filter(f => ['envoyee', 'partiellement_payee'].includes(f.statut))
@@ -115,9 +113,9 @@ export default function FacturesPage() {
 
     setStats({
       total: total || 0,
-      brouillon: brouillon || 0,
-      envoyees: envoyees || 0,
-      payees: payees || 0,
+      brouillon,
+      envoyees,
+      payees,
       totalMontant,
       totalImpaye,
     })

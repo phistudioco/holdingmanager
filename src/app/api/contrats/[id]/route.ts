@@ -70,17 +70,43 @@ export async function DELETE(
       )
     }
 
-    // Récupérer le contrat pour vérifier qu'il existe
+    // Récupérer le contrat pour vérifier qu'il existe ET que l'utilisateur y a accès
+    // Note: Si RLS bloque l'accès, le contrat ne sera pas retourné (comme s'il n'existait pas)
     const { data: contrat, error: fetchError } = await db
       .from('contrats')
-      .select('id, numero, statut')
+      .select(`
+        id,
+        numero,
+        statut,
+        filiale_id,
+        filiale:filiale_id (
+          id,
+          nom
+        )
+      `)
       .eq('id', contratId)
       .single()
 
     if (fetchError || !contrat) {
+      // Gérer spécifiquement les erreurs RLS
+      // Code PGRST116 = no rows returned (peut être dû à RLS)
+      if (fetchError?.code === 'PGRST116' || !contrat) {
+        return NextResponse.json(
+          {
+            error: 'Contrat non trouvé ou accès refusé',
+            message: roleNiveau < 100
+              ? 'Ce contrat n\'existe pas ou vous n\'avez pas accès à la filiale concernée.'
+              : 'Contrat introuvable.',
+          },
+          { status: 404 }
+        )
+      }
+
+      // Autres erreurs techniques
+      console.error('Erreur récupération contrat:', fetchError)
       return NextResponse.json(
-        { error: 'Contrat non trouvé' },
-        { status: 404 }
+        { error: 'Erreur lors de la récupération du contrat', details: fetchError?.message },
+        { status: 500 }
       )
     }
 
@@ -128,8 +154,31 @@ export async function DELETE(
 
     if (deleteError) {
       console.error('Erreur suppression contrat:', deleteError)
+
+      // Vérifier si c'est une erreur RLS spécifique
+      if (deleteError.code === '42501' || deleteError.message?.includes('policy')) {
+        return NextResponse.json(
+          {
+            error: 'Accès refusé par la sécurité',
+            message: 'Les politiques de sécurité de la base de données empêchent cette suppression. Contactez un administrateur.',
+          },
+          { status: 403 }
+        )
+      }
+
+      // Vérifier si c'est une contrainte FK
+      if (deleteError.code === '23503') {
+        return NextResponse.json(
+          {
+            error: 'Suppression impossible',
+            message: 'Ce contrat ne peut pas être supprimé car il est lié à d\'autres données.',
+          },
+          { status: 400 }
+        )
+      }
+
       return NextResponse.json(
-        { error: 'Erreur lors de la suppression du contrat' },
+        { error: 'Erreur lors de la suppression du contrat', details: deleteError.message },
         { status: 500 }
       )
     }

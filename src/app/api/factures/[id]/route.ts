@@ -70,17 +70,43 @@ export async function DELETE(
       )
     }
 
-    // Récupérer la facture pour vérifier qu'elle existe
+    // Récupérer la facture pour vérifier qu'elle existe ET que l'utilisateur y a accès
+    // Note: Si RLS bloque l'accès, la facture ne sera pas retournée (comme si elle n'existait pas)
     const { data: facture, error: fetchError } = await db
       .from('factures')
-      .select('id, numero, statut')
+      .select(`
+        id,
+        numero,
+        statut,
+        filiale_id,
+        filiale:filiale_id (
+          id,
+          nom
+        )
+      `)
       .eq('id', factureId)
       .single()
 
     if (fetchError || !facture) {
+      // Gérer spécifiquement les erreurs RLS
+      // Code PGRST116 = no rows returned (peut être dû à RLS)
+      if (fetchError?.code === 'PGRST116' || !facture) {
+        return NextResponse.json(
+          {
+            error: 'Facture non trouvée ou accès refusé',
+            message: roleNiveau < 100
+              ? 'Cette facture n\'existe pas ou vous n\'avez pas accès à la filiale concernée.'
+              : 'Facture introuvable.',
+          },
+          { status: 404 }
+        )
+      }
+
+      // Autres erreurs techniques
+      console.error('Erreur récupération facture:', fetchError)
       return NextResponse.json(
-        { error: 'Facture non trouvée' },
-        { status: 404 }
+        { error: 'Erreur lors de la récupération de la facture', details: fetchError?.message },
+        { status: 500 }
       )
     }
 
@@ -103,8 +129,20 @@ export async function DELETE(
 
     if (deleteLignesError) {
       console.error('Erreur suppression lignes facture:', deleteLignesError)
+
+      // Vérifier si c'est une erreur RLS spécifique
+      if (deleteLignesError.code === '42501' || deleteLignesError.message?.includes('policy')) {
+        return NextResponse.json(
+          {
+            error: 'Accès refusé par la sécurité',
+            message: 'Les politiques de sécurité de la base de données empêchent cette suppression. Contactez un administrateur.',
+          },
+          { status: 403 }
+        )
+      }
+
       return NextResponse.json(
-        { error: 'Erreur lors de la suppression des lignes de facture' },
+        { error: 'Erreur lors de la suppression des lignes de facture', details: deleteLignesError.message },
         { status: 500 }
       )
     }
@@ -117,8 +155,31 @@ export async function DELETE(
 
     if (deleteError) {
       console.error('Erreur suppression facture:', deleteError)
+
+      // Vérifier si c'est une erreur RLS spécifique
+      if (deleteError.code === '42501' || deleteError.message?.includes('policy')) {
+        return NextResponse.json(
+          {
+            error: 'Accès refusé par la sécurité',
+            message: 'Les politiques de sécurité de la base de données empêchent cette suppression. Contactez un administrateur.',
+          },
+          { status: 403 }
+        )
+      }
+
+      // Vérifier si c'est une contrainte FK
+      if (deleteError.code === '23503') {
+        return NextResponse.json(
+          {
+            error: 'Suppression impossible',
+            message: 'Cette facture ne peut pas être supprimée car elle est liée à d\'autres données (paiements, etc.).',
+          },
+          { status: 400 }
+        )
+      }
+
       return NextResponse.json(
-        { error: 'Erreur lors de la suppression de la facture' },
+        { error: 'Erreur lors de la suppression de la facture', details: deleteError.message },
         { status: 500 }
       )
     }
@@ -233,6 +294,33 @@ export async function PUT(
       )
     }
 
+    // Vérifier que l'utilisateur a accès à la facture avant la mise à jour (protection RLS)
+    const { data: factureCheck, error: checkError } = await db
+      .from('factures')
+      .select('id, numero, filiale_id')
+      .eq('id', factureId)
+      .single()
+
+    if (checkError || !factureCheck) {
+      // Erreur RLS ou facture inexistante
+      if (checkError?.code === 'PGRST116' || !factureCheck) {
+        return NextResponse.json(
+          {
+            error: 'Facture non trouvée ou accès refusé',
+            message: roleNiveau < 100
+              ? 'Cette facture n\'existe pas ou vous n\'avez pas accès à la filiale concernée.'
+              : 'Facture introuvable.',
+          },
+          { status: 404 }
+        )
+      }
+
+      return NextResponse.json(
+        { error: 'Erreur lors de la vérification de la facture', details: checkError?.message },
+        { status: 500 }
+      )
+    }
+
     // Appeler la fonction PostgreSQL pour mise à jour atomique
     const { data: result, error: rpcError } = await db.rpc('update_facture_with_lignes', {
       p_facture_id: factureId,
@@ -255,10 +343,22 @@ export async function PUT(
         )
       }
 
+      // Vérifier si c'est une erreur RLS
+      if (rpcError.code === '42501' || rpcError.message?.includes('policy') || rpcError.message?.includes('row-level security')) {
+        return NextResponse.json(
+          {
+            error: 'Accès refusé par la sécurité',
+            message: 'Les politiques de sécurité de la base de données empêchent cette modification. Vous n\'avez peut-être pas accès à cette filiale.',
+          },
+          { status: 403 }
+        )
+      }
+
       return NextResponse.json(
         {
           error: 'Erreur lors de la mise à jour',
           message: rpcError.message || 'Erreur inconnue',
+          details: rpcError.code,
         },
         { status: 500 }
       )

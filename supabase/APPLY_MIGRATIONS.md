@@ -116,13 +116,18 @@ SELECT update_facture_with_lignes(
 
 ---
 
-### `20260211_enable_rls_policies.sql`
+### `20260211_enable_rls_policies_v5.sql` ⚠️ Utiliser V5 (SQL pur optimisé)
 **Objectif:** Activer Row Level Security (RLS) et créer des politiques de sécurité pour toutes les tables critiques.
 
 **Ce qui est créé:**
 - Activation de RLS sur 11 tables (factures, contrats, clients, filiales, employes, users, etc.)
 - 3 fonctions helper: `is_super_admin()`, `get_user_role_level()`, `get_user_filiales()`
 - 50+ politiques RLS garantissant l'accès selon les affectations et permissions
+
+**⚠️ Évolution des versions:**
+- **V3:** Fix UUID vs TEXT dans les helper functions
+- **V4:** Ajout vérifications existence tables + messages RAISE NOTICE
+- **V5:** SQL pur avec `ALTER TABLE IF EXISTS`, suppression des RAISE NOTICE (version finale optimisée)
 
 **Politiques principales:**
 - **Lecture:** Accès uniquement aux données des filiales assignées (sauf super_admin)
@@ -180,7 +185,7 @@ Si vous devez annuler une migration :
 DROP FUNCTION IF EXISTS update_facture_with_lignes(INTEGER, JSONB, JSONB[]);
 ```
 
-### Rollback `20260211_enable_rls_policies.sql`
+### Rollback `20260211_enable_rls_policies_v5.sql`
 ```sql
 -- Désactiver RLS sur toutes les tables
 ALTER TABLE factures DISABLE ROW LEVEL SECURITY;

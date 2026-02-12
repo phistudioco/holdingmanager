@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo, memo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { RevenueChart } from '@/components/charts/RevenueChart'
 import { CategoryPieChart } from '@/components/charts/CategoryPieChart'
@@ -81,7 +81,17 @@ type FilialeRow = {
   nom: string
 }
 
-export function FinanceDashboardCharts() {
+// Fonction de formatage en dehors du composant (performance)
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount)
+}
+
+function FinanceDashboardChartsComponent() {
   const [loading, setLoading] = useState(true)
   const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([])
   const [revenueCategories, setRevenueCategories] = useState<CategoryData[]>([])
@@ -207,18 +217,20 @@ export function FinanceDashboardCharts() {
     fetchChartData()
   }, [fetchChartData])
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount)
-  }
+  // Memoization des totaux pour éviter les recalculs inutiles
+  const { totalRevenus, totalDepenses, soldeNet, hasData } = useMemo(() => {
+    const revenus = monthlyData.reduce((sum, m) => sum + m.revenus, 0)
+    const depenses = monthlyData.reduce((sum, m) => sum + m.depenses, 0)
+    const solde = revenus - depenses
+    const hasAnyData = monthlyData.some(m => m.revenus > 0 || m.depenses > 0)
 
-  const totalRevenus = monthlyData.reduce((sum, m) => sum + m.revenus, 0)
-  const totalDepenses = monthlyData.reduce((sum, m) => sum + m.depenses, 0)
-  const soldeNet = totalRevenus - totalDepenses
+    return {
+      totalRevenus: revenus,
+      totalDepenses: depenses,
+      soldeNet: solde,
+      hasData: hasAnyData,
+    }
+  }, [monthlyData])
 
   if (loading) {
     return (
@@ -236,8 +248,6 @@ export function FinanceDashboardCharts() {
       </div>
     )
   }
-
-  const hasData = monthlyData.some(m => m.revenus > 0 || m.depenses > 0)
 
   return (
     <div className="space-y-6">
@@ -360,3 +370,6 @@ export function FinanceDashboardCharts() {
     </div>
   )
 }
+
+// Export avec memoization pour éviter les re-renders inutiles
+export const FinanceDashboardCharts = memo(FinanceDashboardChartsComponent)

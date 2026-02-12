@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { createUntypedClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,6 +19,13 @@ import {
   RefreshCw,
 } from 'lucide-react'
 import type { Tables } from '@/types/database'
+import {
+  contratSchema,
+  contratCreateSchema,
+  type ContratFormData,
+  typesContrat,
+  periodicitesContrat,
+} from '@/lib/validations/contrat'
 
 type Contrat = Tables<'contrats'>
 type Client = Tables<'clients'>
@@ -27,46 +36,41 @@ type ContratFormProps = {
   mode: 'create' | 'edit'
 }
 
-const typesContrat = [
-  { label: 'Service', value: 'service' },
-  { label: 'Maintenance', value: 'maintenance' },
-  { label: 'Licence', value: 'licence' },
-  { label: 'Location', value: 'location' },
-  { label: 'Autre', value: 'autre' },
-]
-
-const periodicitesContrat = [
-  { label: 'Mensuel', value: 'mensuel' },
-  { label: 'Trimestriel', value: 'trimestriel' },
-  { label: 'Semestriel', value: 'semestriel' },
-  { label: 'Annuel', value: 'annuel' },
-  { label: 'Ponctuel', value: 'ponctuel' },
-]
-
 export function ContratForm({ contrat, mode }: ContratFormProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const clientIdFromUrl = searchParams.get('client')
 
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [filiales, setFiliales] = useState<Filiale[]>([])
   const [clients, setClients] = useState<Client[]>([])
 
-  const [formData, setFormData] = useState({
-    filiale_id: contrat?.filiale_id || 0,
-    client_id: contrat?.client_id || (clientIdFromUrl ? parseInt(clientIdFromUrl) : 0),
-    numero: contrat?.numero || '',
-    titre: contrat?.titre || '',
-    type: contrat?.type || 'service',
-    date_debut: contrat?.date_debut || new Date().toISOString().split('T')[0],
-    date_fin: contrat?.date_fin || '',
-    montant: contrat?.montant || 0,
-    periodicite: contrat?.periodicite || 'mensuel',
-    reconduction_auto: contrat?.reconduction_auto ?? true,
-    statut: contrat?.statut || 'brouillon',
-    description: contrat?.description || '',
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<ContratFormData>({
+    resolver: zodResolver(mode === 'create' ? contratCreateSchema : contratSchema),
+    defaultValues: {
+      filiale_id: contrat?.filiale_id || undefined,
+      client_id: contrat?.client_id || (clientIdFromUrl ? parseInt(clientIdFromUrl) : undefined),
+      numero: contrat?.numero || '',
+      titre: contrat?.titre || '',
+      type: contrat?.type || 'service',
+      date_debut: contrat?.date_debut || new Date().toISOString().split('T')[0],
+      date_fin: contrat?.date_fin || '',
+      montant: contrat?.montant ? Number(contrat.montant) : 0,
+      periodicite: contrat?.periodicite || 'mensuel',
+      reconduction_auto: contrat?.reconduction_auto ?? true,
+      statut: contrat?.statut || 'brouillon',
+      description: contrat?.description || '',
+    },
   })
+
+  const periodicite = watch('periodicite')
+  const montant = watch('montant')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,13 +87,13 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
       if (filialesData) setFiliales(filialesData)
       if (clientsData) setClients(clientsData)
 
-      if (mode === 'create' && filialesData && filialesData.length > 0) {
-        setFormData(prev => ({ ...prev, filiale_id: filialesData[0].id }))
+      if (mode === 'create' && filialesData && filialesData.length > 0 && !contrat?.filiale_id) {
+        setValue('filiale_id', filialesData[0].id)
       }
     }
 
     fetchData()
-  }, [mode])
+  }, [mode, contrat?.filiale_id, setValue])
 
   const generateNumero = () => {
     const year = new Date().getFullYear()
@@ -97,37 +101,17 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
     return `CTR-${year}-${timestamp}`
   }
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, type } = e.target
-    const checked = (e.target as HTMLInputElement).checked
-
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value,
-    }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = async (data: ContratFormData) => {
     setError(null)
-
-    if (!formData.filiale_id || !formData.client_id || !formData.titre) {
-      setError('Veuillez remplir tous les champs obligatoires')
-      return
-    }
-
-    setLoading(true)
 
     try {
       const supabase = createUntypedClient()
 
       const contratData = {
-        ...formData,
-        numero: mode === 'create' ? generateNumero() : formData.numero,
-        date_fin: formData.date_fin || null,
-        description: formData.description || null,
+        ...data,
+        numero: mode === 'create' ? generateNumero() : data.numero,
+        date_fin: data.date_fin || null,
+        description: data.description || null,
       }
 
       if (mode === 'create') {
@@ -155,8 +139,6 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
         (typeof err === 'object' && err !== null && 'message' in err) ? String((err as { message: unknown }).message) :
         'Erreur inconnue'
       setError(`Erreur: ${errorMessage}`)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -168,7 +150,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       {error && (
         <div className="flex items-center gap-2 p-4 text-red-600 bg-red-50 rounded-xl border border-red-100">
           <AlertCircle className="h-5 w-5 shrink-0" />
@@ -189,9 +171,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
             <Label htmlFor="type">Type de contrat</Label>
             <select
               id="type"
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
+              {...register('type')}
               className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20"
             >
               {typesContrat.map((type) => (
@@ -200,17 +180,19 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
                 </option>
               ))}
             </select>
+            {errors.type && <p className="text-sm text-red-600 mt-1">{errors.type.message}</p>}
           </div>
 
           <div>
             <Label htmlFor="filiale_id">Filiale *</Label>
             <select
               id="filiale_id"
-              name="filiale_id"
-              value={formData.filiale_id}
-              onChange={handleChange}
-              required
-              className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20"
+              {...register('filiale_id', {
+                setValueAs: (v) => v === '' || v === null || v === undefined ? undefined : Number(v)
+              })}
+              className={`mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20 ${
+                errors.filiale_id ? 'border-red-500' : ''
+              }`}
             >
               <option value="">Sélectionner</option>
               {filiales.map((filiale) => (
@@ -219,15 +201,14 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
                 </option>
               ))}
             </select>
+            {errors.filiale_id && <p className="text-sm text-red-600 mt-1">{errors.filiale_id.message}</p>}
           </div>
 
           <div>
             <Label htmlFor="statut">Statut</Label>
             <select
               id="statut"
-              name="statut"
-              value={formData.statut}
-              onChange={handleChange}
+              {...register('statut')}
               className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20"
             >
               <option value="brouillon">Brouillon</option>
@@ -236,6 +217,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
               <option value="termine">Terminé</option>
               <option value="resilie">Résilié</option>
             </select>
+            {errors.statut && <p className="text-sm text-red-600 mt-1">{errors.statut.message}</p>}
           </div>
 
           {mode === 'edit' && (
@@ -243,8 +225,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
               <Label htmlFor="numero">Numéro</Label>
               <Input
                 id="numero"
-                name="numero"
-                value={formData.numero}
+                {...register('numero')}
                 disabled
                 className="mt-1 bg-gray-50"
               />
@@ -255,13 +236,11 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
             <Label htmlFor="titre">Titre du contrat *</Label>
             <Input
               id="titre"
-              name="titre"
-              value={formData.titre}
-              onChange={handleChange}
-              required
+              {...register('titre')}
               placeholder="Contrat de maintenance annuel, Licence logiciel..."
-              className="mt-1"
+              className={`mt-1 ${errors.titre ? 'border-red-500' : ''}`}
             />
+            {errors.titre && <p className="text-sm text-red-600 mt-1">{errors.titre.message}</p>}
           </div>
         </div>
       </div>
@@ -279,11 +258,12 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
             <Label htmlFor="client_id">Client *</Label>
             <select
               id="client_id"
-              name="client_id"
-              value={formData.client_id}
-              onChange={handleChange}
-              required
-              className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20"
+              {...register('client_id', {
+                setValueAs: (v) => v === '' || v === null || v === undefined ? undefined : Number(v)
+              })}
+              className={`mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20 ${
+                errors.client_id ? 'border-red-500' : ''
+              }`}
             >
               <option value="">Sélectionner un client</option>
               {clients.map((client) => (
@@ -292,6 +272,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
                 </option>
               ))}
             </select>
+            {errors.client_id && <p className="text-sm text-red-600 mt-1">{errors.client_id.message}</p>}
           </div>
         </div>
       </div>
@@ -309,35 +290,30 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
             <Label htmlFor="date_debut">Date de début *</Label>
             <Input
               id="date_debut"
-              name="date_debut"
               type="date"
-              value={formData.date_debut}
-              onChange={handleChange}
-              required
-              className="mt-1"
+              {...register('date_debut')}
+              className={`mt-1 ${errors.date_debut ? 'border-red-500' : ''}`}
             />
+            {errors.date_debut && <p className="text-sm text-red-600 mt-1">{errors.date_debut.message}</p>}
           </div>
 
           <div>
             <Label htmlFor="date_fin">Date de fin</Label>
             <Input
               id="date_fin"
-              name="date_fin"
               type="date"
-              value={formData.date_fin}
-              onChange={handleChange}
+              {...register('date_fin')}
               className="mt-1"
             />
             <p className="text-xs text-gray-500 mt-1">Laisser vide pour durée indéterminée</p>
+            {errors.date_fin && <p className="text-sm text-red-600 mt-1">{errors.date_fin.message}</p>}
           </div>
 
           <div>
             <Label htmlFor="periodicite">Périodicité</Label>
             <select
               id="periodicite"
-              name="periodicite"
-              value={formData.periodicite}
-              onChange={handleChange}
+              {...register('periodicite')}
               className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20"
             >
               {periodicitesContrat.map((p) => (
@@ -346,6 +322,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
                 </option>
               ))}
             </select>
+            {errors.periodicite && <p className="text-sm text-red-600 mt-1">{errors.periodicite.message}</p>}
           </div>
 
           <div>
@@ -353,9 +330,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
             <label className="mt-1 flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors border border-gray-200 h-[42px]">
               <input
                 type="checkbox"
-                name="reconduction_auto"
-                checked={formData.reconduction_auto}
-                onChange={handleChange}
+                {...register('reconduction_auto')}
                 className="h-4 w-4 text-phi-primary rounded focus:ring-phi-primary/20"
               />
               <div className="flex items-center gap-2">
@@ -381,25 +356,22 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
               <Label htmlFor="montant">Montant (€) *</Label>
               <Input
                 id="montant"
-                name="montant"
                 type="number"
-                value={formData.montant}
-                onChange={handleChange}
-                min={0}
                 step={0.01}
-                required
-                className="mt-1"
+                {...register('montant', { valueAsNumber: true })}
+                className={`mt-1 ${errors.montant ? 'border-red-500' : ''}`}
               />
               <p className="text-xs text-gray-500 mt-1">
-                Montant par période ({formData.periodicite})
+                Montant par période ({periodicite})
               </p>
+              {errors.montant && <p className="text-sm text-red-600 mt-1">{errors.montant.message}</p>}
             </div>
             <div className="flex items-center">
               <div className="p-4 bg-phi-primary/5 rounded-xl w-full">
                 <p className="text-sm text-gray-600 mb-1">Montant affiché</p>
                 <p className="text-2xl font-bold text-phi-primary">
-                  {formatCurrency(formData.montant)}
-                  <span className="text-sm font-normal text-gray-500 ml-2">/ {formData.periodicite}</span>
+                  {formatCurrency(montant)}
+                  <span className="text-sm font-normal text-gray-500 ml-2">/ {periodicite}</span>
                 </p>
               </div>
             </div>
@@ -418,13 +390,12 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
         <div className="p-6">
           <textarea
             id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
+            {...register('description')}
             rows={4}
             placeholder="Description du contrat, clauses particulières..."
             className="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-phi-primary/20 resize-none"
           />
+          {errors.description && <p className="text-sm text-red-600 mt-1">{errors.description.message}</p>}
         </div>
       </div>
 
@@ -434,16 +405,16 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
           type="button"
           variant="outline"
           onClick={() => router.back()}
-          disabled={loading}
+          disabled={isSubmitting}
         >
           Annuler
         </Button>
         <Button
           type="submit"
-          disabled={loading}
+          disabled={isSubmitting}
           className="bg-phi-primary hover:bg-phi-primary/90"
         >
-          {loading ? (
+          {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Enregistrement...

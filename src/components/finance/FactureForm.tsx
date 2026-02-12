@@ -1,7 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useForm, useFieldArray, useWatch } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { createUntypedClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,7 +19,14 @@ import {
   AlertCircle,
   Calculator,
 } from 'lucide-react'
-import { tauxTVA, typesFacture } from '@/lib/validations/facture'
+import {
+  factureSchema,
+  factureCreateSchema,
+  tauxTVA,
+  typesFacture,
+  type FactureFormData,
+  type FactureLigneFormData,
+} from '@/lib/validations/facture'
 import type { Tables } from '@/types/database'
 import {
   calculateLigneFacture as calculateLigneMontants,
@@ -35,9 +44,10 @@ type LigneFacture = {
   quantite: number
   prix_unitaire: number
   taux_tva: number
-  montant_ht: number
-  montant_tva: number
-  montant_ttc: number
+  montant_ht?: number
+  montant_tva?: number
+  montant_ttc?: number
+  ordre?: number
 }
 
 type FactureFormProps = {
@@ -51,37 +61,61 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
   const searchParams = useSearchParams()
   const clientIdFromUrl = searchParams.get('client')
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [filiales, setFiliales] = useState<Filiale[]>([])
   const [clients, setClients] = useState<Client[]>([])
 
-  const [formData, setFormData] = useState({
-    filiale_id: facture?.filiale_id || 0,
-    client_id: facture?.client_id || (clientIdFromUrl ? parseInt(clientIdFromUrl) : 0),
-    numero: facture?.numero || '',
-    type: facture?.type || 'facture',
-    date_emission: facture?.date_emission || new Date().toISOString().split('T')[0],
-    date_echeance: facture?.date_echeance || '',
-    objet: facture?.objet || '',
-    taux_tva: facture?.taux_tva || 20,
-    statut: facture?.statut || 'brouillon',
-    notes: facture?.notes || '',
+  // Configuration react-hook-form avec zodResolver et lignes dynamiques
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    control,
+    formState: { errors, isSubmitting },
+  } = useForm<FactureFormData>({
+    resolver: zodResolver(mode === 'create' ? factureCreateSchema : factureSchema),
+    defaultValues: {
+      filiale_id: facture?.filiale_id || 0,
+      client_id: facture?.client_id || (clientIdFromUrl ? parseInt(clientIdFromUrl) : 0),
+      numero: facture?.numero || '',
+      type: facture?.type || 'facture',
+      date_emission: facture?.date_emission || new Date().toISOString().split('T')[0],
+      date_echeance: facture?.date_echeance || '',
+      objet: facture?.objet || '',
+      taux_tva: facture?.taux_tva || 20,
+      statut: facture?.statut || 'brouillon',
+      notes: facture?.notes || '',
+      lignes: initialLignes && initialLignes.length > 0
+        ? initialLignes.map(l => ({
+            description: l.description,
+            quantite: l.quantite,
+            prix_unitaire: l.prix_unitaire,
+            taux_tva: l.taux_tva,
+            ordre: l.ordre || 0,
+          }))
+        : [
+            {
+              description: '',
+              quantite: 1,
+              prix_unitaire: 0,
+              taux_tva: 20,
+              ordre: 0,
+            },
+          ],
+    },
   })
 
-  const [lignes, setLignes] = useState<LigneFacture[]>(
-    initialLignes || [
-      {
-        description: '',
-        quantite: 1,
-        prix_unitaire: 0,
-        taux_tva: 20,
-        montant_ht: 0,
-        montant_tva: 0,
-        montant_ttc: 0,
-      },
-    ]
-  )
+  // Gestion du tableau dynamique de lignes
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'lignes',
+  })
+
+  // Observer les changements pour recalculer
+  const watchedLignes = useWatch({ control, name: 'lignes' })
+  const watchedClientId = useWatch({ control, name: 'client_id' })
+  const watchedDateEmission = useWatch({ control, name: 'date_emission' })
+  const watchedTauxTVA = useWatch({ control, name: 'taux_tva' })
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,121 +135,93 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
       if (clientsData) setClients(clientsData)
 
       if (mode === 'create' && filialesData && filialesData.length > 0) {
-        setFormData(prev => ({ ...prev, filiale_id: filialesData[0].id }))
+        setValue('filiale_id', filialesData[0].id)
       }
     }
 
     fetchData()
-  }, [mode])
+  }, [mode, setValue])
 
   // Calculer l'échéance automatiquement selon le client
   useEffect(() => {
-    if (formData.client_id && formData.date_emission) {
-      const client = clients.find(c => c.id === formData.client_id)
+    if (watchedClientId && watchedDateEmission) {
+      const client = clients.find(c => c.id === watchedClientId)
       if (client) {
-        const dateEmission = new Date(formData.date_emission)
+        const dateEmission = new Date(watchedDateEmission)
         dateEmission.setDate(dateEmission.getDate() + client.delai_paiement)
-        setFormData(prev => ({
-          ...prev,
-          date_echeance: dateEmission.toISOString().split('T')[0],
-        }))
+        setValue('date_echeance', dateEmission.toISOString().split('T')[0])
       }
     }
-  }, [formData.client_id, formData.date_emission, clients])
+  }, [watchedClientId, watchedDateEmission, clients, setValue])
 
-  const generateNumero = () => {
+  // Calculer les montants pour chaque ligne avec memoization
+  const lignesWithCalculations = useMemo(() => {
+    if (!watchedLignes) return []
+    return watchedLignes.map((ligne: FactureLigneFormData) => {
+      const { montant_ht, montant_tva, montant_ttc } = calculateLigneMontants(
+        ligne.quantite,
+        ligne.prix_unitaire,
+        ligne.taux_tva
+      )
+      return { ...ligne, montant_ht, montant_tva, montant_ttc }
+    })
+  }, [watchedLignes])
+
+  // Calculer les totaux avec précision décimale
+  const totaux = useMemo(() => ({
+    ht: sumMontants(...lignesWithCalculations.map(l => l.montant_ht || 0)),
+    tva: sumMontants(...lignesWithCalculations.map(l => l.montant_tva || 0)),
+    ttc: sumMontants(...lignesWithCalculations.map(l => l.montant_ttc || 0)),
+  }), [lignesWithCalculations])
+
+  const generateNumero = (type: string) => {
     const year = new Date().getFullYear()
     const timestamp = Date.now().toString().slice(-4)
-    const prefix = formData.type === 'avoir' ? 'AV' : formData.type === 'acompte' ? 'AC' : 'FAC'
+    const prefix = type === 'avoir' ? 'AV' : type === 'acompte' ? 'AC' : 'FAC'
     return `${prefix}-${year}-${timestamp}`
   }
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, type } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? Number(value) : value,
-    }))
-  }
-
-  const calculateLigne = (ligne: LigneFacture): LigneFacture => {
-    // Utilise les calculs décimaux précis pour éviter les erreurs d'arrondi
-    const { montant_ht, montant_tva, montant_ttc } = calculateLigneMontants(
-      ligne.quantite,
-      ligne.prix_unitaire,
-      ligne.taux_tva
-    )
-    return { ...ligne, montant_ht, montant_tva, montant_ttc }
-  }
-
-  const handleLigneChange = (index: number, field: keyof LigneFacture, value: string | number) => {
-    setLignes(prev => {
-      const updated = [...prev]
-      updated[index] = {
-        ...updated[index],
-        [field]: typeof value === 'string' && ['quantite', 'prix_unitaire', 'taux_tva'].includes(field)
-          ? field === 'quantite'
-            ? parseInt(value) || 1
-            : parseFloat(value) || 0
-          : value,
-      }
-      updated[index] = calculateLigne(updated[index])
-      return updated
+  const addLigne = () => {
+    append({
+      description: '',
+      quantite: 1,
+      prix_unitaire: 0,
+      taux_tva: watchedTauxTVA || 20,
+      ordre: fields.length,
     })
   }
 
-  const addLigne = () => {
-    setLignes(prev => [
-      ...prev,
-      {
-        description: '',
-        quantite: 1,
-        prix_unitaire: 0,
-        taux_tva: formData.taux_tva,
-        montant_ht: 0,
-        montant_tva: 0,
-        montant_ttc: 0,
-      },
-    ])
-  }
-
-  const removeLigne = (index: number) => {
-    if (lignes.length > 1) {
-      setLignes(prev => prev.filter((_, i) => i !== index))
-    }
-  }
-
-  // Calcul des totaux avec précision décimale
-  const totaux = {
-    ht: sumMontants(...lignes.map(l => l.montant_ht)),
-    tva: sumMontants(...lignes.map(l => l.montant_tva)),
-    ttc: sumMontants(...lignes.map(l => l.montant_ttc)),
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-
-    if (lignes.some(l => !l.description || l.prix_unitaire <= 0)) {
-      setError('Veuillez remplir toutes les lignes de la facture')
-      return
-    }
-
-    setLoading(true)
-
+  const onSubmit = async (data: FactureFormData) => {
     try {
       const supabase = createUntypedClient()
 
+      // Préparer les lignes avec calculs
+      const lignesWithMontants = lignesWithCalculations.map((ligne, index) => ({
+        description: ligne.description,
+        quantite: ligne.quantite,
+        prix_unitaire: ligne.prix_unitaire,
+        taux_tva: ligne.taux_tva,
+        montant_ht: ligne.montant_ht || 0,
+        montant_tva: ligne.montant_tva || 0,
+        montant_ttc: ligne.montant_ttc || 0,
+        ordre: index,
+      }))
+
       const factureData = {
-        ...formData,
-        numero: mode === 'create' ? generateNumero() : formData.numero,
-        objet: formData.objet || null,
-        notes: formData.notes || null,
+        filiale_id: data.filiale_id,
+        client_id: data.client_id,
+        numero: mode === 'create' ? generateNumero(data.type) : data.numero,
+        type: data.type,
+        date_emission: data.date_emission,
+        date_echeance: data.date_echeance,
+        objet: data.objet || null,
+        taux_tva: data.taux_tva,
+        statut: data.statut,
+        notes: data.notes || null,
         total_ht: totaux.ht,
         total_tva: totaux.tva,
         total_ttc: totaux.ttc,
+        montant_paye: 0,
       }
 
       if (mode === 'create') {
@@ -229,16 +235,9 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
         if (insertError) throw insertError
 
         // Insérer les lignes
-        const lignesData = lignes.map((ligne, index) => ({
+        const lignesData = lignesWithMontants.map((ligne) => ({
           facture_id: newFacture.id,
-          description: ligne.description,
-          quantite: ligne.quantite,
-          prix_unitaire: ligne.prix_unitaire,
-          taux_tva: ligne.taux_tva,
-          montant_ht: ligne.montant_ht,
-          montant_tva: ligne.montant_tva,
-          montant_ttc: ligne.montant_ttc,
-          ordre: index,
+          ...ligne,
         }))
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -249,17 +248,6 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
         if (lignesError) throw lignesError
       } else {
         // Mise à jour via API route sécurisée (transaction atomique)
-        const lignesData = lignes.map((ligne, index) => ({
-          description: ligne.description,
-          quantite: ligne.quantite,
-          prix_unitaire: ligne.prix_unitaire,
-          taux_tva: ligne.taux_tva,
-          montant_ht: ligne.montant_ht,
-          montant_tva: ligne.montant_tva,
-          montant_ttc: ligne.montant_ttc,
-          ordre: index,
-        }))
-
         const response = await fetch(`/api/factures/${facture?.id}`, {
           method: 'PUT',
           headers: {
@@ -267,14 +255,14 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
           },
           body: JSON.stringify({
             facture: factureData,
-            lignes: lignesData,
+            lignes: lignesWithMontants,
           }),
         })
 
-        const data = await response.json()
+        const result = await response.json()
 
         if (!response.ok) {
-          throw new Error(data.message || data.error || 'Erreur lors de la mise à jour')
+          throw new Error(result.message || result.error || 'Erreur lors de la mise à jour')
         }
       }
 
@@ -282,21 +270,30 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
       router.refresh()
     } catch (err: unknown) {
       console.error('Erreur:', err)
-      const errorMessage = err instanceof Error ? err.message :
-        (typeof err === 'object' && err !== null && 'message' in err) ? String((err as { message: unknown }).message) :
-        'Erreur inconnue'
-      setError(`Erreur: ${errorMessage}`)
-    } finally {
-      setLoading(false)
+      // L'erreur sera gérée par react-hook-form
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      {error && (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      {/* Affichage des erreurs générales */}
+      {Object.keys(errors).length > 0 && (
         <div className="flex items-center gap-2 p-4 text-red-600 bg-red-50 rounded-xl border border-red-100">
           <AlertCircle className="h-5 w-5 shrink-0" />
-          <span>{error}</span>
+          <div>
+            <p className="font-semibold">Erreurs de validation :</p>
+            <ul className="list-disc list-inside text-sm mt-1">
+              {Object.entries(errors).map(([key, error]) => (
+                <li key={key}>
+                  {key === 'lignes' && Array.isArray(error)
+                    ? error.map((ligneError, idx) =>
+                        ligneError ? `Ligne ${idx + 1}: ${Object.values(ligneError).join(', ')}` : null
+                      ).filter(Boolean).join('; ')
+                    : error.message}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
 
@@ -313,9 +310,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
             <Label htmlFor="type">Type de document</Label>
             <select
               id="type"
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
+              {...register('type')}
               className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20"
             >
               {typesFacture.map((type) => (
@@ -330,11 +325,10 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
             <Label htmlFor="filiale_id">Filiale *</Label>
             <select
               id="filiale_id"
-              name="filiale_id"
-              value={formData.filiale_id}
-              onChange={handleChange}
-              required
-              className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20"
+              {...register('filiale_id', { valueAsNumber: true })}
+              className={`mt-1 w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20 ${
+                errors.filiale_id ? 'border-red-500' : 'border-gray-200'
+              }`}
             >
               <option value="">Sélectionner</option>
               {filiales.map((filiale) => (
@@ -343,15 +337,14 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
                 </option>
               ))}
             </select>
+            {errors.filiale_id && <p className="text-sm text-red-600 mt-1">{errors.filiale_id.message}</p>}
           </div>
 
           <div>
             <Label htmlFor="statut">Statut</Label>
             <select
               id="statut"
-              name="statut"
-              value={formData.statut}
-              onChange={handleChange}
+              {...register('statut')}
               className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20"
             >
               <option value="brouillon">Brouillon</option>
@@ -366,8 +359,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
               <Label htmlFor="numero">Numéro</Label>
               <Input
                 id="numero"
-                name="numero"
-                value={formData.numero}
+                {...register('numero')}
                 disabled
                 className="mt-1 bg-gray-50"
               />
@@ -378,9 +370,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
             <Label htmlFor="objet">Objet</Label>
             <Input
               id="objet"
-              name="objet"
-              value={formData.objet}
-              onChange={handleChange}
+              {...register('objet')}
               placeholder="Prestation de services, Maintenance..."
               className="mt-1"
             />
@@ -401,11 +391,10 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
             <Label htmlFor="client_id">Client *</Label>
             <select
               id="client_id"
-              name="client_id"
-              value={formData.client_id}
-              onChange={handleChange}
-              required
-              className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20"
+              {...register('client_id', { valueAsNumber: true })}
+              className={`mt-1 w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20 ${
+                errors.client_id ? 'border-red-500' : 'border-gray-200'
+              }`}
             >
               <option value="">Sélectionner un client</option>
               {clients.map((client) => (
@@ -414,6 +403,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
                 </option>
               ))}
             </select>
+            {errors.client_id && <p className="text-sm text-red-600 mt-1">{errors.client_id.message}</p>}
           </div>
         </div>
       </div>
@@ -431,26 +421,22 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
             <Label htmlFor="date_emission">Date d&apos;émission *</Label>
             <Input
               id="date_emission"
-              name="date_emission"
               type="date"
-              value={formData.date_emission}
-              onChange={handleChange}
-              required
-              className="mt-1"
+              {...register('date_emission')}
+              className={`mt-1 ${errors.date_emission ? 'border-red-500' : ''}`}
             />
+            {errors.date_emission && <p className="text-sm text-red-600 mt-1">{errors.date_emission.message}</p>}
           </div>
 
           <div>
             <Label htmlFor="date_echeance">Date d&apos;échéance *</Label>
             <Input
               id="date_echeance"
-              name="date_echeance"
               type="date"
-              value={formData.date_echeance}
-              onChange={handleChange}
-              required
-              className="mt-1"
+              {...register('date_echeance')}
+              className={`mt-1 ${errors.date_echeance ? 'border-red-500' : ''}`}
             />
+            {errors.date_echeance && <p className="text-sm text-red-600 mt-1">{errors.date_echeance.message}</p>}
           </div>
         </div>
       </div>
@@ -474,76 +460,78 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
           </Button>
         </div>
         <div className="p-6 space-y-4">
-          {lignes.map((ligne, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-12 gap-4 items-end p-4 bg-gray-50 rounded-xl"
-            >
-              <div className="col-span-12 lg:col-span-4">
-                <Label>Description *</Label>
-                <Input
-                  value={ligne.description}
-                  onChange={(e) => handleLigneChange(index, 'description', e.target.value)}
-                  placeholder="Description de la prestation"
-                  className="mt-1"
-                />
+          {fields.map((field, index) => {
+            const ligneWithCalc = lignesWithCalculations[index]
+            return (
+              <div
+                key={field.id}
+                className="grid grid-cols-12 gap-4 items-end p-4 bg-gray-50 rounded-xl"
+              >
+                <div className="col-span-12 lg:col-span-4">
+                  <Label>Description *</Label>
+                  <Input
+                    {...register(`lignes.${index}.description`)}
+                    placeholder="Description de la prestation"
+                    className={`mt-1 ${errors.lignes?.[index]?.description ? 'border-red-500' : ''}`}
+                  />
+                  {errors.lignes?.[index]?.description && (
+                    <p className="text-sm text-red-600 mt-1">{errors.lignes[index]?.description?.message}</p>
+                  )}
+                </div>
+                <div className="col-span-4 lg:col-span-2">
+                  <Label>Quantité</Label>
+                  <Input
+                    type="number"
+                    {...register(`lignes.${index}.quantite`, { valueAsNumber: true })}
+                    min={1}
+                    step={1}
+                    className={`mt-1 ${errors.lignes?.[index]?.quantite ? 'border-red-500' : ''}`}
+                  />
+                </div>
+                <div className="col-span-4 lg:col-span-2">
+                  <Label>Prix unitaire HT</Label>
+                  <Input
+                    type="number"
+                    {...register(`lignes.${index}.prix_unitaire`, { valueAsNumber: true })}
+                    min={0}
+                    step={0.01}
+                    className={`mt-1 ${errors.lignes?.[index]?.prix_unitaire ? 'border-red-500' : ''}`}
+                  />
+                </div>
+                <div className="col-span-4 lg:col-span-1">
+                  <Label>TVA %</Label>
+                  <select
+                    {...register(`lignes.${index}.taux_tva`, { valueAsNumber: true })}
+                    className="mt-1 w-full border border-gray-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-phi-primary/20"
+                  >
+                    {tauxTVA.map((taux) => (
+                      <option key={taux.value} value={taux.value}>
+                        {taux.value}%
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-span-10 lg:col-span-2 text-right">
+                  <Label>Total TTC</Label>
+                  <p className="mt-1 py-2 font-semibold text-gray-900">
+                    {ligneWithCalc ? formatMontant(ligneWithCalc.montant_ttc || 0) : '0,00 €'}
+                  </p>
+                </div>
+                <div className="col-span-2 lg:col-span-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => remove(index)}
+                    disabled={fields.length === 1}
+                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <div className="col-span-4 lg:col-span-2">
-                <Label>Quantité</Label>
-                <Input
-                  type="number"
-                  value={ligne.quantite}
-                  onChange={(e) => handleLigneChange(index, 'quantite', e.target.value)}
-                  min={1}
-                  step={1}
-                  className="mt-1"
-                />
-              </div>
-              <div className="col-span-4 lg:col-span-2">
-                <Label>Prix unitaire HT</Label>
-                <Input
-                  type="number"
-                  value={ligne.prix_unitaire}
-                  onChange={(e) => handleLigneChange(index, 'prix_unitaire', e.target.value)}
-                  min={0}
-                  step={0.01}
-                  className="mt-1"
-                />
-              </div>
-              <div className="col-span-4 lg:col-span-1">
-                <Label>TVA %</Label>
-                <select
-                  value={ligne.taux_tva}
-                  onChange={(e) => handleLigneChange(index, 'taux_tva', e.target.value)}
-                  className="mt-1 w-full border border-gray-200 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-phi-primary/20"
-                >
-                  {tauxTVA.map((taux) => (
-                    <option key={taux.value} value={taux.value}>
-                      {taux.value}%
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-span-10 lg:col-span-2 text-right">
-                <Label>Total TTC</Label>
-                <p className="mt-1 py-2 font-semibold text-gray-900">
-                  {formatMontant(ligne.montant_ttc)}
-                </p>
-              </div>
-              <div className="col-span-2 lg:col-span-1">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeLigne(index)}
-                  disabled={lignes.length === 1}
-                  className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         {/* Totaux */}
@@ -576,9 +564,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
         <div className="p-6">
           <textarea
             id="notes"
-            name="notes"
-            value={formData.notes}
-            onChange={handleChange}
+            {...register('notes')}
             rows={3}
             placeholder="Notes internes ou conditions particulières..."
             className="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-phi-primary/20 resize-none"
@@ -592,16 +578,16 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
           type="button"
           variant="outline"
           onClick={() => router.back()}
-          disabled={loading}
+          disabled={isSubmitting}
         >
           Annuler
         </Button>
         <Button
           type="submit"
-          disabled={loading}
+          disabled={isSubmitting}
           className="bg-phi-primary hover:bg-phi-primary/90"
         >
-          {loading ? (
+          {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Enregistrement...

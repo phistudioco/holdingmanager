@@ -42,60 +42,90 @@ export default function EmployesPage() {
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all')
   const [filterFiliale, setFilterFiliale] = useState<string>('all')
   const [currentPage, setCurrentPage] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const [stats, setStats] = useState({ total: 0, actifs: 0, enConge: 0 })
   const itemsPerPage = 12
 
+  // Charger les données avec pagination côté serveur
   useEffect(() => {
-    loadData()
+    loadEmployes()
+  }, [currentPage, searchQuery, filterStatus, filterFiliale])
+
+  // Charger les filiales et stats une seule fois
+  useEffect(() => {
+    loadFilialesAndStats()
   }, [])
 
-  const loadData = async () => {
+  const loadFilialesAndStats = async () => {
     const supabase = createClient()
 
-    const [employesRes, filialesRes] = await Promise.all([
-      supabase
-        .from('employes')
-        .select(`
+    const [filialesRes, statsRes] = await Promise.all([
+      supabase.from('filiales').select('*').order('nom'),
+      // Charger les stats séparément (count rapide sans données)
+      supabase.from('employes').select('statut', { count: 'exact', head: false }),
+    ])
+
+    if (filialesRes.data) setFiliales(filialesRes.data)
+
+    if (statsRes.data) {
+      const total = statsRes.count || 0
+      const actifs = statsRes.data.filter((e: { statut: string }) => e.statut === 'actif').length
+      const enConge = statsRes.data.filter((e: { statut: string }) => e.statut === 'en_conge').length
+      setStats({ total, actifs, enConge })
+    }
+  }
+
+  const loadEmployes = async () => {
+    setLoading(true)
+    const supabase = createClient()
+
+    // Construire la query avec filtres côté serveur
+    let query = supabase
+      .from('employes')
+      .select(
+        `
           *,
           filiale:filiale_id (nom, code),
           service:service_id (nom, couleur)
-        `)
-        .order('nom', { ascending: true }),
-      supabase.from('filiales').select('*').order('nom'),
-    ])
+        `,
+        { count: 'exact' }
+      )
 
-    if (employesRes.data) setEmployes(employesRes.data as Employe[])
-    if (filialesRes.data) setFiliales(filialesRes.data)
+    // Appliquer les filtres côté serveur
+    if (searchQuery) {
+      query = query.or(
+        `nom.ilike.%${searchQuery}%,prenom.ilike.%${searchQuery}%,matricule.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,poste.ilike.%${searchQuery}%`
+      )
+    }
+
+    if (filterStatus !== 'all') {
+      query = query.eq('statut', filterStatus)
+    }
+
+    if (filterFiliale !== 'all') {
+      query = query.eq('filiale_id', parseInt(filterFiliale))
+    }
+
+    // Pagination côté serveur avec range()
+    const from = (currentPage - 1) * itemsPerPage
+    const to = from + itemsPerPage - 1
+
+    const { data, count, error } = await query
+      .order('nom', { ascending: true })
+      .range(from, to)
+
+    if (error) {
+      console.error('Erreur chargement employés:', error)
+    } else {
+      setEmployes((data as Employe[]) || [])
+      setTotalCount(count || 0)
+    }
+
     setLoading(false)
   }
 
-  // Filtrage
-  const filteredEmployes = employes.filter(emp => {
-    const matchesSearch =
-      emp.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.prenom.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.matricule.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.poste?.toLowerCase().includes(searchQuery.toLowerCase())
-
-    const matchesStatus = filterStatus === 'all' || emp.statut === filterStatus
-    const matchesFiliale = filterFiliale === 'all' || emp.filiale_id.toString() === filterFiliale
-
-    return matchesSearch && matchesStatus && matchesFiliale
-  })
-
-  // Pagination
-  const totalPages = Math.ceil(filteredEmployes.length / itemsPerPage)
-  const paginatedEmployes = filteredEmployes.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
-
-  // Stats
-  const stats = {
-    total: employes.length,
-    actifs: employes.filter(e => e.statut === 'actif').length,
-    enConge: employes.filter(e => e.statut === 'en_conge').length,
-  }
+  // Calculer totalPages à partir du count serveur
+  const totalPages = Math.ceil(totalCount / itemsPerPage)
 
   if (loading) {
     return (
@@ -258,7 +288,7 @@ export default function EmployesPage() {
       </div>
 
       {/* Content */}
-      {filteredEmployes.length === 0 ? (
+      {employes.length === 0 && !loading ? (
         <EmptyState
           icon={Users}
           title={searchQuery || filterStatus !== 'all' || filterFiliale !== 'all' ? 'Aucun résultat' : 'Aucun employé'}
@@ -275,7 +305,7 @@ export default function EmployesPage() {
         />
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {paginatedEmployes.map((employe, index) => (
+          {employes.map((employe, index) => (
             <Link
               key={employe.id}
               href={`/employes/${employe.id}`}
@@ -353,7 +383,7 @@ export default function EmployesPage() {
                 </tr>
               </thead>
             <tbody className="divide-y divide-gray-100">
-              {paginatedEmployes.map((employe, index) => (
+              {employes.map((employe, index) => (
                 <tr
                   key={employe.id}
                   className="hover:bg-gray-50/50 transition-colors animate-in fade-in duration-300"
@@ -416,8 +446,8 @@ export default function EmployesPage() {
         <div className="flex items-center justify-between bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
           <p className="text-sm text-gray-500">
             Affichage de <span className="font-medium text-gray-900">{(currentPage - 1) * itemsPerPage + 1}</span> à{' '}
-            <span className="font-medium text-gray-900">{Math.min(currentPage * itemsPerPage, filteredEmployes.length)}</span> sur{' '}
-            <span className="font-medium text-gray-900">{filteredEmployes.length}</span> résultats
+            <span className="font-medium text-gray-900">{Math.min(currentPage * itemsPerPage, totalCount)}</span> sur{' '}
+            <span className="font-medium text-gray-900">{totalCount}</span> résultats
           </p>
           <div className="flex items-center gap-2">
             <Button

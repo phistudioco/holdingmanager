@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { createUntypedClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,6 +23,7 @@ import {
   CheckCircle,
 } from 'lucide-react'
 import type { Tables } from '@/types/database'
+import { filialeSchema, type FilialeFormData } from '@/lib/validations/filiale'
 
 type Filiale = Tables<'filiales'>
 type Pays = Tables<'pays'>
@@ -30,41 +33,32 @@ type FilialeFormProps = {
   mode: 'create' | 'edit'
 }
 
-type FormData = {
-  code: string
-  nom: string
-  adresse: string
-  ville: string
-  code_postal: string
-  pays_id: string
-  telephone: string
-  email: string
-  site_web: string
-  directeur_nom: string
-  directeur_email: string
-  statut: 'actif' | 'inactif' | 'en_creation'
-}
-
 export function FilialeForm({ filiale, mode }: FilialeFormProps) {
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [pays, setPays] = useState<Pays[]>([])
 
-  const [formData, setFormData] = useState<FormData>({
-    code: filiale?.code || '',
-    nom: filiale?.nom || '',
-    adresse: filiale?.adresse || '',
-    ville: filiale?.ville || '',
-    code_postal: filiale?.code_postal || '',
-    pays_id: filiale?.pays_id?.toString() || '',
-    telephone: filiale?.telephone || '',
-    email: filiale?.email || '',
-    site_web: filiale?.site_web || '',
-    directeur_nom: filiale?.directeur_nom || '',
-    directeur_email: filiale?.directeur_email || '',
-    statut: filiale?.statut || 'en_creation',
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FilialeFormData>({
+    resolver: zodResolver(filialeSchema),
+    defaultValues: {
+      code: filiale?.code || '',
+      nom: filiale?.nom || '',
+      adresse: filiale?.adresse || '',
+      ville: filiale?.ville || '',
+      code_postal: filiale?.code_postal || '',
+      pays_id: filiale?.pays_id || undefined,
+      telephone: filiale?.telephone || '',
+      email: filiale?.email || '',
+      site_web: filiale?.site_web || '',
+      directeur_nom: filiale?.directeur_nom || '',
+      directeur_email: filiale?.directeur_email || '',
+      statut: filiale?.statut || 'en_creation',
+    },
   })
 
   useEffect(() => {
@@ -77,40 +71,25 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
     if (data) setPays(data)
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+  const onSubmit = async (data: FilialeFormData) => {
     setError(null)
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-
-    // Validation
-    if (!formData.code || !formData.nom) {
-      setError('Le code et le nom sont obligatoires')
-      setLoading(false)
-      return
-    }
 
     try {
       const supabase = createUntypedClient()
 
       const filialeData = {
-        code: formData.code,
-        nom: formData.nom,
-        adresse: formData.adresse || null,
-        ville: formData.ville || null,
-        code_postal: formData.code_postal || null,
-        pays_id: formData.pays_id ? parseInt(formData.pays_id) : null,
-        telephone: formData.telephone || null,
-        email: formData.email || null,
-        site_web: formData.site_web || null,
-        directeur_nom: formData.directeur_nom || null,
-        directeur_email: formData.directeur_email || null,
-        statut: formData.statut,
+        code: data.code,
+        nom: data.nom,
+        adresse: data.adresse || null,
+        ville: data.ville || null,
+        code_postal: data.code_postal || null,
+        pays_id: data.pays_id || null,
+        telephone: data.telephone || null,
+        email: data.email || null,
+        site_web: data.site_web || null,
+        directeur_nom: data.directeur_nom || null,
+        directeur_email: data.directeur_email || null,
+        statut: data.statut,
       }
 
       if (mode === 'create') {
@@ -142,8 +121,6 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
       } else {
         setError(errorMessage)
       }
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -162,7 +139,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       {/* Error Alert */}
       {error && (
         <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 animate-in slide-in-from-top duration-300">
@@ -189,15 +166,18 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
                 <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   id="code"
-                  name="code"
-                  value={formData.code}
-                  onChange={handleChange}
+                  {...register('code')}
                   placeholder="PHI-FR-001"
-                  className="pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20"
-                  required
+                  className={`pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20 ${
+                    errors.code ? 'border-red-500 focus:border-red-500' : ''
+                  }`}
                 />
               </div>
-              <p className="text-xs text-gray-500">Identifiant unique de la filiale</p>
+              {errors.code ? (
+                <p className="text-sm text-red-600">{errors.code.message}</p>
+              ) : (
+                <p className="text-xs text-gray-500">Identifiant unique de la filiale</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -208,14 +188,14 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
                 <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   id="nom"
-                  name="nom"
-                  value={formData.nom}
-                  onChange={handleChange}
+                  {...register('nom')}
                   placeholder="PHI Studios France"
-                  className="pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20"
-                  required
+                  className={`pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20 ${
+                    errors.nom ? 'border-red-500 focus:border-red-500' : ''
+                  }`}
                 />
               </div>
+              {errors.nom && <p className="text-sm text-red-600">{errors.nom.message}</p>}
             </div>
           </div>
 
@@ -223,15 +203,14 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
             <Label htmlFor="statut" className="text-sm font-medium text-gray-700">Statut</Label>
             <select
               id="statut"
-              name="statut"
-              value={formData.statut}
-              onChange={handleChange}
+              {...register('statut')}
               className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-white text-gray-900 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors"
             >
               <option value="en_creation">En création</option>
               <option value="actif">Actif</option>
               <option value="inactif">Inactif</option>
             </select>
+            {errors.statut && <p className="text-sm text-red-600">{errors.statut.message}</p>}
           </div>
         </div>
       </div>
@@ -249,13 +228,14 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
             <Label htmlFor="adresse" className="text-sm font-medium text-gray-700">Adresse</Label>
             <textarea
               id="adresse"
-              name="adresse"
-              value={formData.adresse}
-              onChange={handleChange}
+              {...register('adresse')}
               placeholder="123 Avenue de l'Innovation"
               rows={2}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors resize-none"
+              className={`w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors resize-none ${
+                errors.adresse ? 'border-red-500 focus:border-red-500' : ''
+              }`}
             />
+            {errors.adresse && <p className="text-sm text-red-600">{errors.adresse.message}</p>}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
@@ -263,33 +243,35 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
               <Label htmlFor="ville" className="text-sm font-medium text-gray-700">Ville</Label>
               <Input
                 id="ville"
-                name="ville"
-                value={formData.ville}
-                onChange={handleChange}
+                {...register('ville')}
                 placeholder="Paris"
-                className="h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20"
+                className={`h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20 ${
+                  errors.ville ? 'border-red-500 focus:border-red-500' : ''
+                }`}
               />
+              {errors.ville && <p className="text-sm text-red-600">{errors.ville.message}</p>}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="code_postal" className="text-sm font-medium text-gray-700">Code postal</Label>
               <Input
                 id="code_postal"
-                name="code_postal"
-                value={formData.code_postal}
-                onChange={handleChange}
+                {...register('code_postal')}
                 placeholder="75001"
-                className="h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20"
+                className={`h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20 ${
+                  errors.code_postal ? 'border-red-500 focus:border-red-500' : ''
+                }`}
               />
+              {errors.code_postal && <p className="text-sm text-red-600">{errors.code_postal.message}</p>}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="pays_id" className="text-sm font-medium text-gray-700">Pays</Label>
               <select
                 id="pays_id"
-                name="pays_id"
-                value={formData.pays_id}
-                onChange={handleChange}
+                {...register('pays_id', {
+                  setValueAs: (v) => v === '' || v === null || v === undefined ? null : Number(v)
+                })}
                 className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-white text-gray-900 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors"
               >
                 <option value="">Sélectionner un pays</option>
@@ -297,6 +279,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
                   <option key={p.id} value={p.id}>{p.nom}</option>
                 ))}
               </select>
+              {errors.pays_id && <p className="text-sm text-red-600">{errors.pays_id.message}</p>}
             </div>
           </div>
         </div>
@@ -318,14 +301,15 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   id="telephone"
-                  name="telephone"
                   type="tel"
-                  value={formData.telephone}
-                  onChange={handleChange}
+                  {...register('telephone')}
                   placeholder="+33 1 23 45 67 89"
-                  className="pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20"
+                  className={`pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20 ${
+                    errors.telephone ? 'border-red-500 focus:border-red-500' : ''
+                  }`}
                 />
               </div>
+              {errors.telephone && <p className="text-sm text-red-600">{errors.telephone.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -334,14 +318,15 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   id="email"
-                  name="email"
                   type="email"
-                  value={formData.email}
-                  onChange={handleChange}
+                  {...register('email')}
                   placeholder="contact@phistudios.fr"
-                  className="pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20"
+                  className={`pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20 ${
+                    errors.email ? 'border-red-500 focus:border-red-500' : ''
+                  }`}
                 />
               </div>
+              {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
             </div>
           </div>
 
@@ -351,14 +336,15 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
               <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 id="site_web"
-                name="site_web"
                 type="url"
-                value={formData.site_web}
-                onChange={handleChange}
+                {...register('site_web')}
                 placeholder="https://www.phistudios.fr"
-                className="pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20"
+                className={`pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20 ${
+                  errors.site_web ? 'border-red-500 focus:border-red-500' : ''
+                }`}
               />
             </div>
+            {errors.site_web && <p className="text-sm text-red-600">{errors.site_web.message}</p>}
           </div>
         </div>
       </div>
@@ -379,13 +365,14 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   id="directeur_nom"
-                  name="directeur_nom"
-                  value={formData.directeur_nom}
-                  onChange={handleChange}
+                  {...register('directeur_nom')}
                   placeholder="Jean Dupont"
-                  className="pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20"
+                  className={`pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20 ${
+                    errors.directeur_nom ? 'border-red-500 focus:border-red-500' : ''
+                  }`}
                 />
               </div>
+              {errors.directeur_nom && <p className="text-sm text-red-600">{errors.directeur_nom.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -394,14 +381,15 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   id="directeur_email"
-                  name="directeur_email"
                   type="email"
-                  value={formData.directeur_email}
-                  onChange={handleChange}
+                  {...register('directeur_email')}
                   placeholder="j.dupont@phistudios.fr"
-                  className="pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20"
+                  className={`pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20 ${
+                    errors.directeur_email ? 'border-red-500 focus:border-red-500' : ''
+                  }`}
                 />
               </div>
+              {errors.directeur_email && <p className="text-sm text-red-600">{errors.directeur_email.message}</p>}
             </div>
           </div>
         </div>
@@ -420,10 +408,10 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
         </Button>
         <Button
           type="submit"
-          disabled={loading}
+          disabled={isSubmitting}
           className="gap-2 bg-phi-primary hover:bg-phi-primary/90 px-8 h-12 rounded-xl shadow-lg shadow-phi-primary/20"
         >
-          {loading ? (
+          {isSubmitting ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
               {mode === 'create' ? 'Création...' : 'Mise à jour...'}
