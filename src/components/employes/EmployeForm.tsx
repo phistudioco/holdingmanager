@@ -138,7 +138,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
     return (
       <div className="flex flex-col items-center justify-center py-16 animate-in fade-in zoom-in duration-500">
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-          <CheckCircle className="h-10 w-10 text-green-600" />
+          <CheckCircle className="h-10 w-10 text-green-600" aria-hidden="true" />
         </div>
         <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">
           {mode === 'create' ? 'Employé ajouté !' : 'Employé mis à jour !'}
@@ -156,7 +156,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-phi-highlight to-yellow-500 text-gray-900">
           <div className="flex items-center gap-3">
-            <Camera className="h-5 w-5" />
+            <Camera className="h-5 w-5" aria-hidden="true" />
             <h3 className="font-heading font-semibold">Photo de profil</h3>
           </div>
         </div>
@@ -175,7 +175,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-phi-primary to-phi-primary/90 text-white">
           <div className="flex items-center gap-3">
-            <User className="h-5 w-5" />
+            <User className="h-5 w-5" aria-hidden="true" />
             <h3 className="font-heading font-semibold">Informations personnelles</h3>
           </div>
         </div>
@@ -186,7 +186,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
                 Prénom <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
                 <Input
                   id="prenom"
                   {...register('prenom')}
@@ -229,7 +229,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
                 <Input
                   id="email"
                   type="email"
@@ -246,7 +246,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
             <div className="space-y-2">
               <Label htmlFor="telephone" className="text-sm font-medium text-gray-700">Téléphone</Label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
                 <Input
                   id="telephone"
                   type="tel"
@@ -265,7 +265,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
             <div className="space-y-2">
               <Label htmlFor="date_naissance" className="text-sm font-medium text-gray-700">Date de naissance</Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
                 <Input
                   id="date_naissance"
                   type="date"
@@ -281,7 +281,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
             <div className="space-y-2">
               <Label htmlFor="adresse" className="text-sm font-medium text-gray-700">Adresse</Label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
                 <Input
                   id="adresse"
                   {...register('adresse')}
@@ -301,7 +301,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-phi-accent to-phi-accent/90 text-white">
           <div className="flex items-center gap-3">
-            <Briefcase className="h-5 w-5" />
+            <Briefcase className="h-5 w-5" aria-hidden="true" />
             <h3 className="font-heading font-semibold">Informations professionnelles</h3>
           </div>
         </div>
@@ -313,7 +313,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
               </Label>
               <div className="flex gap-2">
                 <div className="relative flex-1">
-                  <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
                   <Input
                     id="matricule"
                     {...register('matricule')}
@@ -347,7 +347,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
                 Filiale <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
+                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" aria-hidden="true" />
                 <select
                   id="filiale_id"
                   {...register('filiale_id', {
@@ -395,7 +395,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
             <div className="space-y-2">
               <Label htmlFor="poste" className="text-sm font-medium text-gray-700">Poste</Label>
               <div className="relative">
-                <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
                 <Input
                   id="poste"
                   {...register('poste')}
@@ -415,7 +415,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
                 Date d'embauche <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
                 <Input
                   id="date_embauche"
                   type="date"
@@ -438,7 +438,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
             <div className="space-y-2">
               <Label htmlFor="salaire" className="text-sm font-medium text-gray-700">Salaire mensuel (€)</Label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
                 <Input
                   id="salaire"
                   type="number"
@@ -479,7 +479,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
           onClick={() => router.back()}
           className="gap-2"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Annuler
         </Button>
         <Button
@@ -489,12 +489,12 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
               {mode === 'create' ? 'Création...' : 'Mise à jour...'}
             </>
           ) : (
             <>
-              <Save className="h-4 w-4" />
+              <Save className="h-4 w-4" aria-hidden="true" />
               {mode === 'create' ? 'Ajouter l\'employé' : 'Enregistrer'}
             </>
           )}

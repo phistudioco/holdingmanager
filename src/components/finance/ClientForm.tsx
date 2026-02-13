@@ -190,7 +190,7 @@ export function ClientForm({ client, mode }: ClientFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-phi-accent to-pink-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-            <FileText className="h-5 w-5" />
+            <FileText className="h-5 w-5" aria-hidden="true" />
             Informations générales
           </h3>
         </div>
@@ -275,7 +275,7 @@ export function ClientForm({ client, mode }: ClientFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-green-500 to-emerald-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-            <Mail className="h-5 w-5" />
+            <Mail className="h-5 w-5" aria-hidden="true" />
             Contact
           </h3>
         </div>
@@ -283,7 +283,7 @@ export function ClientForm({ client, mode }: ClientFormProps) {
           <div>
             <Label htmlFor="email">Email</Label>
             <div className="relative mt-1">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
               <Input
                 id="email"
                 type="email"
@@ -298,7 +298,7 @@ export function ClientForm({ client, mode }: ClientFormProps) {
           <div>
             <Label htmlFor="telephone">Téléphone</Label>
             <div className="relative mt-1">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
               <Input
                 id="telephone"
                 {...register('telephone')}
@@ -314,7 +314,7 @@ export function ClientForm({ client, mode }: ClientFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-purple-500 to-violet-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
+            <MapPin className="h-5 w-5" aria-hidden="true" />
             Adresse
           </h3>
         </div>
@@ -374,7 +374,7 @@ export function ClientForm({ client, mode }: ClientFormProps) {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-phi-primary to-indigo-600">
             <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-              <Building2 className="h-5 w-5" />
+              <Building2 className="h-5 w-5" aria-hidden="true" />
               Informations entreprise
             </h3>
           </div>
@@ -427,7 +427,7 @@ export function ClientForm({ client, mode }: ClientFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-phi-highlight to-amber-500">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
+            <CreditCard className="h-5 w-5" aria-hidden="true" />
             Conditions commerciales
           </h3>
         </div>
@@ -483,7 +483,7 @@ export function ClientForm({ client, mode }: ClientFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gray-100">
           <h3 className="font-heading font-semibold text-gray-700 flex items-center gap-2">
-            <FileText className="h-5 w-5" />
+            <FileText className="h-5 w-5" aria-hidden="true" />
             Notes internes
           </h3>
         </div>
@@ -515,12 +515,12 @@ export function ClientForm({ client, mode }: ClientFormProps) {
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
               Enregistrement...
             </>
           ) : (
             <>
-              <Save className="mr-2 h-4 w-4" />
+              <Save className="mr-2 h-4 w-4" aria-hidden="true" />
               {mode === 'create' ? 'Créer le client' : 'Enregistrer'}
             </>
           )}

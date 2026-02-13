@@ -175,9 +175,9 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
         }`}>
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
             {type === 'revenu' ? (
-              <ArrowUpCircle className="h-5 w-5" />
+              <ArrowUpCircle className="h-5 w-5" aria-hidden="true" />
             ) : (
-              <ArrowDownCircle className="h-5 w-5" />
+              <ArrowDownCircle className="h-5 w-5" aria-hidden="true" />
             )}
             Informations
           </h3>
@@ -305,7 +305,7 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-purple-500 to-violet-600">
             <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-              <Euro className="h-5 w-5" />
+              <Euro className="h-5 w-5" aria-hidden="true" />
               Montant
             </h3>
           </div>
@@ -347,7 +347,7 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-blue-500 to-cyan-600">
             <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
+              <Calendar className="h-5 w-5" aria-hidden="true" />
               Date
             </h3>
           </div>
@@ -372,7 +372,7 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
               )}
             </div>
             <div className="mt-4 p-4 bg-blue-50 rounded-xl flex items-center gap-3">
-              <Building2 className="h-5 w-5 text-blue-600" />
+              <Building2 className="h-5 w-5 text-blue-600" aria-hidden="true" />
               <div>
                 <p className="text-sm text-gray-600">Filiale sélectionnée</p>
                 <p className="font-medium text-blue-700">
@@ -401,12 +401,12 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
               Enregistrement...
             </>
           ) : (
             <>
-              <Save className="mr-2 h-4 w-4" />
+              <Save className="mr-2 h-4 w-4" aria-hidden="true" />
               {mode === 'create' ? 'Enregistrer' : 'Modifier'}
             </>
           )}

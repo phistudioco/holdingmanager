@@ -298,7 +298,7 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
       {/* Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <FileText className="h-5 w-5 text-phi-highlight" />
+          <FileText className="h-5 w-5 text-phi-highlight" aria-hidden="true" />
           Informations du devis
         </h2>
 
@@ -363,7 +363,7 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
       {/* Client */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <Users className="h-5 w-5 text-phi-accent" />
+          <Users className="h-5 w-5 text-phi-accent" aria-hidden="true" />
           Client
         </h2>
 
@@ -412,7 +412,7 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
       {/* Dates */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-phi-primary" />
+          <Calendar className="h-5 w-5 text-phi-primary" aria-hidden="true" />
           Dates
         </h2>
 
@@ -466,11 +466,11 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <Calculator className="h-5 w-5 text-phi-highlight" />
+            <Calculator className="h-5 w-5 text-phi-highlight" aria-hidden="true" />
             Lignes du devis
           </h2>
           <Button type="button" onClick={addLigne} variant="outline" size="sm">
-            <Plus className="h-4 w-4 mr-1" />
+            <Plus className="h-4 w-4 mr-1" aria-hidden="true" />
             Ajouter une ligne
           </Button>
         </div>
@@ -535,7 +535,7 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
                   disabled={lignes.length === 1}
                   className="text-red-500 hover:text-red-700 hover:bg-red-50"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </div>
             </div>
@@ -611,12 +611,12 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
               Enregistrement...
             </>
           ) : (
             <>
-              <Save className="h-4 w-4 mr-2" />
+              <Save className="h-4 w-4 mr-2" aria-hidden="true" />
               {mode === 'create' ? 'Créer le devis' : 'Enregistrer'}
             </>
           )}

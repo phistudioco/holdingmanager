@@ -159,7 +159,7 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
       {/* Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <ShoppingCart className="h-5 w-5" style={{ color: themeColor }} />
+          <ShoppingCart className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Informations de la commande
         </h2>
 
@@ -223,7 +223,7 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
           <div>
             <Label htmlFor="filiale_id">
               <span className="flex items-center gap-2">
-                <Building2 className="h-4 w-4" />
+                <Building2 className="h-4 w-4" aria-hidden="true" />
                 Filiale <span className="text-red-500" aria-label="requis">*</span>
               </span>
             </Label>
@@ -250,7 +250,7 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
           <div>
             <Label htmlFor="montant_total">
               <span className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4" />
+                <DollarSign className="h-4 w-4" aria-hidden="true" />
                 Montant total (EUR)
               </span>
             </Label>
@@ -272,7 +272,7 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
       {/* Dates */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <Calendar className="h-5 w-5" style={{ color: themeColor }} />
+          <Calendar className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Planification
         </h2>
 
@@ -300,7 +300,7 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
           <div>
             <Label htmlFor="date_livraison_prevue">
               <span className="flex items-center gap-2">
-                <Truck className="h-4 w-4" />
+                <Truck className="h-4 w-4" aria-hidden="true" />
                 Date de livraison prévue
               </span>
             </Label>
@@ -350,12 +350,12 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
         >
           {loading ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
               Enregistrement...
             </>
           ) : (
             <>
-              <Save className="h-4 w-4 mr-2" />
+              <Save className="h-4 w-4 mr-2" aria-hidden="true" />
               {mode === 'create' ? 'Créer la commande' : 'Enregistrer'}
             </>
           )}

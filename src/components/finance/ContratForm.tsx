@@ -142,7 +142,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-phi-primary to-blue-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-            <ScrollText className="h-5 w-5" />
+            <ScrollText className="h-5 w-5" aria-hidden="true" />
             Informations générales
           </h3>
         </div>
@@ -247,7 +247,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-phi-accent to-pink-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-            <Users className="h-5 w-5" />
+            <Users className="h-5 w-5" aria-hidden="true" />
             Client
           </h3>
         </div>
@@ -288,7 +288,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-green-500 to-emerald-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
+            <Calendar className="h-5 w-5" aria-hidden="true" />
             Durée et Périodicité
           </h3>
         </div>
@@ -350,7 +350,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
                 className="h-4 w-4 text-phi-primary rounded focus:ring-phi-primary/20"
               />
               <div className="flex items-center gap-2">
-                <RefreshCw className="h-4 w-4 text-green-600" />
+                <RefreshCw className="h-4 w-4 text-green-600" aria-hidden="true" />
                 <span className="text-sm font-medium text-gray-700">Reconduction auto</span>
               </div>
             </label>
@@ -362,7 +362,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-purple-500 to-violet-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-            <Euro className="h-5 w-5" />
+            <Euro className="h-5 w-5" aria-hidden="true" />
             Montant
           </h3>
         </div>
@@ -408,7 +408,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gray-100">
           <h3 className="font-heading font-semibold text-gray-700 flex items-center gap-2">
-            <ScrollText className="h-5 w-5" />
+            <ScrollText className="h-5 w-5" aria-hidden="true" />
             Description
           </h3>
         </div>
@@ -441,12 +441,12 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
               Enregistrement...
             </>
           ) : (
             <>
-              <Save className="mr-2 h-4 w-4" />
+              <Save className="mr-2 h-4 w-4" aria-hidden="true" />
               {mode === 'create' ? 'Créer le contrat' : 'Enregistrer'}
             </>
           )}

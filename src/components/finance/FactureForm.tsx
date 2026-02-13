@@ -282,7 +282,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-phi-primary to-blue-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-            <FileText className="h-5 w-5" />
+            <FileText className="h-5 w-5" aria-hidden="true" />
             Informations générales
           </h3>
         </div>
@@ -363,7 +363,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-phi-accent to-pink-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-            <Users className="h-5 w-5" />
+            <Users className="h-5 w-5" aria-hidden="true" />
             Client
           </h3>
         </div>
@@ -393,7 +393,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-green-500 to-emerald-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
+            <Calendar className="h-5 w-5" aria-hidden="true" />
             Dates
           </h3>
         </div>
@@ -426,7 +426,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-purple-500 to-violet-600 flex items-center justify-between">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-            <Calculator className="h-5 w-5" />
+            <Calculator className="h-5 w-5" aria-hidden="true" />
             Lignes de facture
           </h3>
           <Button
@@ -436,7 +436,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
             size="sm"
             className="bg-white/20 hover:bg-white/30 text-white border-0"
           >
-            <Plus className="h-4 w-4 mr-1" />
+            <Plus className="h-4 w-4 mr-1" aria-hidden="true" />
             Ajouter une ligne
           </Button>
         </div>
@@ -507,7 +507,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
                     disabled={fields.length === 1}
                     className="text-red-500 hover:text-red-600 hover:bg-red-50"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
                   </Button>
                 </div>
               </div>
@@ -538,7 +538,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gray-100">
           <h3 className="font-heading font-semibold text-gray-700 flex items-center gap-2">
-            <FileText className="h-5 w-5" />
+            <FileText className="h-5 w-5" aria-hidden="true" />
             Notes
           </h3>
         </div>
@@ -570,12 +570,12 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
               Enregistrement...
             </>
           ) : (
             <>
-              <Save className="mr-2 h-4 w-4" />
+              <Save className="mr-2 h-4 w-4" aria-hidden="true" />
               {mode === 'create' ? 'Créer la facture' : 'Enregistrer'}
             </>
           )}

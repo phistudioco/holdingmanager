@@ -159,7 +159,7 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
       {/* Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <Building className="h-5 w-5" style={{ color: themeColor }} />
+          <Building className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Informations du fournisseur
         </h2>
 
@@ -223,7 +223,7 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
           <div>
             <Label htmlFor="note_qualite">
               <span className="flex items-center gap-2">
-                <Star className="h-4 w-4" />
+                <Star className="h-4 w-4" aria-hidden="true" />
                 Note qualité (1-5)
               </span>
             </Label>
@@ -247,7 +247,7 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
       {/* Contact */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <User className="h-5 w-5" style={{ color: themeColor }} />
+          <User className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Contact
         </h2>
 
@@ -268,7 +268,7 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
           <div>
             <Label htmlFor="contact_email">
               <span className="flex items-center gap-2">
-                <Mail className="h-4 w-4" />
+                <Mail className="h-4 w-4" aria-hidden="true" />
                 Email
               </span>
             </Label>
@@ -287,7 +287,7 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
           <div>
             <Label htmlFor="contact_telephone">
               <span className="flex items-center gap-2">
-                <Phone className="h-4 w-4" />
+                <Phone className="h-4 w-4" aria-hidden="true" />
                 Téléphone
               </span>
             </Label>
@@ -308,7 +308,7 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
       {/* Adresse */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <MapPin className="h-5 w-5" style={{ color: themeColor }} />
+          <MapPin className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Adresse
         </h2>
 
@@ -400,12 +400,12 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
         >
           {loading ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
               Enregistrement...
             </>
           ) : (
             <>
-              <Save className="h-4 w-4 mr-2" />
+              <Save className="h-4 w-4 mr-2" aria-hidden="true" />
               {mode === 'create' ? 'Créer le fournisseur' : 'Enregistrer'}
             </>
           )}

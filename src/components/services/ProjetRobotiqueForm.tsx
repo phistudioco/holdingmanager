@@ -150,7 +150,7 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
       {/* Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <Bot className="h-5 w-5" style={{ color: themeColor }} />
+          <Bot className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Informations du projet
         </h2>
 
@@ -210,7 +210,7 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
           <div>
             <Label htmlFor="budget">Budget (€)</Label>
             <div className="relative mt-1">
-              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
               <Input
                 id="budget"
                 type="number"
@@ -231,7 +231,7 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
       {/* Affectation */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <Building2 className="h-5 w-5" style={{ color: themeColor }} />
+          <Building2 className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Affectation
         </h2>
 
@@ -263,7 +263,7 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
           <div>
             <Label htmlFor="client_id">
               <span className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
+                <Users className="h-4 w-4" aria-hidden="true" />
                 Client (optionnel)
               </span>
             </Label>
@@ -287,7 +287,7 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
       {/* Dates */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <Calendar className="h-5 w-5" style={{ color: themeColor }} />
+          <Calendar className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Planification
         </h2>
 
@@ -338,12 +338,12 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
         >
           {loading ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
               Enregistrement...
             </>
           ) : (
             <>
-              <Save className="h-4 w-4 mr-2" />
+              <Save className="h-4 w-4 mr-2" aria-hidden="true" />
               {mode === 'create' ? 'Créer le projet' : 'Enregistrer'}
             </>
           )}

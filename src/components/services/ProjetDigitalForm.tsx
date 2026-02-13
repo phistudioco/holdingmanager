@@ -168,7 +168,7 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
       {/* Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <Monitor className="h-5 w-5" style={{ color: themeDark }} />
+          <Monitor className="h-5 w-5" style={{ color: themeDark }} aria-hidden="true" />
           Informations du projet
         </h2>
 
@@ -246,7 +246,7 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
           <div>
             <Label htmlFor="url">
               <span className="flex items-center gap-2">
-                <Globe className="h-4 w-4" />
+                <Globe className="h-4 w-4" aria-hidden="true" />
                 URL du projet
               </span>
             </Label>
@@ -265,7 +265,7 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
           <div>
             <Label htmlFor="budget">Budget (EUR)</Label>
             <div className="relative mt-1">
-              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
               <Input
                 id="budget"
                 type="number"
@@ -286,7 +286,7 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
       {/* Affectation */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <Building2 className="h-5 w-5" style={{ color: themeDark }} />
+          <Building2 className="h-5 w-5" style={{ color: themeDark }} aria-hidden="true" />
           Affectation
         </h2>
 
@@ -318,7 +318,7 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
           <div>
             <Label htmlFor="client_id">
               <span className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
+                <Users className="h-4 w-4" aria-hidden="true" />
                 Client (optionnel)
               </span>
             </Label>
@@ -342,7 +342,7 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
       {/* Dates */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <Calendar className="h-5 w-5" style={{ color: themeDark }} />
+          <Calendar className="h-5 w-5" style={{ color: themeDark }} aria-hidden="true" />
           Planification
         </h2>
 
@@ -393,12 +393,12 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
         >
           {loading ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
               Enregistrement...
             </>
           ) : (
             <>
-              <Save className="h-4 w-4 mr-2" />
+              <Save className="h-4 w-4 mr-2" aria-hidden="true" />
               {mode === 'create' ? 'Créer le projet' : 'Enregistrer'}
             </>
           )}

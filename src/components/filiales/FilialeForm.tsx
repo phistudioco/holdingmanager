@@ -127,7 +127,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
     return (
       <div className="flex flex-col items-center justify-center py-16 animate-in fade-in zoom-in duration-500">
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-          <CheckCircle className="h-10 w-10 text-green-600" />
+          <CheckCircle className="h-10 w-10 text-green-600" aria-hidden="true" />
         </div>
         <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">
           {mode === 'create' ? 'Filiale créée !' : 'Filiale mise à jour !'}
@@ -145,7 +145,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-phi-primary to-phi-primary/90 text-white">
           <div className="flex items-center gap-3">
-            <Building2 className="h-5 w-5" />
+            <Building2 className="h-5 w-5" aria-hidden="true" />
             <h3 className="font-heading font-semibold">Informations générales</h3>
           </div>
         </div>
@@ -156,7 +156,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
                 Code filiale <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <div className="relative">
-                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
                 <Input
                   id="code"
                   {...register('code')}
@@ -181,7 +181,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
                 Nom <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
                 <Input
                   id="nom"
                   {...register('nom')}
@@ -222,7 +222,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-phi-accent to-phi-accent/90 text-white">
           <div className="flex items-center gap-3">
-            <MapPin className="h-5 w-5" />
+            <MapPin className="h-5 w-5" aria-hidden="true" />
             <h3 className="font-heading font-semibold">Adresse</h3>
           </div>
         </div>
@@ -292,7 +292,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-phi-highlight to-phi-highlight/90 text-gray-900">
           <div className="flex items-center gap-3">
-            <Phone className="h-5 w-5" />
+            <Phone className="h-5 w-5" aria-hidden="true" />
             <h3 className="font-heading font-semibold">Contact</h3>
           </div>
         </div>
@@ -301,7 +301,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
             <div className="space-y-2">
               <Label htmlFor="telephone" className="text-sm font-medium text-gray-700">Téléphone</Label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
                 <Input
                   id="telephone"
                   type="tel"
@@ -318,7 +318,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
                 <Input
                   id="email"
                   type="email"
@@ -381,7 +381,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
             <div className="space-y-2">
               <Label htmlFor="directeur_email" className="text-sm font-medium text-gray-700">Email du directeur</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
                 <Input
                   id="directeur_email"
                   type="email"

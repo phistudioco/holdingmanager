@@ -221,7 +221,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
     return (
       <div className="flex flex-col items-center justify-center py-16 animate-in fade-in zoom-in duration-500">
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-          <CheckCircle className="h-10 w-10 text-green-600" />
+          <CheckCircle className="h-10 w-10 text-green-600" aria-hidden="true" />
         </div>
         <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">
           {submitAction === 'soumettre' ? 'Demande soumise !' : 'Brouillon enregistré !'}
@@ -271,7 +271,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-phi-accent to-phi-accent/90 text-white">
           <div className="flex items-center gap-3">
-            <FileText className="h-5 w-5" />
+            <FileText className="h-5 w-5" aria-hidden="true" />
             <h3 className="font-heading font-semibold">Informations générales</h3>
           </div>
         </div>
