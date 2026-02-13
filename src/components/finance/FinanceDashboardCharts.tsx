@@ -108,7 +108,10 @@ function FinanceDashboardChartsComponent() {
       const startDate = `${selectedYear}-01-01`
       const endDate = `${selectedYear}-12-31`
 
-      const [transactionsRes, filialesRes] = await Promise.all([
+      const [
+        { data: transactions },
+        { data: filiales }
+      ] = await Promise.all([
         supabase
           .from('transactions')
           .select('*, filiale:filiale_id(nom)')
@@ -116,12 +119,10 @@ function FinanceDashboardChartsComponent() {
           .lte('date_transaction', endDate)
           .eq('statut', 'validee'),
         supabase.from('filiales').select('id, nom').eq('statut', 'actif'),
-      ])
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const transactions = (transactionsRes as any).data as TransactionRow[] | null
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const filiales = (filialesRes as any).data as FilialeRow[] | null
+      ]) as [
+        { data: TransactionRow[] | null },
+        { data: FilialeRow[] | null }
+      ]
 
       if (!transactions) {
         setLoading(false)

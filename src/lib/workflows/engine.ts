@@ -148,16 +148,14 @@ export async function approveWorkflowStep(
     if (approvalError) throw approvalError
 
     // Récupérer la demande pour connaître le type et l'étape suivante
-    const demandeRes = await supabase
+    const { data: demandeData, error: demandeError } = await supabase
       .from('workflow_demandes')
       .select('type, etape_actuelle')
       .eq('id', demandeId)
       .single()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((demandeRes as any).error) throw (demandeRes as any).error
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const demande = (demandeRes as any).data as { type: string; etape_actuelle: number }
+    if (demandeError) throw demandeError
+    const demande = demandeData as { type: string; etape_actuelle: number }
 
     const config = WORKFLOW_CONFIGS[demande.type as WorkflowType]
     const etapesRestantes = config.etapes.filter(e => e.ordre > etape)

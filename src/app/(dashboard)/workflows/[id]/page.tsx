@@ -71,7 +71,10 @@ export default function WorkflowDetailPage() {
     setLoading(true)
     const supabase = createClient()
 
-    const [demandeRes, approbationsRes] = await Promise.all([
+    const [
+      { data: demandeData },
+      { data: approbationsData }
+    ] = await Promise.all([
       supabase
         .from('workflow_demandes')
         .select('*, demandeur:demandeur_id(nom, prenom, email), filiale:filiale_id(nom, code)')
@@ -84,13 +87,9 @@ export default function WorkflowDetailPage() {
         .order('etape', { ascending: true }),
     ])
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const demandeData = (demandeRes as any).data
     if (demandeData) {
       setDemande(demandeData as WorkflowDemande)
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const approbationsData = (approbationsRes as any).data
     if (approbationsData) {
       setApprobations(approbationsData as WorkflowApprobation[])
     }

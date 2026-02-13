@@ -168,7 +168,7 @@ export default function DevisPage() {
         throw new Error('Erreur lors de la récupération du devis')
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // Type complexe avec relations Supabase - cast nécessaire pour transformation PDF
       const devisData = devisDataRaw as any
 
       const { data: lignesDataRaw, error: lignesError } = await supabase
@@ -181,7 +181,6 @@ export default function DevisPage() {
         throw new Error('Erreur lors de la récupération des lignes')
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const lignesData = (lignesDataRaw || []) as any[]
 
       await downloadDevisPDF({

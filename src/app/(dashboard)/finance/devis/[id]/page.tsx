@@ -62,11 +62,9 @@ export default function DevisDetailPage() {
         return
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const typedDevis = devisData as any
-      setDevis(typedDevis)
-      setClient(typedDevis.client)
-      setFiliale(typedDevis.filiale)
+      setDevis(devisData as Devis)
+      setClient((devisData as { client: Client }).client)
+      setFiliale((devisData as { filiale: Filiale }).filiale)
 
       const { data: lignesData } = await supabase
         .from('devis_lignes')

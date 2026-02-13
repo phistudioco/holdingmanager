@@ -226,14 +226,11 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
 
         if (devisError) throw devisError
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const typedDevis = newDevis as any
-
         // Insérer les lignes
         const lignesData = lignes
           .filter(l => l.description.trim())
           .map((ligne, index) => ({
-            devis_id: typedDevis.id,
+            devis_id: (newDevis as { id: number }).id,
             description: ligne.description,
             quantite: ligne.quantite,
             prix_unitaire: ligne.prix_unitaire,
@@ -252,7 +249,7 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
           if (lignesError) throw lignesError
         }
 
-        router.push(`/finance/devis/${typedDevis.id}`)
+        router.push(`/finance/devis/${(newDevis as { id: number }).id}`)
       } else if (devis) {
         const { error: updateError } = await db
           .from('devis')

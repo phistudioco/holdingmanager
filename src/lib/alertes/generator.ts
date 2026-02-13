@@ -93,16 +93,14 @@ export async function generateFactureAlertes(): Promise<{ count: number; error?:
 
   try {
     // Factures en retard (échéance dépassée)
-    const retardRes = await supabase
+    const { data: facturesEnRetardData, error: retardError } = await supabase
       .from('factures')
       .select('id, numero, client_id, date_echeance, total_ttc')
       .in('statut', ['envoyee', 'partiellement_payee'])
       .lt('date_echeance', today)
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((retardRes as any).error) throw (retardRes as any).error
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const facturesEnRetard = ((retardRes as any).data || []) as FactureAlerte[]
+    if (retardError) throw retardError
+    const facturesEnRetard = (facturesEnRetardData || []) as FactureAlerte[]
 
     for (const facture of facturesEnRetard) {
       const joursRetard = Math.floor(
@@ -143,17 +141,15 @@ export async function generateFactureAlertes(): Promise<{ count: number; error?:
     sevenDaysLater.setDate(sevenDaysLater.getDate() + 7)
     const futureDate = sevenDaysLater.toISOString().split('T')[0]
 
-    const echeanceRes = await supabase
+    const { data: facturesEcheanceData, error: echeanceError } = await supabase
       .from('factures')
       .select('id, numero, client_id, date_echeance, total_ttc')
       .in('statut', ['envoyee', 'partiellement_payee'])
       .gte('date_echeance', today)
       .lte('date_echeance', futureDate)
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((echeanceRes as any).error) throw (echeanceRes as any).error
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const facturesEcheance = ((echeanceRes as any).data || []) as FactureAlerte[]
+    if (echeanceError) throw echeanceError
+    const facturesEcheance = (facturesEcheanceData || []) as FactureAlerte[]
 
     for (const facture of facturesEcheance) {
       const joursRestants = Math.floor(
@@ -207,17 +203,15 @@ export async function generateContratAlertes(): Promise<{ count: number; error?:
     thirtyDaysLater.setDate(thirtyDaysLater.getDate() + 30)
     const futureDate = thirtyDaysLater.toISOString().split('T')[0]
 
-    const contratsRes = await supabase
+    const { data: contratsExpirationData, error: contratsError } = await supabase
       .from('contrats')
       .select('id, numero, titre, client_id, date_fin, montant, reconduction_auto')
       .eq('statut', 'actif')
       .gte('date_fin', today)
       .lte('date_fin', futureDate)
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((contratsRes as any).error) throw (contratsRes as any).error
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const contratsExpiration = ((contratsRes as any).data || []) as ContratAlerte[]
+    if (contratsError) throw contratsError
+    const contratsExpiration = (contratsExpirationData || []) as ContratAlerte[]
 
     for (const contrat of contratsExpiration) {
       const joursRestants = Math.floor(
