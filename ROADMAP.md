@@ -361,7 +361,48 @@ Trois analyses parallèles approfondies ont été réalisées pour identifier le
 - [ ] Remplacer `createUntypedClient()` par client typé (après régénération types)
 
 #### Phase 4 : Accessibilité (1-2 jours) ⚙️ (En cours - 13 février 2026)
-- [ ] Ajouter ARIA labels sur tous les formulaires
+- [x] **Créer composants accessibles réutilisables** ✅ (13 février 2026)
+  - [x] FormAlert : Composant d'alerte avec role="alert" et aria-live automatiques
+    - 4 types : error, success, warning, info
+    - Support message unique ou liste de messages
+    - aria-live="polite" (info/success) ou "assertive" (error/warning)
+    - Conforme WCAG AA
+  - [x] RadioGroupAccessible : Groupe radio avec ARIA complet
+    - Structure <fieldset> + role="radiogroup"
+    - aria-checked, aria-required, aria-invalid automatiques
+    - aria-describedby pour les erreurs
+    - Navigation clavier native
+    - Support icônes et descriptions
+  - Impact : ✅ Composants réutilisables standardisés pour 12 formulaires
+- [x] **Appliquer FormAlert à tous les formulaires** ✅ (13 février 2026)
+  - [x] ClientForm : FormAlert + RadioGroup + aria-required sur 2 champs
+  - [x] TransactionForm : FormAlert + RadioGroup type transaction
+  - [x] WorkflowForm : FormAlert + RadioGroup 4 types de demande
+  - [x] ContratForm : FormAlert standardisé
+  - [x] DevisForm : FormAlert avec message d'erreur
+  - [x] FactureForm : FormAlert avec gestion erreurs de lignes (array)
+  - [x] EmployeForm : FormAlert + aria-required sur champs prenom/nom
+  - [x] FilialeForm : FormAlert accessible
+  - [x] CommandeOutsourcingForm : FormAlert standardisé
+  - [x] FournisseurForm : FormAlert accessible
+  - [x] ProjetDigitalForm : FormAlert avec ARIA
+  - [x] ProjetRobotiqueForm : FormAlert standardisé
+  - Impact : ✅ 100% des formulaires avec messages d'erreur accessibles
+- [ ] **Ajouter aria-required sur tous les champs obligatoires** (En cours - 13 février 2026)
+  - [x] Pattern établi : aria-required="true" + aria-invalid + aria-describedby
+  - [x] EmployeForm : 2 champs complétés (prenom, nom)
+  - [x] ClientForm : 2 champs complétés (nom, filiale_id)
+  - [ ] ~50-60 champs restants dans 12 formulaires
+  - Pattern à appliquer :
+    ```tsx
+    <Label>Champ <span className="text-red-500" aria-label="requis">*</span></Label>
+    <Input
+      aria-required="true"
+      aria-invalid={!!errors.field}
+      aria-describedby={errors.field ? 'field-error' : undefined}
+    />
+    {errors.field && <p id="field-error" role="alert">{errors.field.message}</p>}
+    ```
 - [ ] Vérifier navigation au clavier
 - [ ] Contraste couleurs (WCAG AA)
 - [ ] Tests avec screen reader

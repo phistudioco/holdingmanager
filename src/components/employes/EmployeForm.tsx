@@ -183,7 +183,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="prenom" className="text-sm font-medium text-gray-700">
-                Prénom <span className="text-red-500">*</span>
+                Prénom <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -194,14 +194,21 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
                   className={`pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20 ${
                     errors.prenom ? 'border-red-500 focus:border-red-500' : ''
                   }`}
+                  aria-required="true"
+                  aria-invalid={!!errors.prenom}
+                  aria-describedby={errors.prenom ? 'prenom-error' : undefined}
                 />
               </div>
-              {errors.prenom && <p className="text-sm text-red-600">{errors.prenom.message}</p>}
+              {errors.prenom && (
+                <p id="prenom-error" className="text-sm text-red-600" role="alert">
+                  {errors.prenom.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="nom" className="text-sm font-medium text-gray-700">
-                Nom <span className="text-red-500">*</span>
+                Nom <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <Input
                 id="nom"
@@ -210,6 +217,9 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
                 className={`h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20 ${
                   errors.nom ? 'border-red-500 focus:border-red-500' : ''
                 }`}
+                aria-required="true"
+                aria-invalid={!!errors.nom}
+                aria-describedby={errors.nom ? 'nom-error' : undefined}
               />
               {errors.nom && <p className="text-sm text-red-600">{errors.nom.message}</p>}
             </div>
