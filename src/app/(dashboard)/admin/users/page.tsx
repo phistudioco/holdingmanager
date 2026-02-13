@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createUntypedClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -69,7 +69,7 @@ export default function AdminUsersPage() {
   const [filterRole, setFilterRole] = useState<string>('all')
   const [updating, setUpdating] = useState<string | null>(null)
 
-  const supabase = createClient()
+  const supabase = createUntypedClient()
 
   const fetchData = useCallback(async () => {
     setLoading(true)
