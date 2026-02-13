@@ -9,6 +9,8 @@ import { useFiliales } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { FormAlert } from '@/components/ui/form-alert'
+import { RadioGroupAccessible } from '@/components/ui/radio-group-accessible'
 import {
   Building2,
   UserCircle,
@@ -19,7 +21,6 @@ import {
   CreditCard,
   Save,
   Loader2,
-  AlertCircle,
 } from 'lucide-react'
 import {
   clientSchema,
@@ -143,71 +144,45 @@ export function ClientForm({ client, mode }: ClientFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire client">
       {/* Affichage des erreurs générales */}
-      {Object.keys(errors).length > 0 && (
-        <div className="flex items-center gap-2 p-4 text-red-600 bg-red-50 rounded-xl border border-red-100">
-          <AlertCircle className="h-5 w-5 shrink-0" />
-          <div>
-            <p className="font-semibold">Erreurs de validation :</p>
-            <ul className="list-disc list-inside text-sm mt-1">
-              {Object.entries(errors).map(([key, error]) => (
-                <li key={key}>{error.message}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
+      <FormAlert
+        type="error"
+        message={Object.keys(errors).length > 0 ? 'Erreurs de validation :' : undefined}
+        messages={Object.entries(errors).map(([_, error]) => error.message || '')}
+        aria-label="Erreurs de validation du formulaire"
+      />
 
       {/* Type de client */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-phi-primary to-blue-600">
-          <h3 className="font-heading font-semibold text-white flex items-center gap-2">
-            <UserCircle className="h-5 w-5" />
+          <h2 className="font-heading font-semibold text-white flex items-center gap-2">
+            <UserCircle className="h-5 w-5" aria-hidden="true" />
             Type de client
-          </h3>
+          </h2>
         </div>
         <div className="p-6">
-          <div className="grid grid-cols-2 gap-4">
-            <button
-              type="button"
-              onClick={() => setValue('type', 'entreprise')}
-              className={`p-6 rounded-xl border-2 transition-all ${
-                clientType === 'entreprise'
-                  ? 'border-phi-primary bg-phi-primary/5'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <Building2
-                className={`h-8 w-8 mx-auto mb-3 ${
-                  clientType === 'entreprise' ? 'text-phi-primary' : 'text-gray-400'
-                }`}
-              />
-              <p className={`font-semibold ${clientType === 'entreprise' ? 'text-phi-primary' : 'text-gray-600'}`}>
-                Entreprise
-              </p>
-              <p className="text-sm text-gray-400 mt-1">Société, association...</p>
-            </button>
-            <button
-              type="button"
-              onClick={() => setValue('type', 'particulier')}
-              className={`p-6 rounded-xl border-2 transition-all ${
-                clientType === 'particulier'
-                  ? 'border-phi-accent bg-phi-accent/5'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <UserCircle
-                className={`h-8 w-8 mx-auto mb-3 ${
-                  clientType === 'particulier' ? 'text-phi-accent' : 'text-gray-400'
-                }`}
-              />
-              <p className={`font-semibold ${clientType === 'particulier' ? 'text-phi-accent' : 'text-gray-600'}`}>
-                Particulier
-              </p>
-              <p className="text-sm text-gray-400 mt-1">Personne physique</p>
-            </button>
-          </div>
+          <RadioGroupAccessible
+            name="type"
+            label="Type de client"
+            value={clientType}
+            onChange={(value) => setValue('type', value)}
+            required
+            options={[
+              {
+                value: 'entreprise',
+                label: 'Entreprise',
+                description: 'Société, association...',
+                icon: <Building2 className="h-8 w-8 text-current" aria-hidden="true" />,
+              },
+              {
+                value: 'particulier',
+                label: 'Particulier',
+                description: 'Personne physique',
+                icon: <UserCircle className="h-8 w-8 text-current" aria-hidden="true" />,
+              },
+            ]}
+          />
         </div>
       </div>
 
@@ -221,24 +196,38 @@ export function ClientForm({ client, mode }: ClientFormProps) {
         </div>
         <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <div className="md:col-span-2">
-            <Label htmlFor="nom">Nom / Raison sociale *</Label>
+            <Label htmlFor="nom">
+              Nom / Raison sociale <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <Input
               id="nom"
               {...register('nom')}
               placeholder={clientType === 'entreprise' ? 'Nom de l\'entreprise' : 'Nom complet'}
               className={`mt-1 ${errors.nom ? 'border-red-500' : ''}`}
+              aria-required="true"
+              aria-invalid={!!errors.nom}
+              aria-describedby={errors.nom ? 'nom-error' : undefined}
             />
-            {errors.nom && <p className="text-sm text-red-600 mt-1">{errors.nom.message}</p>}
+            {errors.nom && (
+              <p id="nom-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.nom.message}
+              </p>
+            )}
           </div>
 
           <div>
-            <Label htmlFor="filiale_id">Filiale *</Label>
+            <Label htmlFor="filiale_id">
+              Filiale <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <select
               id="filiale_id"
               {...register('filiale_id', { valueAsNumber: true })}
               className={`mt-1 w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20 ${
                 errors.filiale_id ? 'border-red-500' : 'border-gray-200'
               }`}
+              aria-required="true"
+              aria-invalid={!!errors.filiale_id}
+              aria-describedby={errors.filiale_id ? 'filiale-error' : undefined}
             >
               <option value="">Sélectionner une filiale</option>
               {filiales.map((filiale) => (
@@ -247,7 +236,11 @@ export function ClientForm({ client, mode }: ClientFormProps) {
                 </option>
               ))}
             </select>
-            {errors.filiale_id && <p className="text-sm text-red-600 mt-1">{errors.filiale_id.message}</p>}
+            {errors.filiale_id && (
+              <p id="filiale-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.filiale_id.message}
+              </p>
+            )}
           </div>
 
           <div>

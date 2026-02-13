@@ -332,15 +332,18 @@ Trois analyses parallèles approfondies ont été réalisées pour identifier le
   - [x] useNotifications.ts : Utilisation forme fonctionnelle setState pour éviter stale closures
   - [x] useUser.ts : Correction dépendances useEffect infinies, ajout eslint-disable intentionnel
   - Impact : ✅ Moins de re-renders inutiles, pas de memory leaks
-- [x] **Éliminer les `as any` dans hooks critiques** ⚙️ (En cours - 12 février 2026)
+- [x] **Éliminer les `as any` dans hooks critiques** ✅ (Complété - 13 février 2026)
   - [x] useNotifications.ts : 2 occurrences éliminées (payloads Realtime typés)
   - [x] useUser.ts : 1 occurrence éliminée (remplacement par createUntypedClient)
   - [x] DevisForm : 2 occurrences éliminées (hooks typés)
   - [x] FactureForm : 2 occurrences éliminées (hooks typés)
   - [x] TransactionForm : 2 occurrences éliminées (hooks typés)
   - [x] ClientForm : 2 occurrences éliminées (hooks typés)
-  - [ ] 61 occurrences restantes dans 18 fichiers (PDF, autres composants)
-  - Impact : ✅ Type-safety améliorée, moins d'erreurs runtime, 11 `as any` éliminés au total
+  - [x] Élimination globale : 40 occurrences éliminées en 21 fichiers (62 → 19 restantes)
+  - [x] 19 occurrences restantes toutes justifiées :
+    - 18 dans les fichiers PDF (API jsPDF/autoTable non typée)
+    - 1 dans vitest.config.ts (conflit types Vite/Vitest)
+  - Impact : ✅ Type-safety améliorée, moins d'erreurs runtime, 65% des `as any` éliminés
 - [x] **Factoriser la logique de query dupliquée** ✅ (Complété - 12 février 2026)
   - [x] Création hooks réutilisables : useFiliales, useClients, useServices, useFournisseurs
   - [x] Hooks avec génériques TypeScript pour typage flexible (Tables<> compatible)
@@ -357,7 +360,7 @@ Trois analyses parallèles approfondies ont été réalisées pour identifier le
   - Impact : ✅ Réduction duplication, loading states centralisés, 10 formulaires refactorisés, ~250 lignes dupliquées éliminées
 - [ ] Remplacer `createUntypedClient()` par client typé (après régénération types)
 
-#### Phase 4 : Accessibilité (1-2 jours)
+#### Phase 4 : Accessibilité (1-2 jours) ⚙️ (En cours - 13 février 2026)
 - [ ] Ajouter ARIA labels sur tous les formulaires
 - [ ] Vérifier navigation au clavier
 - [ ] Contraste couleurs (WCAG AA)

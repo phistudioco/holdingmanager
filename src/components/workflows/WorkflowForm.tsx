@@ -7,6 +7,8 @@ import { useFiliales } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { FormAlert } from '@/components/ui/form-alert'
+import { RadioGroupAccessible, type RadioOption } from '@/components/ui/radio-group-accessible'
 import {
   GitBranch,
   FileText,
@@ -16,7 +18,6 @@ import {
   Loader2,
   Save,
   ArrowLeft,
-  AlertCircle,
   CheckCircle,
   Send,
   Building2,
@@ -230,50 +231,39 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
     )
   }
 
+  // Créer les options de radio accessibles
+  const workflowRadioOptions: RadioOption<FormData['type']>[] = workflowTypes.map((type) => ({
+    value: type.value as FormData['type'],
+    label: type.label,
+    icon: (
+      <div className={`p-3 rounded-xl ${type.color} text-white`}>
+        {<type.icon className="h-6 w-6" aria-hidden="true" />}
+      </div>
+    ),
+  }))
+
   return (
-    <form onSubmit={(e) => e.preventDefault()} className="space-y-8">
+    <form onSubmit={(e) => e.preventDefault()} className="space-y-8" aria-label="Formulaire de demande workflow">
       {/* Error Alert */}
-      {error && (
-        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 animate-in slide-in-from-top duration-300">
-          <AlertCircle className="h-5 w-5 shrink-0" />
-          <p className="text-sm font-medium">{error}</p>
-        </div>
-      )}
+      <FormAlert type="error" message={error || undefined} aria-label="Erreur de workflow" />
 
       {/* Section: Type de demande */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-phi-primary to-phi-primary/90 text-white">
           <div className="flex items-center gap-3">
-            <GitBranch className="h-5 w-5" />
-            <h3 className="font-heading font-semibold">Type de demande</h3>
+            <GitBranch className="h-5 w-5" aria-hidden="true" />
+            <h2 className="font-heading font-semibold">Type de demande</h2>
           </div>
         </div>
         <div className="p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {workflowTypes.map((type) => {
-              const Icon = type.icon
-              const isSelected = formData.type === type.value
-              return (
-                <button
-                  key={type.value}
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, type: type.value as FormData['type'] }))}
-                  className={`flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all ${
-                    isSelected
-                      ? 'border-phi-primary bg-phi-primary/5 shadow-md'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  <div className={`p-3 rounded-xl ${type.color} text-white`}>
-                    <Icon className="h-6 w-6" />
-                  </div>
-                  <span className={`text-sm font-medium ${isSelected ? 'text-phi-primary' : 'text-gray-700'}`}>
-                    {type.label}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
+          <RadioGroupAccessible
+            name="type"
+            label="Type de demande"
+            value={formData.type}
+            onChange={(value) => setFormData(prev => ({ ...prev, type: value }))}
+            options={workflowRadioOptions}
+            required
+          />
         </div>
       </div>
 

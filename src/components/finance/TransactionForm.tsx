@@ -9,6 +9,8 @@ import { useFiliales, useClients } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { FormAlert } from '@/components/ui/form-alert'
+import { RadioGroupAccessible } from '@/components/ui/radio-group-accessible'
 import {
   ArrowUpCircle,
   ArrowDownCircle,
@@ -16,7 +18,6 @@ import {
   Euro,
   Save,
   Loader2,
-  AlertCircle,
   Building2,
 } from 'lucide-react'
 import type { Tables } from '@/types/database'
@@ -126,58 +127,44 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
   const categories = type === 'revenu' ? categoriesRevenu : categoriesDepense
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      {error && (
-        <div className="flex items-center gap-2 p-4 text-red-600 bg-red-50 rounded-xl border border-red-100">
-          <AlertCircle className="h-5 w-5 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire de transaction">
+      <FormAlert type="error" message={error || undefined} aria-label="Erreur de transaction" />
 
       {/* Type de transaction */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gray-100">
-          <h3 className="font-heading font-semibold text-gray-700">Type de transaction</h3>
+          <h2 className="font-heading font-semibold text-gray-700">Type de transaction</h2>
         </div>
         <div className="p-6">
-          <div className="grid grid-cols-2 gap-4">
-            <button
-              type="button"
-              onClick={() => {
-                setValue('type', 'revenu')
+          <RadioGroupAccessible
+            name="type"
+            label="Type de transaction"
+            value={type}
+            onChange={(value) => {
+              setValue('type', value)
+              // Définir la catégorie par défaut selon le type
+              if (value === 'revenu') {
                 setValue('categorie', 'facturation')
-              }}
-              className={`flex items-center justify-center gap-3 p-6 rounded-xl border-2 transition-all ${
-                type === 'revenu'
-                  ? 'border-green-500 bg-green-50 text-green-700'
-                  : 'border-gray-200 hover:border-green-200 hover:bg-green-50/50'
-              }`}
-            >
-              <ArrowUpCircle className={`h-8 w-8 ${type === 'revenu' ? 'text-green-500' : 'text-gray-400'}`} />
-              <div className="text-left">
-                <p className="font-semibold text-lg">Revenu</p>
-                <p className="text-sm opacity-70">Entrée d&apos;argent</p>
-              </div>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setValue('type', 'depense')
+              } else {
                 setValue('categorie', 'salaires')
-              }}
-              className={`flex items-center justify-center gap-3 p-6 rounded-xl border-2 transition-all ${
-                type === 'depense'
-                  ? 'border-red-500 bg-red-50 text-red-700'
-                  : 'border-gray-200 hover:border-red-200 hover:bg-red-50/50'
-              }`}
-            >
-              <ArrowDownCircle className={`h-8 w-8 ${type === 'depense' ? 'text-red-500' : 'text-gray-400'}`} />
-              <div className="text-left">
-                <p className="font-semibold text-lg">Dépense</p>
-                <p className="text-sm opacity-70">Sortie d&apos;argent</p>
-              </div>
-            </button>
-          </div>
+              }
+            }}
+            required
+            options={[
+              {
+                value: 'revenu',
+                label: 'Revenu',
+                description: "Entrée d'argent",
+                icon: <ArrowUpCircle className="h-8 w-8 text-green-500" aria-hidden="true" />,
+              },
+              {
+                value: 'depense',
+                label: 'Dépense',
+                description: "Sortie d'argent",
+                icon: <ArrowDownCircle className="h-8 w-8 text-red-500" aria-hidden="true" />,
+              },
+            ]}
+          />
         </div>
       </div>
 

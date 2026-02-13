@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 
 export default defineConfig({
+  // Type cast nécessaire : conflit de types entre Vite (direct) et Vite (embarqué dans Vitest)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   plugins: [react() as any],
   test: {
