@@ -9,6 +9,7 @@ import { useFiliales, useClients } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { FormAlert } from '@/components/ui/form-alert'
 import {
   FileText,
   Users,
@@ -17,7 +18,6 @@ import {
   Trash2,
   Save,
   Loader2,
-  AlertCircle,
   Calculator,
 } from 'lucide-react'
 import type { Tables } from '@/types/database'
@@ -292,13 +292,8 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
-          <p className="text-sm text-red-700">{error}</p>
-        </div>
-      )}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire de devis">
+      <FormAlert type="error" message={error || undefined} aria-label="Erreur de devis" />
 
       {/* Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">

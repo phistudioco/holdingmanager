@@ -9,6 +9,7 @@ import { useFiliales, useServices } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { FormAlert } from '@/components/ui/form-alert'
 import {
   User,
   Building2,
@@ -21,7 +22,6 @@ import {
   Loader2,
   Save,
   ArrowLeft,
-  AlertCircle,
   CheckCircle,
   DollarSign,
   Camera,
@@ -149,14 +149,8 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      {/* Error Alert */}
-      {error && (
-        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 animate-in slide-in-from-top duration-300">
-          <AlertCircle className="h-5 w-5 shrink-0" />
-          <p className="text-sm font-medium">{error}</p>
-        </div>
-      )}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire d'employé">
+      <FormAlert type="error" message={error || undefined} aria-label="Erreur d'employé" />
 
       {/* Section: Photo */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">

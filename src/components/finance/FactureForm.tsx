@@ -9,6 +9,7 @@ import { useFiliales, useClients } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { FormAlert } from '@/components/ui/form-alert'
 import {
   FileText,
   Users,
@@ -17,7 +18,6 @@ import {
   Trash2,
   Save,
   Loader2,
-  AlertCircle,
   Calculator,
 } from 'lucide-react'
 import {
@@ -256,28 +256,27 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
     }
   }
 
+  // Préparer les messages d'erreur pour FormAlert
+  const errorMessages = Object.entries(errors).map(([key, error]) => {
+    if (key === 'lignes' && Array.isArray(error)) {
+      return error
+        .map((ligneError, idx) =>
+          ligneError ? `Ligne ${idx + 1}: ${Object.values(ligneError).join(', ')}` : null
+        )
+        .filter(Boolean)
+        .join('; ')
+    }
+    return error.message || ''
+  })
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      {/* Affichage des erreurs générales */}
-      {Object.keys(errors).length > 0 && (
-        <div className="flex items-center gap-2 p-4 text-red-600 bg-red-50 rounded-xl border border-red-100">
-          <AlertCircle className="h-5 w-5 shrink-0" />
-          <div>
-            <p className="font-semibold">Erreurs de validation :</p>
-            <ul className="list-disc list-inside text-sm mt-1">
-              {Object.entries(errors).map(([key, error]) => (
-                <li key={key}>
-                  {key === 'lignes' && Array.isArray(error)
-                    ? error.map((ligneError, idx) =>
-                        ligneError ? `Ligne ${idx + 1}: ${Object.values(ligneError).join(', ')}` : null
-                      ).filter(Boolean).join('; ')
-                    : error.message}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire de facture">
+      <FormAlert
+        type="error"
+        message={Object.keys(errors).length > 0 ? 'Erreurs de validation :' : undefined}
+        messages={errorMessages}
+        aria-label="Erreurs de validation du formulaire"
+      />
 
       {/* Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">

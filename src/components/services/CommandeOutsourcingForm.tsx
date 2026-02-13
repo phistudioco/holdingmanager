@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { createUntypedClient } from '@/lib/supabase/client'
 import { useFiliales, useFournisseurs, type Filiale, type Fournisseur } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
+import { FormAlert } from '@/components/ui/form-alert'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -16,7 +17,7 @@ import {
   Calendar,
   Save,
   Loader2,
-  AlertCircle,
+  
   DollarSign,
   Truck,
 } from 'lucide-react'
@@ -152,13 +153,8 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
   const themeColor = '#0f2080'
 
   return (
-    <form onSubmit={handleFormSubmit(onSubmit)} className="space-y-8">
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
-          <p className="text-sm text-red-700">{error}</p>
-        </div>
-      )}
+    <form onSubmit={handleFormSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire de commande outsourcing">
+      <FormAlert type="error" message={error || undefined} aria-label="Erreur de commande" />
 
       {/* Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">

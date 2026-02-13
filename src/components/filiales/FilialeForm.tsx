@@ -8,6 +8,7 @@ import { createUntypedClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { FormAlert } from '@/components/ui/form-alert'
 import {
   Building2,
   MapPin,
@@ -19,7 +20,7 @@ import {
   Loader2,
   Save,
   ArrowLeft,
-  AlertCircle,
+  
   CheckCircle,
 } from 'lucide-react'
 import type { Tables } from '@/types/database'
@@ -137,14 +138,8 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      {/* Error Alert */}
-      {error && (
-        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 animate-in slide-in-from-top duration-300">
-          <AlertCircle className="h-5 w-5 shrink-0" />
-          <p className="text-sm font-medium">{error}</p>
-        </div>
-      )}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire de filiale">
+      <FormAlert type="error" message={error || undefined} aria-label="Erreur de filiale" />
 
       {/* Section: Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">

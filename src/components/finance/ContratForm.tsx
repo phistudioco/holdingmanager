@@ -9,6 +9,7 @@ import { useFiliales, useClients } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { FormAlert } from '@/components/ui/form-alert'
 import {
   ScrollText,
   Users,
@@ -16,7 +17,6 @@ import {
   Euro,
   Save,
   Loader2,
-  AlertCircle,
   RefreshCw,
 } from 'lucide-react'
 import type { Tables } from '@/types/database'
@@ -135,13 +135,8 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      {error && (
-        <div className="flex items-center gap-2 p-4 text-red-600 bg-red-50 rounded-xl border border-red-100">
-          <AlertCircle className="h-5 w-5 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire de contrat">
+      <FormAlert type="error" message={error || undefined} aria-label="Erreur de contrat" />
 
       {/* Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
