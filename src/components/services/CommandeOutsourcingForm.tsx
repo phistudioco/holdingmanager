@@ -197,11 +197,16 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
           </div>
 
           <div>
-            <Label htmlFor="fournisseur_id">Fournisseur *</Label>
+            <Label htmlFor="fournisseur_id">
+              Fournisseur <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <select
               id="fournisseur_id"
               {...register('fournisseur_id', { valueAsNumber: true })}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              aria-required="true"
+              aria-invalid={!!errors.fournisseur_id}
+              aria-describedby={errors.fournisseur_id ? 'fournisseur-error' : undefined}
             >
               <option value={0}>Sélectionner un fournisseur</option>
               {fournisseurs.map(f => (
@@ -209,7 +214,9 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
               ))}
             </select>
             {errors.fournisseur_id && (
-              <p className="text-sm text-red-600 mt-1">{errors.fournisseur_id.message}</p>
+              <p id="fournisseur-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.fournisseur_id.message}
+              </p>
             )}
           </div>
 
@@ -217,13 +224,16 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
             <Label htmlFor="filiale_id">
               <span className="flex items-center gap-2">
                 <Building2 className="h-4 w-4" />
-                Filiale *
+                Filiale <span className="text-red-500" aria-label="requis">*</span>
               </span>
             </Label>
             <select
               id="filiale_id"
               {...register('filiale_id', { valueAsNumber: true })}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              aria-required="true"
+              aria-invalid={!!errors.filiale_id}
+              aria-describedby={errors.filiale_id ? 'filiale-error' : undefined}
             >
               <option value={0}>Sélectionner une filiale</option>
               {filiales.map(f => (
@@ -231,7 +241,9 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
               ))}
             </select>
             {errors.filiale_id && (
-              <p className="text-sm text-red-600 mt-1">{errors.filiale_id.message}</p>
+              <p id="filiale-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.filiale_id.message}
+              </p>
             )}
           </div>
 
@@ -266,15 +278,22 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <Label htmlFor="date_commande">Date de commande *</Label>
+            <Label htmlFor="date_commande">
+              Date de commande <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <Input
               id="date_commande"
               type="date"
               {...register('date_commande')}
               className="mt-1"
+              aria-required="true"
+              aria-invalid={!!errors.date_commande}
+              aria-describedby={errors.date_commande ? 'date-commande-error' : undefined}
             />
             {errors.date_commande && (
-              <p className="text-sm text-red-600 mt-1">{errors.date_commande.message}</p>
+              <p id="date-commande-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.date_commande.message}
+              </p>
             )}
           </div>
 

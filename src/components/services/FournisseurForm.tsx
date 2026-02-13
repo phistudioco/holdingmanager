@@ -165,15 +165,22 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
-            <Label htmlFor="nom">Nom du fournisseur *</Label>
+            <Label htmlFor="nom">
+              Nom du fournisseur <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <Input
               id="nom"
               {...register('nom')}
               placeholder="Ex: Acme Industries"
               className="mt-1"
+              aria-required="true"
+              aria-invalid={!!errors.nom}
+              aria-describedby={errors.nom ? 'nom-error' : undefined}
             />
             {errors.nom && (
-              <p className="text-sm text-red-600 mt-1">{errors.nom.message}</p>
+              <p id="nom-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.nom.message}
+              </p>
             )}
           </div>
 

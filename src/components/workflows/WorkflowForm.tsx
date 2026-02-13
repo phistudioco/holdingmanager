@@ -279,7 +279,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="space-y-2">
               <Label htmlFor="titre" className="text-sm font-medium text-gray-700">
-                Titre <span className="text-red-500">*</span>
+                Titre <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <Input
                 id="titre"
@@ -289,12 +289,13 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
                 placeholder="Titre de la demande"
                 className="h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20"
                 required
+                aria-required="true"
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="filiale_id" className="text-sm font-medium text-gray-700">
-                Filiale <span className="text-red-500">*</span>
+                Filiale <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <div className="relative">
                 <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -305,6 +306,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
                   onChange={handleChange}
                   className="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-200 bg-white text-gray-900 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors"
                   required
+                  aria-required="true"
                 >
                   <option value="">Sélectionner une filiale</option>
                   {filiales.map(f => (
@@ -317,7 +319,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="demandeur_id" className="text-sm font-medium text-gray-700">
-              Demandeur <span className="text-red-500">*</span>
+              Demandeur <span className="text-red-500" aria-label="requis">*</span>
             </Label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -328,6 +330,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
                 onChange={handleChange}
                 className="w-full h-12 pl-10 pr-4 rounded-xl border border-gray-200 bg-white text-gray-900 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors"
                 required
+                aria-required="true"
               >
                 <option value="">Sélectionner un demandeur</option>
                 {employes.map(e => (

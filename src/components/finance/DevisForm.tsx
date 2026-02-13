@@ -304,7 +304,9 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
-            <Label htmlFor="filiale_id">Filiale émettrice *</Label>
+            <Label htmlFor="filiale_id">
+              Filiale émettrice <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <select
               id="filiale_id"
               {...register('filiale_id', {
@@ -313,13 +315,20 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
               className={`mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-phi-primary/20 focus:border-phi-primary ${
                 errors.filiale_id ? 'border-red-500' : ''
               }`}
+              aria-required="true"
+              aria-invalid={!!errors.filiale_id}
+              aria-describedby={errors.filiale_id ? 'filiale-error' : undefined}
             >
               <option value={0}>Sélectionner une filiale</option>
               {filiales.map(f => (
                 <option key={f.id} value={f.id}>{f.nom}</option>
               ))}
             </select>
-            {errors.filiale_id && <p className="text-sm text-red-600 mt-1">{errors.filiale_id.message}</p>}
+            {errors.filiale_id && (
+              <p id="filiale-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.filiale_id.message}
+              </p>
+            )}
           </div>
 
           {mode === 'edit' && (
@@ -360,7 +369,9 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <Label htmlFor="client_id">Client *</Label>
+            <Label htmlFor="client_id">
+              Client <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <select
               id="client_id"
               {...register('client_id', {
@@ -369,13 +380,20 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
               className={`mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-phi-primary/20 focus:border-phi-primary ${
                 errors.client_id ? 'border-red-500' : ''
               }`}
+              aria-required="true"
+              aria-invalid={!!errors.client_id}
+              aria-describedby={errors.client_id ? 'client-error' : undefined}
             >
               <option value={0}>Sélectionner un client</option>
               {clients.map(c => (
                 <option key={c.id} value={c.id}>{c.nom} ({c.code})</option>
               ))}
             </select>
-            {errors.client_id && <p className="text-sm text-red-600 mt-1">{errors.client_id.message}</p>}
+            {errors.client_id && (
+              <p id="client-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.client_id.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -400,28 +418,46 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <Label htmlFor="date_emission">Date d&apos;émission *</Label>
+            <Label htmlFor="date_emission">
+              Date d&apos;émission <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <Input
               id="date_emission"
               type="date"
               {...register('date_emission')}
               className={`mt-1 ${errors.date_emission ? 'border-red-500' : ''}`}
+              aria-required="true"
+              aria-invalid={!!errors.date_emission}
+              aria-describedby={errors.date_emission ? 'date-emission-error' : undefined}
             />
-            {errors.date_emission && <p className="text-sm text-red-600 mt-1">{errors.date_emission.message}</p>}
+            {errors.date_emission && (
+              <p id="date-emission-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.date_emission.message}
+              </p>
+            )}
           </div>
 
           <div>
-            <Label htmlFor="date_validite">Date de validité *</Label>
+            <Label htmlFor="date_validite">
+              Date de validité <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <Input
               id="date_validite"
               type="date"
               {...register('date_validite')}
               className={`mt-1 ${errors.date_validite ? 'border-red-500' : ''}`}
+              aria-required="true"
+              aria-invalid={!!errors.date_validite}
+              aria-describedby={errors.date_validite ? 'date-validite-error date-validite-hint' : 'date-validite-hint'}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p id="date-validite-hint" className="text-xs text-gray-500 mt-1">
               Par défaut: 30 jours après émission
             </p>
-            {errors.date_validite && <p className="text-sm text-red-600 mt-1">{errors.date_validite.message}</p>}
+            {errors.date_validite && (
+              <p id="date-validite-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.date_validite.message}
+              </p>
+            )}
           </div>
         </div>
       </div>

@@ -309,7 +309,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="matricule" className="text-sm font-medium text-gray-700">
-                Matricule <span className="text-red-500">*</span>
+                Matricule <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <div className="flex gap-2">
                 <div className="relative flex-1">
@@ -321,6 +321,9 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
                     className={`pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20 ${
                       errors.matricule ? 'border-red-500 focus:border-red-500' : ''
                     }`}
+                    aria-required="true"
+                    aria-invalid={!!errors.matricule}
+                    aria-describedby={errors.matricule ? 'matricule-error' : undefined}
                   />
                 </div>
                 <Button
@@ -332,12 +335,16 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
                   Générer
                 </Button>
               </div>
-              {errors.matricule && <p className="text-sm text-red-600">{errors.matricule.message}</p>}
+              {errors.matricule && (
+                <p id="matricule-error" className="text-sm text-red-600" role="alert">
+                  {errors.matricule.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="filiale_id" className="text-sm font-medium text-gray-700">
-                Filiale <span className="text-red-500">*</span>
+                Filiale <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <div className="relative">
                 <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
@@ -349,6 +356,9 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
                   className={`w-full h-12 pl-10 pr-4 rounded-xl border border-gray-200 bg-white text-gray-900 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors appearance-none ${
                     errors.filiale_id ? 'border-red-500 focus:border-red-500' : ''
                   }`}
+                  aria-required="true"
+                  aria-invalid={!!errors.filiale_id}
+                  aria-describedby={errors.filiale_id ? 'filiale-error' : undefined}
                 >
                   <option value="">Sélectionner une filiale</option>
                   {filiales.map(f => (
@@ -356,7 +366,11 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
                   ))}
                 </select>
               </div>
-              {errors.filiale_id && <p className="text-sm text-red-600">{errors.filiale_id.message}</p>}
+              {errors.filiale_id && (
+                <p id="filiale-error" className="text-sm text-red-600" role="alert">
+                  {errors.filiale_id.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -398,7 +412,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <Label htmlFor="date_embauche" className="text-sm font-medium text-gray-700">
-                Date d'embauche <span className="text-red-500">*</span>
+                Date d'embauche <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <div className="relative">
                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -409,9 +423,16 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
                   className={`pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20 ${
                     errors.date_embauche ? 'border-red-500 focus:border-red-500' : ''
                   }`}
+                  aria-required="true"
+                  aria-invalid={!!errors.date_embauche}
+                  aria-describedby={errors.date_embauche ? 'date-embauche-error' : undefined}
                 />
               </div>
-              {errors.date_embauche && <p className="text-sm text-red-600">{errors.date_embauche.message}</p>}
+              {errors.date_embauche && (
+                <p id="date-embauche-error" className="text-sm text-red-600" role="alert">
+                  {errors.date_embauche.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">

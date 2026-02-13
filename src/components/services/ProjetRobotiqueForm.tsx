@@ -156,15 +156,22 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
-            <Label htmlFor="nom">Nom du projet *</Label>
+            <Label htmlFor="nom">
+              Nom du projet <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <Input
               id="nom"
               {...register('nom')}
               placeholder="Ex: Automatisation ligne de production"
               className="mt-1"
+              aria-required="true"
+              aria-invalid={!!errors.nom}
+              aria-describedby={errors.nom ? 'nom-error' : undefined}
             />
             {errors.nom && (
-              <p className="text-sm text-red-600 mt-1">{errors.nom.message}</p>
+              <p id="nom-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.nom.message}
+              </p>
             )}
           </div>
 
@@ -230,11 +237,16 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <Label htmlFor="filiale_id">Filiale *</Label>
+            <Label htmlFor="filiale_id">
+              Filiale <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <select
               id="filiale_id"
               {...register('filiale_id', { valueAsNumber: true })}
               className="mt-1 w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500"
+              aria-required="true"
+              aria-invalid={!!errors.filiale_id}
+              aria-describedby={errors.filiale_id ? 'filiale-error' : undefined}
             >
               <option value={0}>Sélectionner une filiale</option>
               {filiales.map(f => (
@@ -242,7 +254,9 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
               ))}
             </select>
             {errors.filiale_id && (
-              <p className="text-sm text-red-600 mt-1">{errors.filiale_id.message}</p>
+              <p id="filiale-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.filiale_id.message}
+              </p>
             )}
           </div>
 

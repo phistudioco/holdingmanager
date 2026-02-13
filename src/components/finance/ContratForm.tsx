@@ -164,7 +164,9 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
           </div>
 
           <div>
-            <Label htmlFor="filiale_id">Filiale *</Label>
+            <Label htmlFor="filiale_id">
+              Filiale <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <select
               id="filiale_id"
               {...register('filiale_id', {
@@ -173,6 +175,9 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
               className={`mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20 ${
                 errors.filiale_id ? 'border-red-500' : ''
               }`}
+              aria-required="true"
+              aria-invalid={!!errors.filiale_id}
+              aria-describedby={errors.filiale_id ? 'filiale-error' : undefined}
             >
               <option value="">Sélectionner</option>
               {filiales.map((filiale) => (
@@ -181,7 +186,11 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
                 </option>
               ))}
             </select>
-            {errors.filiale_id && <p className="text-sm text-red-600 mt-1">{errors.filiale_id.message}</p>}
+            {errors.filiale_id && (
+              <p id="filiale-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.filiale_id.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -213,14 +222,23 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
           )}
 
           <div className="md:col-span-2 lg:col-span-3">
-            <Label htmlFor="titre">Titre du contrat *</Label>
+            <Label htmlFor="titre">
+              Titre du contrat <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <Input
               id="titre"
               {...register('titre')}
               placeholder="Contrat de maintenance annuel, Licence logiciel..."
               className={`mt-1 ${errors.titre ? 'border-red-500' : ''}`}
+              aria-required="true"
+              aria-invalid={!!errors.titre}
+              aria-describedby={errors.titre ? 'titre-error' : undefined}
             />
-            {errors.titre && <p className="text-sm text-red-600 mt-1">{errors.titre.message}</p>}
+            {errors.titre && (
+              <p id="titre-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.titre.message}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -235,7 +253,9 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
         </div>
         <div className="p-6">
           <div>
-            <Label htmlFor="client_id">Client *</Label>
+            <Label htmlFor="client_id">
+              Client <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <select
               id="client_id"
               {...register('client_id', {
@@ -244,6 +264,9 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
               className={`mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20 ${
                 errors.client_id ? 'border-red-500' : ''
               }`}
+              aria-required="true"
+              aria-invalid={!!errors.client_id}
+              aria-describedby={errors.client_id ? 'client-error' : undefined}
             >
               <option value="">Sélectionner un client</option>
               {clients.map((client) => (
@@ -252,7 +275,11 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
                 </option>
               ))}
             </select>
-            {errors.client_id && <p className="text-sm text-red-600 mt-1">{errors.client_id.message}</p>}
+            {errors.client_id && (
+              <p id="client-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.client_id.message}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -267,14 +294,23 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
         </div>
         <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <div>
-            <Label htmlFor="date_debut">Date de début *</Label>
+            <Label htmlFor="date_debut">
+              Date de début <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <Input
               id="date_debut"
               type="date"
               {...register('date_debut')}
               className={`mt-1 ${errors.date_debut ? 'border-red-500' : ''}`}
+              aria-required="true"
+              aria-invalid={!!errors.date_debut}
+              aria-describedby={errors.date_debut ? 'date-debut-error' : undefined}
             />
-            {errors.date_debut && <p className="text-sm text-red-600 mt-1">{errors.date_debut.message}</p>}
+            {errors.date_debut && (
+              <p id="date-debut-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.date_debut.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -333,18 +369,27 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
         <div className="p-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <Label htmlFor="montant">Montant (€) *</Label>
+              <Label htmlFor="montant">
+                Montant (€) <span className="text-red-500" aria-label="requis">*</span>
+              </Label>
               <Input
                 id="montant"
                 type="number"
                 step={0.01}
                 {...register('montant', { valueAsNumber: true })}
                 className={`mt-1 ${errors.montant ? 'border-red-500' : ''}`}
+                aria-required="true"
+                aria-invalid={!!errors.montant}
+                aria-describedby={errors.montant ? 'montant-error' : undefined}
               />
               <p className="text-xs text-gray-500 mt-1">
                 Montant par période ({periodicite})
               </p>
-              {errors.montant && <p className="text-sm text-red-600 mt-1">{errors.montant.message}</p>}
+              {errors.montant && (
+                <p id="montant-error" className="text-sm text-red-600 mt-1" role="alert">
+                  {errors.montant.message}
+                </p>
+              )}
             </div>
             <div className="flex items-center">
               <div className="p-4 bg-phi-primary/5 rounded-xl w-full">

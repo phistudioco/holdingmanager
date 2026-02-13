@@ -184,7 +184,9 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
         </div>
         <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <div>
-            <Label htmlFor="filiale_id">Filiale *</Label>
+            <Label htmlFor="filiale_id">
+              Filiale <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <select
               id="filiale_id"
               {...register('filiale_id', {
@@ -193,6 +195,9 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
               className={`mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20 ${
                 errors.filiale_id ? 'border-red-500' : ''
               }`}
+              aria-required="true"
+              aria-invalid={!!errors.filiale_id}
+              aria-describedby={errors.filiale_id ? 'filiale-error' : undefined}
             >
               <option value="">Sélectionner</option>
               {filiales.map((filiale) => (
@@ -201,17 +206,26 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
                 </option>
               ))}
             </select>
-            {errors.filiale_id && <p className="text-sm text-red-600 mt-1">{errors.filiale_id.message}</p>}
+            {errors.filiale_id && (
+              <p id="filiale-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.filiale_id.message}
+              </p>
+            )}
           </div>
 
           <div>
-            <Label htmlFor="categorie">Catégorie *</Label>
+            <Label htmlFor="categorie">
+              Catégorie <span className="text-red-500" aria-label="requis">*</span>
+            </Label>
             <select
               id="categorie"
               {...register('categorie')}
               className={`mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-phi-primary/20 ${
                 errors.categorie ? 'border-red-500' : ''
               }`}
+              aria-required="true"
+              aria-invalid={!!errors.categorie}
+              aria-describedby={errors.categorie ? 'categorie-error' : undefined}
             >
               {categories.map((cat) => (
                 <option key={cat.value} value={cat.value}>
@@ -219,7 +233,11 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
                 </option>
               ))}
             </select>
-            {errors.categorie && <p className="text-sm text-red-600 mt-1">{errors.categorie.message}</p>}
+            {errors.categorie && (
+              <p id="categorie-error" className="text-sm text-red-600 mt-1" role="alert">
+                {errors.categorie.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -293,15 +311,24 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
           </div>
           <div className="p-6">
             <div>
-              <Label htmlFor="montant">Montant (€) *</Label>
+              <Label htmlFor="montant">
+                Montant (€) <span className="text-red-500" aria-label="requis">*</span>
+              </Label>
               <Input
                 id="montant"
                 type="number"
                 step={0.01}
                 {...register('montant', { valueAsNumber: true })}
                 className={`mt-1 text-lg ${errors.montant ? 'border-red-500' : ''}`}
+                aria-required="true"
+                aria-invalid={!!errors.montant}
+                aria-describedby={errors.montant ? 'montant-error' : undefined}
               />
-              {errors.montant && <p className="text-sm text-red-600 mt-1">{errors.montant.message}</p>}
+              {errors.montant && (
+                <p id="montant-error" className="text-sm text-red-600 mt-1" role="alert">
+                  {errors.montant.message}
+                </p>
+              )}
             </div>
             <div className={`mt-4 p-4 rounded-xl ${
               type === 'revenu' ? 'bg-green-50' : 'bg-red-50'
@@ -326,14 +353,23 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
           </div>
           <div className="p-6">
             <div>
-              <Label htmlFor="date_transaction">Date de la transaction *</Label>
+              <Label htmlFor="date_transaction">
+                Date de la transaction <span className="text-red-500" aria-label="requis">*</span>
+              </Label>
               <Input
                 id="date_transaction"
                 type="date"
                 {...register('date_transaction')}
                 className={`mt-1 ${errors.date_transaction ? 'border-red-500' : ''}`}
+                aria-required="true"
+                aria-invalid={!!errors.date_transaction}
+                aria-describedby={errors.date_transaction ? 'date-transaction-error' : undefined}
               />
-              {errors.date_transaction && <p className="text-sm text-red-600 mt-1">{errors.date_transaction.message}</p>}
+              {errors.date_transaction && (
+                <p id="date-transaction-error" className="text-sm text-red-600 mt-1" role="alert">
+                  {errors.date_transaction.message}
+                </p>
+              )}
             </div>
             <div className="mt-4 p-4 bg-blue-50 rounded-xl flex items-center gap-3">
               <Building2 className="h-5 w-5 text-blue-600" />

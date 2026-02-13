@@ -153,7 +153,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="space-y-2">
               <Label htmlFor="code" className="text-sm font-medium text-gray-700">
-                Code filiale <span className="text-red-500">*</span>
+                Code filiale <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <div className="relative">
                 <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -164,18 +164,21 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
                   className={`pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20 ${
                     errors.code ? 'border-red-500 focus:border-red-500' : ''
                   }`}
+                  aria-required="true"
+                  aria-invalid={!!errors.code}
+                  aria-describedby={errors.code ? 'code-error code-hint' : 'code-hint'}
                 />
               </div>
               {errors.code ? (
-                <p className="text-sm text-red-600">{errors.code.message}</p>
+                <p id="code-error" className="text-sm text-red-600" role="alert">{errors.code.message}</p>
               ) : (
-                <p className="text-xs text-gray-500">Identifiant unique de la filiale</p>
+                <p id="code-hint" className="text-xs text-gray-500">Identifiant unique de la filiale</p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="nom" className="text-sm font-medium text-gray-700">
-                Nom <span className="text-red-500">*</span>
+                Nom <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <div className="relative">
                 <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -186,9 +189,16 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
                   className={`pl-10 h-12 rounded-xl border-gray-200 focus:border-phi-primary focus:ring-phi-primary/20 ${
                     errors.nom ? 'border-red-500 focus:border-red-500' : ''
                   }`}
+                  aria-required="true"
+                  aria-invalid={!!errors.nom}
+                  aria-describedby={errors.nom ? 'nom-error' : undefined}
                 />
               </div>
-              {errors.nom && <p className="text-sm text-red-600">{errors.nom.message}</p>}
+              {errors.nom && (
+                <p id="nom-error" className="text-sm text-red-600" role="alert">
+                  {errors.nom.message}
+                </p>
+              )}
             </div>
           </div>
 
