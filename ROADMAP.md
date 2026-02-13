@@ -388,12 +388,21 @@ Trois analyses parallèles approfondies ont été réalisées pour identifier le
   - [x] ProjetDigitalForm : FormAlert avec ARIA
   - [x] ProjetRobotiqueForm : FormAlert standardisé
   - Impact : ✅ 100% des formulaires avec messages d'erreur accessibles
-- [ ] **Ajouter aria-required sur tous les champs obligatoires** (En cours - 13 février 2026)
-  - [x] Pattern établi : aria-required="true" + aria-invalid + aria-describedby
-  - [x] EmployeForm : 2 champs complétés (prenom, nom)
-  - [x] ClientForm : 2 champs complétés (nom, filiale_id)
-  - [ ] ~50-60 champs restants dans 12 formulaires
-  - Pattern à appliquer :
+- [x] **Ajouter aria-required sur tous les champs obligatoires** ✅ (Complété - 13 février 2026)
+  - [x] Pattern établi : aria-required="true" + aria-invalid + aria-describedby + role="alert"
+  - [x] ClientForm : 2 champs (nom, filiale_id)
+  - [x] EmployeForm : 5 champs (prenom, nom, matricule, filiale_id, date_embauche)
+  - [x] TransactionForm : 4 champs (filiale_id, categorie, montant, date_transaction)
+  - [x] WorkflowForm : 3 champs (titre, filiale_id, demandeur_id)
+  - [x] ContratForm : 5 champs (filiale_id, client_id, titre, date_debut, montant)
+  - [x] DevisForm : 4 champs (filiale_id, client_id, date_emission, date_validite)
+  - [x] FilialeForm : 2 champs (code, nom) - cas spécial avec hint text
+  - [x] CommandeOutsourcingForm : 3 champs (fournisseur_id, filiale_id, date_commande)
+  - [x] FournisseurForm : 1 champ (nom)
+  - [x] ProjetDigitalForm : 2 champs (nom, filiale_id)
+  - [x] ProjetRobotiqueForm : 2 champs (nom, filiale_id)
+  - Impact : ✅ 33 champs requis sur 10 formulaires conformes WCAG AA (100% couverture)
+  - Pattern appliqué :
     ```tsx
     <Label>Champ <span className="text-red-500" aria-label="requis">*</span></Label>
     <Input
