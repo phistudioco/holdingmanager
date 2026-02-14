@@ -1,5 +1,18 @@
+import dynamic from 'next/dynamic'
 import { PageHeader } from '@/components/common/PageHeader'
-import { DevisForm } from '@/components/finance/DevisForm'
+import { Loader2 } from 'lucide-react'
+
+const DevisForm = dynamic(
+  () => import('@/components/finance/DevisForm').then(mod => ({ default: mod.DevisForm })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-phi-primary" />
+      </div>
+    )
+  }
+)
 
 export default function NouveauDevisPage() {
   return (

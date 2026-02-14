@@ -1,5 +1,18 @@
+import dynamic from 'next/dynamic'
 import { PageHeader } from '@/components/common/PageHeader'
-import { ContratForm } from '@/components/finance/ContratForm'
+import { Loader2 } from 'lucide-react'
+
+const ContratForm = dynamic(
+  () => import('@/components/finance/ContratForm').then(mod => ({ default: mod.ContratForm })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-phi-primary" />
+      </div>
+    )
+  }
+)
 
 export default function NouveauContratPage() {
   return (

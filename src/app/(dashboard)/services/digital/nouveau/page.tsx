@@ -1,5 +1,18 @@
+import dynamic from 'next/dynamic'
 import { PageHeader } from '@/components/common/PageHeader'
-import { ProjetDigitalForm } from '@/components/services/ProjetDigitalForm'
+import { Loader2 } from 'lucide-react'
+
+const ProjetDigitalForm = dynamic(
+  () => import('@/components/services/ProjetDigitalForm').then(mod => ({ default: mod.ProjetDigitalForm })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-phi-primary" />
+      </div>
+    )
+  }
+)
 
 export default function NouveauProjetDigitalPage() {
   return (

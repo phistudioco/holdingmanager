@@ -1,5 +1,18 @@
+import dynamic from 'next/dynamic'
 import { PageHeader } from '@/components/common/PageHeader'
-import { EmployeForm } from '@/components/employes/EmployeForm'
+import { Loader2 } from 'lucide-react'
+
+const EmployeForm = dynamic(
+  () => import('@/components/employes/EmployeForm').then(mod => ({ default: mod.EmployeForm })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-phi-primary" />
+      </div>
+    )
+  }
+)
 
 export default function NouvelEmployePage() {
   return (
