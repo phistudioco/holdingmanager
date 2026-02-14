@@ -49,70 +49,68 @@ export default function ClientsPage() {
     actifs: 0,
   })
 
-  const fetchClients = useCallback(async () => {
+  // Fonction combinée pour charger clients et stats en parallèle
+  const fetchData = useCallback(async () => {
     setLoading(true)
     const supabase = createClient()
 
-    let query = supabase
+    // Construire la requête de clients
+    let clientsQuery = supabase
       .from('clients')
       .select('*, filiale:filiale_id(nom, code)', { count: 'exact' })
 
     // Filtres
     if (search) {
-      query = query.or(`nom.ilike.%${search}%,code.ilike.%${search}%,email.ilike.%${search}%`)
+      clientsQuery = clientsQuery.or(`nom.ilike.%${search}%,code.ilike.%${search}%,email.ilike.%${search}%`)
     }
     if (filterType !== 'all') {
-      query = query.eq('type', filterType)
+      clientsQuery = clientsQuery.eq('type', filterType)
     }
     if (filterStatut !== 'all') {
-      query = query.eq('statut', filterStatut)
+      clientsQuery = clientsQuery.eq('statut', filterStatut)
     }
 
     // Pagination
     const from = (page - 1) * ITEMS_PER_PAGE
     const to = from + ITEMS_PER_PAGE - 1
 
-    const { data, count, error } = await query
+    clientsQuery = clientsQuery
       .order('created_at', { ascending: false })
       .range(from, to)
 
-    if (!error && data) {
-      setClients(data as Client[])
-      setTotalCount(count || 0)
+    try {
+      // Exécuter les 5 requêtes en parallèle (clients + 4 stats)
+      const [clientsResult, totalResult, entreprisesResult, particuliersResult, actifsResult] = await Promise.all([
+        clientsQuery,
+        supabase.from('clients').select('*', { count: 'exact', head: true }),
+        supabase.from('clients').select('*', { count: 'exact', head: true }).eq('type', 'entreprise'),
+        supabase.from('clients').select('*', { count: 'exact', head: true }).eq('type', 'particulier'),
+        supabase.from('clients').select('*', { count: 'exact', head: true }).eq('statut', 'actif'),
+      ])
+
+      // Traiter les résultats des clients
+      if (!clientsResult.error && clientsResult.data) {
+        setClients(clientsResult.data as Client[])
+        setTotalCount(clientsResult.count || 0)
+      }
+
+      // Traiter les résultats des stats
+      setStats({
+        total: totalResult.count || 0,
+        entreprises: entreprisesResult.count || 0,
+        particuliers: particuliersResult.count || 0,
+        actifs: actifsResult.count || 0,
+      })
+    } catch (error) {
+      console.error('Erreur lors du chargement des données:', error)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }, [search, filterType, filterStatut, page])
 
-  const fetchStats = useCallback(async () => {
-    const supabase = createClient()
-
-    const [
-      { count: total },
-      { count: entreprises },
-      { count: particuliers },
-      { count: actifs },
-    ] = await Promise.all([
-      supabase.from('clients').select('*', { count: 'exact', head: true }),
-      supabase.from('clients').select('*', { count: 'exact', head: true }).eq('type', 'entreprise'),
-      supabase.from('clients').select('*', { count: 'exact', head: true }).eq('type', 'particulier'),
-      supabase.from('clients').select('*', { count: 'exact', head: true }).eq('statut', 'actif'),
-    ])
-
-    setStats({
-      total: total || 0,
-      entreprises: entreprises || 0,
-      particuliers: particuliers || 0,
-      actifs: actifs || 0,
-    })
-  }, [])
-
   useEffect(() => {
-    fetchClients()
-  }, [fetchClients])
-
-  useEffect(() => {
-    fetchStats()
-  }, [fetchStats])
+    fetchData()
+  }, [fetchData])
 
   const handleExport = async () => {
     const supabase = createClient()

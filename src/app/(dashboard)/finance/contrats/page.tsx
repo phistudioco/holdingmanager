@@ -44,77 +44,75 @@ export default function ContratsPage() {
     montantTotal: 0,
   })
 
-  const fetchContrats = useCallback(async () => {
+  // Fonction combinée pour charger contrats et stats en parallèle
+  const fetchData = useCallback(async () => {
     setLoading(true)
     const supabase = createClient()
+    const today = new Date().toISOString().split('T')[0]
+    const in30Days = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
 
-    let query = supabase
+    // Construire la requête de contrats
+    let contratsQuery = supabase
       .from('contrats')
       .select('*, client:client_id(nom, code), filiale:filiale_id(nom)', { count: 'exact' })
 
     if (search) {
-      query = query.or(`numero.ilike.%${search}%,titre.ilike.%${search}%`)
+      contratsQuery = contratsQuery.or(`numero.ilike.%${search}%,titre.ilike.%${search}%`)
     }
     if (filterStatut !== 'all') {
-      query = query.eq('statut', filterStatut)
+      contratsQuery = contratsQuery.eq('statut', filterStatut)
     }
     if (filterType !== 'all') {
-      query = query.eq('type', filterType)
+      contratsQuery = contratsQuery.eq('type', filterType)
     }
 
     const from = (page - 1) * ITEMS_PER_PAGE
     const to = from + ITEMS_PER_PAGE - 1
 
-    const { data, count, error } = await query
+    contratsQuery = contratsQuery
       .order('created_at', { ascending: false })
       .range(from, to)
 
-    if (!error && data) {
-      setContrats(data as Contrat[])
-      setTotalCount(count || 0)
+    try {
+      // Exécuter les 5 requêtes en parallèle (contrats + 4 stats)
+      const [contratsResult, totalResult, actifsResult, expirantBientotResult, montantsResult] = await Promise.all([
+        contratsQuery,
+        supabase.from('contrats').select('*', { count: 'exact', head: true }),
+        supabase.from('contrats').select('*', { count: 'exact', head: true }).eq('statut', 'actif'),
+        supabase
+          .from('contrats')
+          .select('*', { count: 'exact', head: true })
+          .eq('statut', 'actif')
+          .gte('date_fin', today)
+          .lte('date_fin', in30Days),
+        supabase.from('contrats').select('montant, statut').eq('statut', 'actif'),
+      ])
+
+      // Traiter les résultats des contrats
+      if (!contratsResult.error && contratsResult.data) {
+        setContrats(contratsResult.data as Contrat[])
+        setTotalCount(contratsResult.count || 0)
+      }
+
+      // Traiter les résultats des stats
+      const montantTotal = (montantsResult.data as { montant: number }[] | null)?.reduce((sum, c) => sum + (c.montant || 0), 0) || 0
+
+      setStats({
+        total: totalResult.count || 0,
+        actifs: actifsResult.count || 0,
+        expirantBientot: expirantBientotResult.count || 0,
+        montantTotal,
+      })
+    } catch (error) {
+      console.error('Erreur lors du chargement des données:', error)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }, [search, filterStatut, filterType, page])
 
-  const fetchStats = useCallback(async () => {
-    const supabase = createClient()
-    const today = new Date().toISOString().split('T')[0]
-    const in30Days = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-
-    const [
-      { count: total },
-      { count: actifs },
-      { count: expirantBientot },
-      { data: allContrats },
-    ] = await Promise.all([
-      supabase.from('contrats').select('*', { count: 'exact', head: true }),
-      supabase.from('contrats').select('*', { count: 'exact', head: true }).eq('statut', 'actif'),
-      supabase
-        .from('contrats')
-        .select('*', { count: 'exact', head: true })
-        .eq('statut', 'actif')
-        .gte('date_fin', today)
-        .lte('date_fin', in30Days),
-      supabase.from('contrats').select('montant, statut').eq('statut', 'actif'),
-    ])
-
-    const montantTotal = (allContrats as { montant: number }[] | null)?.reduce((sum, c) => sum + (c.montant || 0), 0) || 0
-
-    setStats({
-      total: total || 0,
-      actifs: actifs || 0,
-      expirantBientot: expirantBientot || 0,
-      montantTotal,
-    })
-  }, [])
-
   useEffect(() => {
-    fetchContrats()
-  }, [fetchContrats])
-
-  useEffect(() => {
-    fetchStats()
-  }, [fetchStats])
+    fetchData()
+  }, [fetchData])
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
 

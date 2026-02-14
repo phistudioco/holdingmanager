@@ -59,18 +59,21 @@ export default function EmployesPage() {
   const loadFilialesAndStats = async () => {
     const supabase = createClient()
 
-    const [filialesRes, statsRes] = await Promise.all([
+    // Exécuter 3 requêtes en parallèle pour maximiser la performance
+    const [filialesRes, totalCountRes, statsDataRes] = await Promise.all([
       supabase.from('filiales').select('*').order('nom'),
-      // Charger les stats séparément (count rapide sans données)
-      supabase.from('employes').select('statut', { count: 'exact', head: false }),
+      // Requête 1 : count total uniquement (head: true pour ne pas charger de données)
+      supabase.from('employes').select('*', { count: 'exact', head: true }),
+      // Requête 2 : données minimales pour les stats par statut
+      supabase.from('employes').select('statut'),
     ])
 
     if (filialesRes.data) setFiliales(filialesRes.data)
 
-    if (statsRes.data) {
-      const total = statsRes.count || 0
-      const actifs = statsRes.data.filter((e: { statut: string }) => e.statut === 'actif').length
-      const enConge = statsRes.data.filter((e: { statut: string }) => e.statut === 'en_conge').length
+    if (statsDataRes.data) {
+      const total = totalCountRes.count || 0
+      const actifs = statsDataRes.data.filter((e: { statut: string }) => e.statut === 'actif').length
+      const enConge = statsDataRes.data.filter((e: { statut: string }) => e.statut === 'en_conge').length
       setStats({ total, actifs, enConge })
     }
   }

@@ -58,76 +58,85 @@ export default function FacturesPage() {
   })
   const [downloadingId, setDownloadingId] = useState<number | null>(null)
 
-  const fetchFactures = useCallback(async () => {
+  // Fonction combinée pour charger factures et stats en parallèle
+  const fetchData = useCallback(async () => {
     setLoading(true)
     const supabase = createClient()
 
-    let query = supabase
+    // Construire la requête de factures
+    let facturesQuery = supabase
       .from('factures')
       .select('*, client:client_id(nom, code), filiale:filiale_id(nom)', { count: 'exact' })
 
     if (search) {
-      query = query.or(`numero.ilike.%${search}%,objet.ilike.%${search}%`)
+      facturesQuery = facturesQuery.or(`numero.ilike.%${search}%,objet.ilike.%${search}%`)
     }
     if (filterStatut !== 'all') {
-      query = query.eq('statut', filterStatut)
+      facturesQuery = facturesQuery.eq('statut', filterStatut)
     }
     if (filterType !== 'all') {
-      query = query.eq('type', filterType)
+      facturesQuery = facturesQuery.eq('type', filterType)
     }
 
     const from = (page - 1) * ITEMS_PER_PAGE
     const to = from + ITEMS_PER_PAGE - 1
 
-    const { data, count, error } = await query
+    facturesQuery = facturesQuery
       .order('date_emission', { ascending: false })
       .range(from, to)
 
-    if (!error && data) {
-      setFactures(data as Facture[])
-      setTotalCount(count || 0)
-    }
-    setLoading(false)
-  }, [search, filterStatut, filterType, page])
-
-  const fetchStats = useCallback(async () => {
-    const supabase = createClient()
-
-    // Optimisation : 1 seule requête au lieu de 5
-    // Charge uniquement les colonnes nécessaires pour calculer les stats
-    const { data: allFactures, count: total } = await supabase
+    // Construire la requête de stats (head: false car on a besoin des données)
+    const statsQuery = supabase
       .from('factures')
       .select('statut, total_ttc, montant_paye', { count: 'exact' })
 
-    const facturesStats = (allFactures || []) as FactureStats[]
+    try {
+      // Exécuter les deux requêtes en parallèle
+      const [facturesResult, statsResult] = await Promise.all([
+        facturesQuery,
+        statsQuery,
+      ])
 
-    // Calcul de tous les stats à partir d'une seule requête
-    const brouillon = facturesStats.filter(f => f.statut === 'brouillon').length
-    const envoyees = facturesStats.filter(f => f.statut === 'envoyee').length
-    const payees = facturesStats.filter(f => f.statut === 'payee').length
+      // Traiter les résultats des factures
+      if (!facturesResult.error && facturesResult.data) {
+        setFactures(facturesResult.data as Facture[])
+        setTotalCount(facturesResult.count || 0)
+      }
 
-    const totalMontant = facturesStats.reduce((sum, f) => sum + (f.total_ttc || 0), 0)
-    const totalImpaye = facturesStats
-      .filter(f => ['envoyee', 'partiellement_payee'].includes(f.statut))
-      .reduce((sum, f) => sum + ((f.total_ttc || 0) - (f.montant_paye || 0)), 0)
+      // Traiter les résultats des stats
+      if (!statsResult.error && statsResult.data) {
+        const facturesStats = statsResult.data as FactureStats[]
+        const total = statsResult.count || 0
 
-    setStats({
-      total: total || 0,
-      brouillon,
-      envoyees,
-      payees,
-      totalMontant,
-      totalImpaye,
-    })
-  }, [])
+        // Calcul de tous les stats à partir d'une seule requête
+        const brouillon = facturesStats.filter(f => f.statut === 'brouillon').length
+        const envoyees = facturesStats.filter(f => f.statut === 'envoyee').length
+        const payees = facturesStats.filter(f => f.statut === 'payee').length
+
+        const totalMontant = facturesStats.reduce((sum, f) => sum + (f.total_ttc || 0), 0)
+        const totalImpaye = facturesStats
+          .filter(f => ['envoyee', 'partiellement_payee'].includes(f.statut))
+          .reduce((sum, f) => sum + ((f.total_ttc || 0) - (f.montant_paye || 0)), 0)
+
+        setStats({
+          total,
+          brouillon,
+          envoyees,
+          payees,
+          totalMontant,
+          totalImpaye,
+        })
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des données:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [search, filterStatut, filterType, page])
 
   useEffect(() => {
-    fetchFactures()
-  }, [fetchFactures])
-
-  useEffect(() => {
-    fetchStats()
-  }, [fetchStats])
+    fetchData()
+  }, [fetchData])
 
   const handleExport = async () => {
     const supabase = createClient()
