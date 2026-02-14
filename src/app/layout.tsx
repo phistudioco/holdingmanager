@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Poppins } from 'next/font/google'
 import './globals.css'
+import { WebVitalsReporter } from './_components/WebVitalsReporter'
 
 // Fonts
 const inter = Inter({
@@ -75,6 +76,7 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <body className={`${inter.variable} ${poppins.variable} font-sans antialiased`}>
+        <WebVitalsReporter />
         {children}
       </body>
     </html>
