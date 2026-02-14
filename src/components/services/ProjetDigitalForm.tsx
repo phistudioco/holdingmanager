@@ -132,7 +132,8 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
       }
 
       if (mode === 'create') {
-        const { data, error: insertError } = await supabase
+        // Table projets_digital pas complètement typée dans database.ts - type assertion temporaire
+        const { data, error: insertError } = await (supabase as any)
           .from('projets_digital')
           .insert(projetData)
           .select()
@@ -142,7 +143,8 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
 
         router.push(`/services/digital/${(data as { id: number }).id}`)
       } else if (projet?.id) {
-        const { error: updateError } = await supabase
+        // Table projets_digital pas complètement typée dans database.ts - type assertion temporaire
+        const { error: updateError } = await (supabase as any)
           .from('projets_digital')
           .update(projetData)
           .eq('id', projet.id)

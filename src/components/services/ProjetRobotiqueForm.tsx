@@ -115,7 +115,8 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
       }
 
       if (mode === 'create') {
-        const { data, error: insertError } = await supabase
+        // Table projets_robotique pas complètement typée dans database.ts - type assertion temporaire
+        const { data, error: insertError } = await (supabase as any)
           .from('projets_robotique')
           .insert(projetData)
           .select()
@@ -125,7 +126,8 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
 
         router.push(`/services/robotique/${(data as { id: number }).id}`)
       } else if (projet?.id) {
-        const { error: updateError } = await supabase
+        // Table projets_robotique pas complètement typée dans database.ts - type assertion temporaire
+        const { error: updateError } = await (supabase as any)
           .from('projets_robotique')
           .update(projetData)
           .eq('id', projet.id)

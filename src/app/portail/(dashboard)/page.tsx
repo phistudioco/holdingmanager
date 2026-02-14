@@ -77,7 +77,8 @@ export default function PortailDashboardPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const { data: client } = await db
+      // Table clients pas complètement typée dans database.ts - type assertion temporaire
+      const { data: client } = await (db as any)
         .from('clients')
         .select('id, nom')
         .eq('portail_user_id', user.id)

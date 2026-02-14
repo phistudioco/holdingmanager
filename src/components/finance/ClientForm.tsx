@@ -127,12 +127,14 @@ export function ClientForm({ client, mode }: ClientFormProps) {
       }
 
       if (mode === 'create') {
-        const { error: insertError } = await supabase
+        // Table clients pas complètement typée dans database.ts - type assertion temporaire
+        const { error: insertError } = await (supabase as any)
           .from('clients')
           .insert(clientData)
         if (insertError) throw insertError
       } else {
-        const { error: updateError } = await supabase
+        // Table clients pas complètement typée dans database.ts - type assertion temporaire
+        const { error: updateError } = await (supabase as any)
           .from('clients')
           .update(clientData)
           .eq('id', client?.id)

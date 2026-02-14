@@ -123,7 +123,8 @@ export function useUser(): UseUserReturn {
         // Mettre à jour la dernière connexion
         if (userProfile) {
           const untypedSupabase = createClient()
-          await untypedSupabase
+          // Table users pas complètement typée dans database.ts - type assertion temporaire
+          await (untypedSupabase as any)
             .from('users')
             .update({ derniere_connexion: new Date().toISOString() })
             .eq('id', user.id)

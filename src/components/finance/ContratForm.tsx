@@ -103,13 +103,15 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
       }
 
       if (mode === 'create') {
-        const { error: insertError } = await supabase
+        // Table contrats pas complètement typée dans database.ts - type assertion temporaire
+        const { error: insertError } = await (supabase as any)
           .from('contrats')
           .insert(contratData)
 
         if (insertError) throw insertError
       } else {
-        const { error: updateError } = await supabase
+        // Table contrats pas complètement typée dans database.ts - type assertion temporaire
+        const { error: updateError } = await (supabase as any)
           .from('contrats')
           .update(contratData)
           .eq('id', contrat?.id)

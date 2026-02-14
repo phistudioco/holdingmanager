@@ -44,7 +44,8 @@ export function useNotifications() {
   const markAsRead = useCallback(async (id: number) => {
     const supabase = createClient()
 
-    const { error } = await supabase
+    // Table alertes pas complètement typée dans database.ts - type assertion temporaire
+    const { error } = await (supabase as any)
       .from('alertes')
       .update({ lue: true })
       .eq('id', id)
@@ -68,7 +69,8 @@ export function useNotifications() {
       if (unreadIds.length === 0) return prev
 
       // Lancer la requête de manière asynchrone
-      supabase
+      // Table alertes pas complètement typée dans database.ts - type assertion temporaire
+      void (supabase as any)
         .from('alertes')
         .update({ lue: true })
         .in('id', unreadIds)
@@ -88,7 +90,8 @@ export function useNotifications() {
   const markAsDone = useCallback(async (id: number) => {
     const supabase = createClient()
 
-    const { error } = await supabase
+    // Table alertes pas complètement typée dans database.ts - type assertion temporaire
+    const { error } = await (supabase as any)
       .from('alertes')
       .update({ traitee: true })
       .eq('id', id)

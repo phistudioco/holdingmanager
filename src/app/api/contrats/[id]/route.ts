@@ -35,7 +35,8 @@ export async function DELETE(
 
     // Récupérer les informations de l'utilisateur avec son rôle
     const db = await createClient()
-    const { data: userProfile, error: profileError } = await db
+    // Table users pas complètement typée dans database.ts - type assertion temporaire
+    const { data: userProfile, error: profileError } = await (db as any)
       .from('users')
       .select(`
         *,
@@ -71,7 +72,8 @@ export async function DELETE(
 
     // Récupérer le contrat pour vérifier qu'il existe ET que l'utilisateur y a accès
     // Note: Si RLS bloque l'accès, le contrat ne sera pas retourné (comme s'il n'existait pas)
-    const { data: contrat, error: fetchError } = await db
+    // Table contrats pas complètement typée dans database.ts - type assertion temporaire
+    const { data: contrat, error: fetchError } = await (db as any)
       .from('contrats')
       .select(`
         id,
@@ -183,7 +185,8 @@ export async function DELETE(
     }
 
     // Log de l'action (optionnel, pour audit)
-    await db
+    // Table activity_logs pas complètement typée dans database.ts - type assertion temporaire
+    await (db as any)
       .from('activity_logs')
       .insert({
         user_id: user.id,

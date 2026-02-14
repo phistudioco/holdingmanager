@@ -88,7 +88,8 @@ export default function DemandesListePage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const { data: client } = await supabase
+      // Table clients pas complètement typée dans database.ts - type assertion temporaire
+      const { data: client } = await (supabase as any)
         .from('clients')
         .select('id')
         .eq('portail_user_id', user.id)

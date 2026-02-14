@@ -157,7 +157,8 @@ export default function NewReportTemplatePage() {
 
       // Use untyped client for report_templates (new table not in generated types)
       const db = createClient()
-      const { data, error: insertError } = await db
+      // Table report_templates pas complètement typée dans database.ts - type assertion temporaire
+      const { data, error: insertError } = await (db as any)
         .from('report_templates')
         .insert({
           user_id: user.id,

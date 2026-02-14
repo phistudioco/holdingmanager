@@ -106,13 +106,15 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
       }
 
       if (mode === 'create') {
-        const { error: insertError } = await supabase
+        // Table employes pas complètement typée dans database.ts - type assertion temporaire
+        const { error: insertError } = await (supabase as any)
           .from('employes')
           .insert(employeData)
 
         if (insertError) throw insertError
       } else if (employe) {
-        const { error: updateError } = await supabase
+        // Table employes pas complètement typée dans database.ts - type assertion temporaire
+        const { error: updateError } = await (supabase as any)
           .from('employes')
           .update(employeData)
           .eq('id', employe.id)

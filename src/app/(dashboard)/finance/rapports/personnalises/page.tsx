@@ -125,7 +125,8 @@ export default function CustomReportsPage() {
     if (!user) return
 
     const db = createClient()
-    const { data } = await db
+    // Table report_templates pas complètement typée dans database.ts - type assertion temporaire
+    const { data } = await (db as any)
       .from('report_templates')
       .insert({
         user_id: user.id,

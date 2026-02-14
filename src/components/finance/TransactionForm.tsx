@@ -93,13 +93,15 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
       }
 
       if (mode === 'create') {
-        const { error: insertError } = await supabase
+        // Table transactions pas complètement typée dans database.ts - type assertion temporaire
+        const { error: insertError } = await (supabase as any)
           .from('transactions')
           .insert(transactionData)
 
         if (insertError) throw insertError
       } else {
-        const { error: updateError } = await supabase
+        // Table transactions pas complètement typée dans database.ts - type assertion temporaire
+        const { error: updateError } = await (supabase as any)
           .from('transactions')
           .update(transactionData)
           .eq('id', transaction?.id)

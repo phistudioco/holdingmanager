@@ -15,7 +15,8 @@ export async function insertIntoTable(
   data: AnyRecord | AnyRecord[]
 ) {
   const supabase = createClient()
-  return supabase.from(tableName).insert(data).select()
+  // Type assertion temporaire pour les tables pas complètement typées dans database.ts
+  return (supabase as any).from(tableName).insert(data).select()
 }
 
 /**
@@ -27,7 +28,8 @@ export async function updateTable(
   filters: { column: string; value: unknown }[]
 ) {
   const supabase = createClient()
-  let query = supabase.from(tableName).update(data)
+  // Type assertion temporaire pour les tables pas complètement typées dans database.ts
+  let query = (supabase as any).from(tableName).update(data)
   for (const filter of filters) {
     query = query.eq(filter.column, filter.value)
   }
@@ -44,7 +46,8 @@ export async function selectFromTable<T = AnyRecord>(
   options: { order?: { column: string; ascending: boolean }; limit?: number; single?: boolean } = {}
 ) {
   const supabase = createClient()
-  let query = supabase.from(tableName).select(columns)
+  // Type assertion temporaire pour les tables pas complètement typées dans database.ts
+  let query = (supabase as any).from(tableName).select(columns)
 
   for (const filter of filters) {
     query = query.eq(filter.column, filter.value)

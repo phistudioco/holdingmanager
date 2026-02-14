@@ -124,7 +124,8 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
       }
 
       if (mode === 'create') {
-        const { data, error: insertError } = await supabase
+        // Table fournisseurs pas complètement typée dans database.ts - type assertion temporaire
+        const { data, error: insertError } = await (supabase as any)
           .from('fournisseurs')
           .insert(fournisseurData)
           .select()
@@ -134,7 +135,8 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
 
         router.push(`/services/outsourcing/fournisseurs/${(data as { id: number }).id}`)
       } else if (fournisseur?.id) {
-        const { error: updateError } = await supabase
+        // Table fournisseurs pas complètement typée dans database.ts - type assertion temporaire
+        const { error: updateError } = await (supabase as any)
           .from('fournisseurs')
           .update(fournisseurData)
           .eq('id', fournisseur.id)

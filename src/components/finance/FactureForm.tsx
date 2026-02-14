@@ -214,7 +214,8 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
       }
 
       if (mode === 'create') {
-        const { data: newFacture, error: insertError } = await supabase
+        // Table factures pas complètement typée dans database.ts - type assertion temporaire
+        const { data: newFacture, error: insertError } = await (supabase as any)
           .from('factures')
           .insert(factureData)
           .select()
@@ -228,7 +229,8 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
           ...ligne,
         }))
 
-        const { error: lignesError } = await supabase
+        // Table facture_lignes pas complètement typée dans database.ts - type assertion temporaire
+        const { error: lignesError } = await (supabase as any)
           .from('facture_lignes')
           .insert(lignesData)
 

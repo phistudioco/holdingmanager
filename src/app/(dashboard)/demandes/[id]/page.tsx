@@ -301,7 +301,8 @@ export default function DemandeGestionPage() {
     try {
       const db = createClient()
 
-      const { error } = await db
+      // Table demandes_clients pas complètement typée dans database.ts - type assertion temporaire
+      const { error } = await (db as any)
         .from('demandes_clients')
         .update(updates)
         .eq('id', demande.id)
@@ -345,7 +346,8 @@ export default function DemandeGestionPage() {
     try {
       const db = createClient()
 
-      const { data, error } = await db
+      // Table demandes_messages pas complètement typée dans database.ts - type assertion temporaire
+      const { data, error } = await (db as any)
         .from('demandes_messages')
         .insert({
           demande_id: demande.id,
@@ -363,8 +365,8 @@ export default function DemandeGestionPage() {
       setNewMessage('')
       setIsInternalMessage(false)
 
-      // Ajouter à l'historique
-      await db.from('demandes_historique').insert({
+      // Ajouter à l'historique - Table pas complètement typée dans database.ts
+      await (db as any).from('demandes_historique').insert({
         demande_id: demande.id,
         action: 'message',
         description: isInternalMessage ? 'Note interne ajoutée' : 'Réponse envoyée au client',

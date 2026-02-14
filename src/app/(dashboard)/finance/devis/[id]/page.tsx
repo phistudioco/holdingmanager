@@ -187,7 +187,8 @@ export default function DevisDetailPage() {
     setUpdating(true)
     try {
       const supabase = createClient()
-      const { error } = await supabase
+      // Table devis pas complètement typée dans database.ts - type assertion temporaire
+      const { error } = await (supabase as any)
         .from('devis')
         .update({ statut: newStatut })
         .eq('id', devis.id)

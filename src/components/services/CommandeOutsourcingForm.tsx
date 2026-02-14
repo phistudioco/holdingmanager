@@ -124,7 +124,8 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
       }
 
       if (mode === 'create') {
-        const { data, error: insertError } = await supabase
+        // Table commandes_outsourcing pas complètement typée dans database.ts - type assertion temporaire
+        const { data, error: insertError } = await (supabase as any)
           .from('commandes_outsourcing')
           .insert(commandeData)
           .select()
@@ -134,7 +135,8 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
 
         router.push(`/services/outsourcing/commandes/${(data as { id: number }).id}`)
       } else if (commande?.id) {
-        const { error: updateError } = await supabase
+        // Table commandes_outsourcing pas complètement typée dans database.ts - type assertion temporaire
+        const { error: updateError } = await (supabase as any)
           .from('commandes_outsourcing')
           .update(commandeData)
           .eq('id', commande.id)

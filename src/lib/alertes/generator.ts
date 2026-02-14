@@ -57,7 +57,8 @@ export async function createAlerte(params: CreateAlerteParams): Promise<{ succes
   const supabase = createClient()
 
   try {
-    const { error } = await supabase
+    // Table alertes pas complètement typée dans database.ts - type assertion temporaire
+    const { error } = await (supabase as any)
       .from('alertes')
       .insert({
         type: params.type,

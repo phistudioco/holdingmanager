@@ -139,7 +139,8 @@ export default function DemandeDetailPage() {
         return
       }
 
-      const { data: client } = await supabase
+      // Table clients pas complètement typée dans database.ts - type assertion temporaire
+      const { data: client } = await (supabase as any)
         .from('clients')
         .select('id')
         .eq('portail_user_id', user.id)
@@ -218,7 +219,8 @@ export default function DemandeDetailPage() {
     try {
       const supabase = createClient()
 
-      const { data, error } = await supabase
+      // Table demandes_messages pas complètement typée dans database.ts - type assertion temporaire
+      const { data, error } = await (supabase as any)
         .from('demandes_messages')
         .insert({
           demande_id: parseInt(demandeId),
@@ -236,7 +238,8 @@ export default function DemandeDetailPage() {
       setNewMessage('')
 
       // Ajouter à l'historique
-      await supabase.from('demandes_historique').insert({
+      // Table demandes_historique pas complètement typée dans database.ts - type assertion temporaire
+      await (supabase as any).from('demandes_historique').insert({
         demande_id: parseInt(demandeId),
         action: 'message',
         description: 'Nouveau message du client',

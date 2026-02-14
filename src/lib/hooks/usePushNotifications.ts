@@ -145,7 +145,8 @@ export function usePushNotifications() {
         const subscriptionJSON = subscription.toJSON()
 
         // Upsert subscription
-        const { error: dbError } = await db
+        // Table push_subscriptions pas complètement typée dans database.ts - type assertion temporaire
+        const { error: dbError } = await (db as any)
           .from('push_subscriptions')
           .upsert({
             user_id: user.id,

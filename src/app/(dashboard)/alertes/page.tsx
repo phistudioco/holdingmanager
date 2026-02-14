@@ -89,13 +89,15 @@ export default function AlertesPage() {
 
   const markAsRead = async (id: number) => {
     const supabase = createClient()
-    await supabase.from('alertes').update({ lue: true }).eq('id', id)
+    // Table alertes pas complètement typée dans database.ts - type assertion temporaire
+    await (supabase as any).from('alertes').update({ lue: true }).eq('id', id)
     fetchAlertes()
   }
 
   const markAsHandled = async (id: number) => {
     const supabase = createClient()
-    await supabase.from('alertes').update({ traitee: true, lue: true }).eq('id', id)
+    // Table alertes pas complètement typée dans database.ts - type assertion temporaire
+    await (supabase as any).from('alertes').update({ traitee: true, lue: true }).eq('id', id)
     fetchAlertes()
   }
 

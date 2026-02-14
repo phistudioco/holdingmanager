@@ -98,7 +98,8 @@ export default function NouvelleDemandePagee() {
         return
       }
 
-      const { data: client } = await supabase
+      // Table clients pas complètement typée dans database.ts - type assertion temporaire
+      const { data: client } = await (supabase as any)
         .from('clients')
         .select('id')
         .eq('portail_user_id', user.id)
@@ -151,7 +152,8 @@ export default function NouvelleDemandePagee() {
       const supabase = createClient()
 
       // Créer la demande
-      const { data: demande, error: demandeError } = await supabase
+      // Table demandes_clients pas complètement typée dans database.ts - type assertion temporaire
+      const { data: demande, error: demandeError } = await (supabase as any)
         .from('demandes_clients')
         .insert({
           client_id: clientId,
@@ -181,7 +183,8 @@ export default function NouvelleDemandePagee() {
           }
 
           // Enregistrer le fichier dans la table
-          await supabase.from('demandes_fichiers').insert({
+          // Table demandes_fichiers pas complètement typée dans database.ts - type assertion temporaire
+          await (supabase as any).from('demandes_fichiers').insert({
             demande_id: demande.id,
             nom_fichier: uploadedFile.name,
             type_fichier: uploadedFile.type,

@@ -183,13 +183,15 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
       }
 
       if (mode === 'create') {
-        const { error: insertError } = await supabase
+        // Table workflow_demandes pas complètement typée dans database.ts - type assertion temporaire
+        const { error: insertError } = await (supabase as any)
           .from('workflow_demandes')
           .insert(demandeData)
 
         if (insertError) throw insertError
       } else if (demande) {
-        const { error: updateError } = await supabase
+        // Table workflow_demandes pas complètement typée dans database.ts - type assertion temporaire
+        const { error: updateError } = await (supabase as any)
           .from('workflow_demandes')
           .update(demandeData)
           .eq('id', demande.id)

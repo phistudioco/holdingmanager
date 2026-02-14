@@ -223,7 +223,8 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
       }
 
       if (mode === 'create') {
-        const { data: newDevis, error: devisError } = await db
+        // Table devis pas complètement typée dans database.ts - type assertion temporaire
+        const { data: newDevis, error: devisError } = await (db as any)
           .from('devis')
           .insert(devisData)
           .select()
@@ -247,7 +248,8 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
           }))
 
         if (lignesData.length > 0) {
-          const { error: lignesError } = await db
+          // Table devis_lignes pas complètement typée dans database.ts - type assertion temporaire
+          const { error: lignesError } = await (db as any)
             .from('devis_lignes')
             .insert(lignesData)
 
@@ -256,7 +258,8 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
 
         router.push(`/finance/devis/${(newDevis as { id: number }).id}`)
       } else if (devis) {
-        const { error: updateError } = await db
+        // Table devis pas complètement typée dans database.ts - type assertion temporaire
+        const { error: updateError } = await (db as any)
           .from('devis')
           .update(devisData)
           .eq('id', devis.id)
@@ -264,7 +267,8 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
         if (updateError) throw updateError
 
         // Supprimer les anciennes lignes et réinsérer
-        await db.from('devis_lignes').delete().eq('devis_id', devis.id)
+        // Table devis_lignes pas complètement typée dans database.ts - type assertion temporaire
+        await (db as any).from('devis_lignes').delete().eq('devis_id', devis.id)
 
         const lignesData = lignes
           .filter(l => l.description.trim())
@@ -281,7 +285,8 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
           }))
 
         if (lignesData.length > 0) {
-          const { error: lignesError } = await db
+          // Table devis_lignes pas complètement typée dans database.ts - type assertion temporaire
+          const { error: lignesError } = await (db as any)
             .from('devis_lignes')
             .insert(lignesData)
 

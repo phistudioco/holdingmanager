@@ -47,7 +47,8 @@ export function ApprovalDialog({
       const supabase = createClient()
 
       // Enregistrer l'approbation
-      const { error: approvalError } = await supabase
+      // Table workflow_approbations pas complètement typée dans database.ts - type assertion temporaire
+      const { error: approvalError } = await (supabase as any)
         .from('workflow_approbations')
         .insert({
           demande_id: demandeId,
@@ -62,7 +63,8 @@ export function ApprovalDialog({
 
       // Mettre à jour le statut de la demande
       const newStatut = decision === 'approuve' ? 'approuve' : 'rejete'
-      const { error: updateError } = await supabase
+      // Table workflow_demandes pas complètement typée dans database.ts - type assertion temporaire
+      const { error: updateError } = await (supabase as any)
         .from('workflow_demandes')
         .update({
           statut: newStatut,

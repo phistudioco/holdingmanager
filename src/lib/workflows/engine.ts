@@ -101,7 +101,8 @@ export async function submitWorkflow(demandeId: number): Promise<{ success: bool
 
   try {
     // Mettre à jour le statut de la demande
-    const { error } = await supabase
+    // Table workflow_demandes pas complètement typée dans database.ts - type assertion temporaire
+    const { error } = await (supabase as any)
       .from('workflow_demandes')
       .update({
         statut: 'en_cours',
@@ -134,7 +135,8 @@ export async function approveWorkflowStep(
 
   try {
     // Enregistrer l'approbation
-    const { error: approvalError } = await supabase
+    // Table workflow_approbations pas complètement typée dans database.ts - type assertion temporaire
+    const { error: approvalError } = await (supabase as any)
       .from('workflow_approbations')
       .insert({
         demande_id: demandeId,
@@ -162,7 +164,8 @@ export async function approveWorkflowStep(
 
     if (etapesRestantes.length === 0) {
       // Toutes les étapes sont approuvées - finaliser la demande
-      const { error: updateError } = await supabase
+      // Table workflow_demandes pas complètement typée dans database.ts - type assertion temporaire
+      const { error: updateError } = await (supabase as any)
         .from('workflow_demandes')
         .update({
           statut: 'approuve',
@@ -173,7 +176,8 @@ export async function approveWorkflowStep(
       if (updateError) throw updateError
     } else {
       // Passer à l'étape suivante
-      const { error: updateError } = await supabase
+      // Table workflow_demandes pas complètement typée dans database.ts - type assertion temporaire
+      const { error: updateError } = await (supabase as any)
         .from('workflow_demandes')
         .update({
           etape_actuelle: etape + 1,
@@ -205,7 +209,8 @@ export async function rejectWorkflow(
 
   try {
     // Enregistrer le rejet
-    const { error: approvalError } = await supabase
+    // Table workflow_approbations pas complètement typée dans database.ts - type assertion temporaire
+    const { error: approvalError } = await (supabase as any)
       .from('workflow_approbations')
       .insert({
         demande_id: demandeId,
@@ -219,7 +224,8 @@ export async function rejectWorkflow(
     if (approvalError) throw approvalError
 
     // Mettre à jour le statut de la demande
-    const { error: updateError } = await supabase
+    // Table workflow_demandes pas complètement typée dans database.ts - type assertion temporaire
+    const { error: updateError } = await (supabase as any)
       .from('workflow_demandes')
       .update({
         statut: 'rejete',
@@ -245,7 +251,8 @@ export async function cancelWorkflow(demandeId: number): Promise<{ success: bool
   const supabase = createClient()
 
   try {
-    const { error } = await supabase
+    // Table workflow_demandes pas complètement typée dans database.ts - type assertion temporaire
+    const { error } = await (supabase as any)
       .from('workflow_demandes')
       .update({
         statut: 'annule',

@@ -127,7 +127,8 @@ export function useNotificationPreferences() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, ...prefsWithoutId } = prefsToSave as NotificationPreferences & { id?: number }
 
-      const { error: saveError } = await db
+      // Table notification_preferences pas complètement typée dans database.ts - type assertion temporaire
+      const { error: saveError } = await (db as any)
         .from('notification_preferences')
         .upsert(prefsWithoutId, {
           onConflict: 'user_id',

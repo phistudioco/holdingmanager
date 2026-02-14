@@ -35,7 +35,8 @@ export async function DELETE(
 
     // Récupérer les informations de l'utilisateur avec son rôle
     const db = await createClient()
-    const { data: userProfile, error: profileError } = await db
+    // Table users pas complètement typée dans database.ts - type assertion temporaire
+    const { data: userProfile, error: profileError } = await (db as any)
       .from('users')
       .select(`
         *,
@@ -71,7 +72,8 @@ export async function DELETE(
 
     // Récupérer la facture pour vérifier qu'elle existe ET que l'utilisateur y a accès
     // Note: Si RLS bloque l'accès, la facture ne sera pas retournée (comme si elle n'existait pas)
-    const { data: facture, error: fetchError } = await db
+    // Table factures pas complètement typée dans database.ts - type assertion temporaire
+    const { data: facture, error: fetchError } = await (db as any)
       .from('factures')
       .select(`
         id,
@@ -184,7 +186,8 @@ export async function DELETE(
     }
 
     // Log de l'action (optionnel, pour audit)
-    await db
+    // Table activity_logs pas complètement typée dans database.ts - type assertion temporaire
+    await (db as any)
       .from('activity_logs')
       .insert({
         user_id: user.id,
@@ -260,7 +263,8 @@ export async function PUT(
 
     // Vérifier les permissions (edit permission)
     const db = await createClient()
-    const { data: userProfile, error: profileError } = await db
+    // Table users pas complètement typée dans database.ts - type assertion temporaire
+    const { data: userProfile, error: profileError } = await (db as any)
       .from('users')
       .select(`
         *,
@@ -294,7 +298,8 @@ export async function PUT(
     }
 
     // Vérifier que l'utilisateur a accès à la facture avant la mise à jour (protection RLS)
-    const { data: factureCheck, error: checkError } = await db
+    // Table factures pas complètement typée dans database.ts - type assertion temporaire
+    const { data: factureCheck, error: checkError } = await (db as any)
       .from('factures')
       .select('id, numero, filiale_id')
       .eq('id', factureId)
@@ -321,7 +326,8 @@ export async function PUT(
     }
 
     // Appeler la fonction PostgreSQL pour mise à jour atomique
-    const { data: result, error: rpcError } = await db.rpc('update_facture_with_lignes', {
+    // Fonction RPC pas complètement typée dans database.ts - type assertion temporaire
+    const { data: result, error: rpcError } = await (db as any).rpc('update_facture_with_lignes', {
       p_facture_id: factureId,
       p_facture_data: facture,
       p_lignes: lignes,
@@ -364,7 +370,8 @@ export async function PUT(
     }
 
     // Log de l'action
-    await db
+    // Table activity_logs pas complètement typée dans database.ts - type assertion temporaire
+    await (db as any)
       .from('activity_logs')
       .insert({
         user_id: user.id,

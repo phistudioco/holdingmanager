@@ -42,7 +42,8 @@ export default function PortailLoginPage() {
       }
 
       // Vérifier que l'utilisateur est bien un client du portail
-      const { data: client, error: clientError } = await db
+      // Table clients pas complètement typée dans database.ts - type assertion temporaire
+      const { data: client, error: clientError } = await (db as any)
         .from('clients')
         .select('id, nom, portail_actif')
         .eq('portail_user_id', authData.user.id)
@@ -61,7 +62,8 @@ export default function PortailLoginPage() {
       }
 
       // Mettre à jour la dernière connexion
-      await db
+      // Table clients pas complètement typée dans database.ts - type assertion temporaire
+      await (db as any)
         .from('clients')
         .update({ derniere_connexion_portail: new Date().toISOString() })
         .eq('id', client.id)

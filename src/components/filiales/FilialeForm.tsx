@@ -95,13 +95,15 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
       }
 
       if (mode === 'create') {
-        const { error: insertError } = await supabase
+        // Table filiales pas complètement typée dans database.ts - type assertion temporaire
+        const { error: insertError } = await (supabase as any)
           .from('filiales')
           .insert(filialeData)
 
         if (insertError) throw insertError
       } else if (filiale) {
-        const { error: updateError } = await supabase
+        // Table filiales pas complètement typée dans database.ts - type assertion temporaire
+        const { error: updateError } = await (supabase as any)
           .from('filiales')
           .update(filialeData)
           .eq('id', filiale.id)
