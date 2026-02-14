@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import Link from 'next/link'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import {
@@ -23,7 +24,7 @@ const statusColors = {
   en_creation: 'from-phi-highlight',
 }
 
-export function FilialeCard({ filiale }: FilialeCardProps) {
+const FilialeCardComponent = ({ filiale }: FilialeCardProps) => {
   return (
     <Link href={`/filiales/${filiale.id}`} className="group block">
       <div className="relative bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-phi-primary/20">
@@ -125,3 +126,7 @@ export function FilialeCard({ filiale }: FilialeCardProps) {
     </Link>
   )
 }
+
+FilialeCardComponent.displayName = 'FilialeCard'
+
+export const FilialeCard = memo(FilialeCardComponent)

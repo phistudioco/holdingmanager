@@ -1,14 +1,13 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/common/PageHeader'
-import { StatusBadge } from '@/components/common/StatusBadge'
 import { EmptyState } from '@/components/common/EmptyState'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { EmployeeGridCard } from '@/components/employes/EmployeeGridCard'
+import { EmployeeTableRow } from '@/components/employes/EmployeeTableRow'
 import {
   Users,
   Plus,
@@ -16,11 +15,9 @@ import {
   LayoutGrid,
   List,
   Filter,
-  Building2,
   Briefcase,
   ChevronLeft,
   ChevronRight,
-  Mail,
   Calendar,
 } from 'lucide-react'
 import type { Tables } from '@/types/database'
@@ -312,66 +309,7 @@ export default function EmployesPage() {
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {employes.map((employe, index) => (
-            <Link
-              key={employe.id}
-              href={`/employes/${employe.id}`}
-              className="group animate-in fade-in slide-in-from-bottom-4 duration-500"
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-phi-primary/20">
-                {/* Service color bar */}
-                <div
-                  className="h-1.5"
-                  style={{ backgroundColor: employe.service?.couleur || '#6b7280' }}
-                />
-
-                <div className="p-5">
-                  {/* Avatar & Name */}
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-phi-primary to-phi-accent rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-phi-primary/20 group-hover:scale-110 transition-transform duration-300 overflow-hidden relative">
-                      {employe.photo ? (
-                        <Image
-                          src={employe.photo}
-                          alt={`${employe.prenom} ${employe.nom}`}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <>{employe.prenom[0]}{employe.nom[0]}</>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 group-hover:text-phi-primary transition-colors truncate">
-                        {employe.prenom} {employe.nom}
-                      </h3>
-                      <p className="text-sm text-gray-500 truncate">{employe.poste || 'Poste non défini'}</p>
-                    </div>
-                  </div>
-
-                  {/* Info */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Building2 className="h-4 w-4 text-gray-400 shrink-0" />
-                      <span className="truncate">{employe.filiale?.nom || '—'}</span>
-                    </div>
-                    {employe.email && (
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Mail className="h-4 w-4 text-gray-400 shrink-0" />
-                        <span className="truncate">{employe.email}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Footer */}
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                    <code className="text-xs font-mono text-gray-500 bg-gray-50 px-2 py-1 rounded">
-                      {employe.matricule}
-                    </code>
-                    <StatusBadge status={employe.statut} />
-                  </div>
-                </div>
-              </div>
-            </Link>
+            <EmployeeGridCard key={employe.id} employe={employe} index={index} />
           ))}
         </div>
       ) : (
@@ -390,56 +328,7 @@ export default function EmployesPage() {
               </thead>
             <tbody className="divide-y divide-gray-100">
               {employes.map((employe, index) => (
-                <tr
-                  key={employe.id}
-                  className="hover:bg-gray-50/50 transition-colors animate-in fade-in duration-300"
-                  style={{ animationDelay: `${index * 30}ms` }}
-                >
-                  <td className="py-4 px-6">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm overflow-hidden relative"
-                        style={{ backgroundColor: employe.service?.couleur || '#6b7280' }}
-                      >
-                        {employe.photo ? (
-                          <Image
-                            src={employe.photo}
-                            alt={`${employe.prenom} ${employe.nom}`}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <>{employe.prenom[0]}{employe.nom[0]}</>
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-900">{employe.prenom} {employe.nom}</p>
-                        <p className="text-sm text-gray-500">{employe.email || '—'}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-4 px-6 hidden sm:table-cell">
-                    <code className="px-2 py-1 bg-gray-100 rounded text-sm font-mono text-gray-700">
-                      {employe.matricule}
-                    </code>
-                  </td>
-                  <td className="py-4 px-6 text-gray-600 hidden md:table-cell">
-                    {employe.filiale?.nom || '—'}
-                  </td>
-                  <td className="py-4 px-6 text-gray-600 hidden lg:table-cell">
-                    {employe.poste || '—'}
-                  </td>
-                  <td className="py-4 px-6">
-                    <StatusBadge status={employe.statut} />
-                  </td>
-                  <td className="py-4 px-6 text-right">
-                    <Link href={`/employes/${employe.id}`}>
-                      <Button variant="ghost" size="sm" className="text-phi-primary hover:text-phi-primary/80 hover:bg-phi-primary/5">
-                        Voir détails
-                      </Button>
-                    </Link>
-                  </td>
-                </tr>
+                <EmployeeTableRow key={employe.id} employe={employe} index={index} />
               ))}
             </tbody>
           </table>
