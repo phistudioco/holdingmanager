@@ -300,7 +300,12 @@ Trois analyses parallèles approfondies ont été réalisées pour identifier le
   - Messages en français adaptés au contexte (RLS, doublon, FK, NOT NULL)
   - Détails supplémentaires dans FormAlert (formError.details)
   - Codes PostgreSQL masqués pour l'utilisateur final
-- [ ] Tests de permissions par rôle
+- [x] **Documentation tests de permissions par rôle** ✅ (Complété - 13 février 2026)
+  - [x] Analyse complète du système de rôles (5 niveaux : super_admin, admin, directeur, manager, employe)
+  - [x] Matrice permissions (rôle × ressource × action)
+  - [x] Guide tests RLS : docs/TESTS_RLS.md avec 25+ scénarios de test
+  - [x] Test suites : Accès filiale, Permissions API, Restrictions d'état, Affectations temporelles, Cas limites
+  - Impact : ✅ Documentation complète pour valider politiques RLS en production
 
 #### Phase 2 : Optimisation Performance (2-3 jours)
 - [x] **FinanceDashboardCharts** : Optimisations performance ✅ (11 février 2026)
