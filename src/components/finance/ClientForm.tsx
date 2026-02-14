@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { FormAlert } from '@/components/ui/form-alert'
 import { RadioGroupAccessible } from '@/components/ui/radio-group-accessible'
+import { parseSupabaseError, type FormError } from '@/lib/errors/parse-error'
 import {
   Building2,
   UserCircle,
@@ -43,6 +44,7 @@ type ClientFormProps = {
 export function ClientForm({ client, mode }: ClientFormProps) {
   const router = useRouter()
   const [pays, setPays] = useState<Pays[]>([])
+  const [formError, setFormError] = useState<FormError | null>(null)
 
   // Utiliser le hook réutilisable pour filiales
   const { data: filiales } = useFiliales<Filiale>()
@@ -104,6 +106,8 @@ export function ClientForm({ client, mode }: ClientFormProps) {
   }
 
   const onSubmit = async (data: ClientFormData) => {
+    setFormError(null) // Réinitialiser l'erreur précédente
+
     try {
       const supabase = createUntypedClient()
 
@@ -139,19 +143,32 @@ export function ClientForm({ client, mode }: ClientFormProps) {
       router.refresh()
     } catch (err) {
       console.error('Erreur:', err)
-      // L'erreur sera affichée par react-hook-form
+      const parsedError = parseSupabaseError(err)
+      setFormError(parsedError)
     }
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire client">
-      {/* Affichage des erreurs générales */}
-      <FormAlert
-        type="error"
-        message={Object.keys(errors).length > 0 ? 'Erreurs de validation :' : undefined}
-        messages={Object.entries(errors).map(([_, error]) => error.message || '')}
-        aria-label="Erreurs de validation du formulaire"
-      />
+      {/* Affichage des erreurs de validation Zod */}
+      {Object.keys(errors).length > 0 && (
+        <FormAlert
+          type="error"
+          message="Erreurs de validation :"
+          messages={Object.entries(errors).map(([_, error]) => error.message || '')}
+          aria-label="Erreurs de validation du formulaire"
+        />
+      )}
+
+      {/* Affichage des erreurs serveur (RLS, métier, techniques) */}
+      {formError && (
+        <FormAlert
+          type={formError.type === 'rls' ? 'warning' : 'error'}
+          message={formError.message}
+          messages={formError.details ? [formError.details] : undefined}
+          aria-label={formError.type === 'rls' ? 'Erreur d\'accès' : 'Erreur du serveur'}
+        />
+      )}
 
       {/* Type de client */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">

@@ -18,10 +18,11 @@ import {
   Calendar,
   Save,
   Loader2,
-  
+
   DollarSign,
   Globe,
 } from 'lucide-react'
+import { parseSupabaseError, type FormError } from '@/lib/errors/parse-error'
 
 type ProjetDigital = {
   id?: number
@@ -76,7 +77,7 @@ type ProjetDigitalFormData = z.infer<typeof projetDigitalSchema>
 export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [formError, setFormError] = useState<FormError | null>(null)
 
   // Utiliser les hooks réutilisables
   const { data: filiales } = useFiliales({ fields: 'id, nom, code' })
@@ -111,7 +112,7 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
   }, [mode, filiales, setValue])
 
   const onSubmit = async (data: ProjetDigitalFormData) => {
-    setError(null)
+    setFormError(null)
     setLoading(true)
 
     try {
@@ -152,7 +153,8 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
       }
     } catch (err) {
       console.error('Erreur:', err)
-      setError('Une erreur est survenue lors de l\'enregistrement')
+      const parsedError = parseSupabaseError(err)
+      setFormError(parsedError)
     } finally {
       setLoading(false)
     }
@@ -163,7 +165,24 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
 
   return (
     <form onSubmit={handleFormSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire de projet digital">
-      <FormAlert type="error" message={error || undefined} aria-label="Erreur de projet digital" />
+      {/* Erreurs de validation Zod */}
+      {Object.keys(errors).length > 0 && (
+        <FormAlert
+          type="error"
+          message="Erreurs de validation :"
+          messages={Object.entries(errors).map(([key, error]) => `${key}: ${error.message}`)}
+          aria-label="Erreurs de validation du formulaire"
+        />
+      )}
+
+      {/* Erreurs serveur (RLS, métier, techniques) */}
+      {formError && (
+        <FormAlert
+          type={formError.type === 'rls' ? 'warning' : 'error'}
+          message={formError.message}
+          messages={formError.details ? [formError.details] : undefined}
+        />
+      )}
 
       {/* Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">

@@ -17,10 +17,11 @@ import {
   Calendar,
   Save,
   Loader2,
-  
+
   DollarSign,
   Truck,
 } from 'lucide-react'
+import { parseSupabaseError, type FormError } from '@/lib/errors/parse-error'
 
 type CommandeOutsourcing = {
   id?: number
@@ -63,7 +64,7 @@ type CommandeFormData = z.infer<typeof commandeSchema>
 export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [formError, setFormError] = useState<FormError | null>(null)
 
   // Utiliser les hooks réutilisables
   const { data: filiales } = useFiliales({ fields: 'id, nom, code' })
@@ -105,7 +106,7 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
   }, [mode, filiales, setValue])
 
   const onSubmit = async (data: CommandeFormData) => {
-    setError(null)
+    setFormError(null)
     setLoading(true)
 
     try {
@@ -144,7 +145,8 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
       }
     } catch (err) {
       console.error('Erreur:', err)
-      setError('Une erreur est survenue lors de l\'enregistrement')
+      const parsedError = parseSupabaseError(err)
+      setFormError(parsedError)
     } finally {
       setLoading(false)
     }
@@ -154,7 +156,24 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
 
   return (
     <form onSubmit={handleFormSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire de commande outsourcing">
-      <FormAlert type="error" message={error || undefined} aria-label="Erreur de commande" />
+      {/* Erreurs de validation Zod */}
+      {Object.keys(errors).length > 0 && (
+        <FormAlert
+          type="error"
+          message="Erreurs de validation :"
+          messages={Object.entries(errors).map(([key, error]) => `${key}: ${error.message}`)}
+          aria-label="Erreurs de validation du formulaire"
+        />
+      )}
+
+      {/* Erreurs serveur (RLS, métier, techniques) */}
+      {formError && (
+        <FormAlert
+          type={formError.type === 'rls' ? 'warning' : 'error'}
+          message={formError.message}
+          messages={formError.details ? [formError.details] : undefined}
+        />
+      )}
 
       {/* Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">

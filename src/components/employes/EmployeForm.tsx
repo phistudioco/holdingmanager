@@ -29,6 +29,7 @@ import {
 import { PhotoUpload } from '@/components/common/PhotoUpload'
 import type { Tables } from '@/types/database'
 import { employeSchema, type EmployeFormData } from '@/lib/validations/employe'
+import { parseSupabaseError, type FormError } from '@/lib/errors/parse-error'
 
 type Employe = Tables<'employes'>
 type Filiale = Tables<'filiales'>
@@ -41,7 +42,7 @@ type EmployeFormProps = {
 
 export function EmployeForm({ employe, mode }: EmployeFormProps) {
   const router = useRouter()
-  const [error, setError] = useState<string | null>(null)
+  const [formError, setFormError] = useState<FormError | null>(null)
   const [success, setSuccess] = useState(false)
 
   // Utiliser les hooks réutilisables
@@ -82,7 +83,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
   }
 
   const onSubmit = async (data: EmployeFormData) => {
-    setError(null)
+    setFormError(null)
 
     try {
       const supabase = createUntypedClient()
@@ -125,12 +126,9 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
         router.refresh()
       }, 1500)
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue'
-      if (errorMessage.includes('duplicate key') || errorMessage.includes('unique')) {
-        setError('Ce matricule existe déjà')
-      } else {
-        setError(errorMessage)
-      }
+      console.error('Erreur:', err)
+      const parsedError = parseSupabaseError(err)
+      setFormError(parsedError)
     }
   }
 
@@ -150,7 +148,24 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire d'employé">
-      <FormAlert type="error" message={error || undefined} aria-label="Erreur d'employé" />
+      {/* Erreurs de validation Zod */}
+      {Object.keys(errors).length > 0 && (
+        <FormAlert
+          type="error"
+          message="Erreurs de validation :"
+          messages={Object.entries(errors).map(([key, error]) => `${key}: ${error.message}`)}
+          aria-label="Erreurs de validation du formulaire"
+        />
+      )}
+
+      {/* Erreurs serveur (RLS, métier, techniques) */}
+      {formError && (
+        <FormAlert
+          type={formError.type === 'rls' ? 'warning' : 'error'}
+          message={formError.message}
+          messages={formError.details ? [formError.details] : undefined}
+        />
+      )}
 
       {/* Section: Photo */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">

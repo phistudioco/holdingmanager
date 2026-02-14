@@ -27,6 +27,7 @@ import {
   categoriesRevenu,
   categoriesDepense,
 } from '@/lib/validations/transaction'
+import { parseSupabaseError, type FormError } from '@/lib/errors/parse-error'
 
 type Transaction = Tables<'transactions'>
 type Client = Tables<'clients'>
@@ -40,7 +41,7 @@ type TransactionFormProps = {
 export function TransactionForm({ transaction, mode }: TransactionFormProps) {
   const router = useRouter()
 
-  const [error, setError] = useState<string | null>(null)
+  const [formError, setFormError] = useState<FormError | null>(null)
 
   // Utiliser les hooks réutilisables
   const { data: filiales } = useFiliales<Filiale>()
@@ -79,7 +80,7 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
   }, [mode, filiales, transaction?.filiale_id, setValue])
 
   const onSubmit = async (data: TransactionFormData) => {
-    setError(null)
+    setFormError(null)
 
     try {
       const supabase = createUntypedClient()
@@ -110,10 +111,8 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
       router.refresh()
     } catch (err: unknown) {
       console.error('Erreur:', err)
-      const errorMessage = err instanceof Error ? err.message :
-        (typeof err === 'object' && err !== null && 'message' in err) ? String((err as { message: unknown }).message) :
-        'Erreur inconnue'
-      setError(`Erreur: ${errorMessage}`)
+      const parsedError = parseSupabaseError(err)
+      setFormError(parsedError)
     }
   }
 
@@ -128,7 +127,24 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire de transaction">
-      <FormAlert type="error" message={error || undefined} aria-label="Erreur de transaction" />
+      {/* Erreurs de validation Zod */}
+      {Object.keys(errors).length > 0 && (
+        <FormAlert
+          type="error"
+          message="Erreurs de validation :"
+          messages={Object.entries(errors).map(([key, error]) => `${key}: ${error.message}`)}
+          aria-label="Erreurs de validation du formulaire"
+        />
+      )}
+
+      {/* Erreurs serveur (RLS, métier, techniques) */}
+      {formError && (
+        <FormAlert
+          type={formError.type === 'rls' ? 'warning' : 'error'}
+          message={formError.message}
+          messages={formError.details ? [formError.details] : undefined}
+        />
+      )}
 
       {/* Type de transaction */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">

@@ -289,8 +289,17 @@ Trois analyses parallèles approfondies ont été réalisées pour identifier le
   - Codes d'erreur PostgreSQL: `42501` (policy violation), `23503` (FK constraint), `PGRST116` (no rows)
   - Messages différenciés : "non trouvé" vs "accès refusé" selon niveau utilisateur
   - Vérification filiale avant opérations critiques
-- [ ] Ajouter gestion d'erreurs 403 dans les formulaires
-- [ ] Messages d'erreur clairs pour l'utilisateur
+- [x] **Ajouter gestion d'erreurs RLS dans les formulaires** ✅ (Complété - 13 février 2026)
+  - [x] Helper centralisé parseSupabaseError() pour détecter et catégoriser les erreurs
+  - [x] Types d'erreurs : RLS (403), métier (23505, 23503), validation (23502), technique, réseau
+  - [x] Pattern standardisé appliqué aux 12 formulaires (useState<FormError>)
+  - [x] Affichage différencié : warning (jaune) pour RLS, error (rouge) pour autres
+  - [x] Messages user-friendly adaptés au type d'erreur
+  - Impact : ✅ Utilisateurs voient maintenant les erreurs RLS au lieu de console only
+- [x] **Messages d'erreur clairs pour l'utilisateur** ✅ (Complété - 13 février 2026)
+  - Messages en français adaptés au contexte (RLS, doublon, FK, NOT NULL)
+  - Détails supplémentaires dans FormAlert (formError.details)
+  - Codes PostgreSQL masqués pour l'utilisateur final
 - [ ] Tests de permissions par rôle
 
 #### Phase 2 : Optimisation Performance (2-3 jours)

@@ -25,6 +25,7 @@ import {
   ShoppingCart,
 } from 'lucide-react'
 import type { Tables } from '@/types/database'
+import { parseSupabaseError, type FormError } from '@/lib/errors/parse-error'
 
 type Filiale = Tables<'filiales'>
 type Employe = Tables<'employes'>
@@ -71,7 +72,7 @@ const workflowTypes = [
 export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [formError, setFormError] = useState<FormError | null>(null)
   const [success, setSuccess] = useState(false)
   const [employes, setEmployes] = useState<Employe[]>([])
   const [submitAction, setSubmitAction] = useState<'brouillon' | 'soumettre'>('brouillon')
@@ -113,7 +114,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-    setError(null)
+    setFormError(null)
   }
 
   const generateNumero = () => {
@@ -131,12 +132,16 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
   const handleSubmit = async (e: React.FormEvent, action: 'brouillon' | 'soumettre') => {
     e.preventDefault()
     setLoading(true)
-    setError(null)
+    setFormError(null)
     setSubmitAction(action)
 
     // Validation
     if (!formData.titre || !formData.filiale_id || !formData.demandeur_id) {
-      setError('Le titre, la filiale et le demandeur sont obligatoires')
+      setFormError({
+        type: 'validation',
+        message: 'Le titre, la filiale et le demandeur sont obligatoires',
+        userFriendly: true,
+      })
       setLoading(false)
       return
     }
@@ -199,19 +204,8 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
       }, 1500)
     } catch (err: unknown) {
       console.error('Workflow submission error:', err)
-      let errorMessage = 'Une erreur est survenue'
-      if (err && typeof err === 'object') {
-        if ('message' in err) {
-          errorMessage = String(err.message)
-        }
-        if ('details' in err) {
-          errorMessage += ` - ${String(err.details)}`
-        }
-        if ('code' in err) {
-          errorMessage += ` (Code: ${String(err.code)})`
-        }
-      }
-      setError(errorMessage)
+      const parsedError = parseSupabaseError(err)
+      setFormError(parsedError)
     } finally {
       setLoading(false)
     }
@@ -244,8 +238,15 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
 
   return (
     <form onSubmit={(e) => e.preventDefault()} className="space-y-8" aria-label="Formulaire de demande workflow">
-      {/* Error Alert */}
-      <FormAlert type="error" message={error || undefined} aria-label="Erreur de workflow" />
+      {/* Erreurs serveur (RLS, métier, techniques) */}
+      {formError && (
+        <FormAlert
+          type={formError.type === 'rls' ? 'warning' : 'error'}
+          message={formError.message}
+          messages={formError.details ? [formError.details] : undefined}
+          aria-label={formError.type === 'rls' ? 'Erreur d\'accès' : 'Erreur du serveur'}
+        />
+      )}
 
       {/* Section: Type de demande */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">

@@ -20,11 +20,12 @@ import {
   Loader2,
   Save,
   ArrowLeft,
-  
+
   CheckCircle,
 } from 'lucide-react'
 import type { Tables } from '@/types/database'
 import { filialeSchema, type FilialeFormData } from '@/lib/validations/filiale'
+import { parseSupabaseError, type FormError } from '@/lib/errors/parse-error'
 
 type Filiale = Tables<'filiales'>
 type Pays = Tables<'pays'>
@@ -36,7 +37,7 @@ type FilialeFormProps = {
 
 export function FilialeForm({ filiale, mode }: FilialeFormProps) {
   const router = useRouter()
-  const [error, setError] = useState<string | null>(null)
+  const [formError, setFormError] = useState<FormError | null>(null)
   const [success, setSuccess] = useState(false)
   const [pays, setPays] = useState<Pays[]>([])
 
@@ -73,7 +74,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
   }
 
   const onSubmit = async (data: FilialeFormData) => {
-    setError(null)
+    setFormError(null)
 
     try {
       const supabase = createUntypedClient()
@@ -114,12 +115,9 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
         router.refresh()
       }, 1500)
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue'
-      if (errorMessage.includes('duplicate key') || errorMessage.includes('unique')) {
-        setError('Ce code de filiale existe déjà')
-      } else {
-        setError(errorMessage)
-      }
+      console.error('Erreur:', err)
+      const parsedError = parseSupabaseError(err)
+      setFormError(parsedError)
     }
   }
 
@@ -139,7 +137,24 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire de filiale">
-      <FormAlert type="error" message={error || undefined} aria-label="Erreur de filiale" />
+      {/* Erreurs de validation Zod */}
+      {Object.keys(errors).length > 0 && (
+        <FormAlert
+          type="error"
+          message="Erreurs de validation :"
+          messages={Object.entries(errors).map(([key, error]) => `${key}: ${error.message}`)}
+          aria-label="Erreurs de validation du formulaire"
+        />
+      )}
+
+      {/* Erreurs serveur (RLS, métier, techniques) */}
+      {formError && (
+        <FormAlert
+          type={formError.type === 'rls' ? 'warning' : 'error'}
+          message={formError.message}
+          messages={formError.details ? [formError.details] : undefined}
+        />
+      )}
 
       {/* Section: Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">

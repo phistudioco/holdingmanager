@@ -27,6 +27,7 @@ import {
   type DevisFormData,
   tauxTVA as tauxTVAOptions,
 } from '@/lib/validations/devis'
+import { parseSupabaseError, type FormError } from '@/lib/errors/parse-error'
 
 type Devis = Tables<'devis'>
 type Client = Tables<'clients'>
@@ -61,7 +62,7 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
   const searchParams = useSearchParams()
   const clientIdFromUrl = searchParams.get('client')
 
-  const [error, setError] = useState<string | null>(null)
+  const [formError, setFormError] = useState<FormError | null>(null)
 
   // Utiliser les hooks réutilisables
   const { data: filiales } = useFiliales<Filiale>()
@@ -188,11 +189,15 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
   }
 
   const onSubmit = async (data: DevisFormData) => {
-    setError(null)
+    setFormError(null)
 
     // Validation des lignes
     if (lignes.every(l => !l.description.trim())) {
-      setError('Veuillez ajouter au moins une ligne avec une description')
+      setFormError({
+        type: 'validation',
+        message: 'Veuillez ajouter au moins une ligne avec une description',
+        userFriendly: true,
+      })
       return
     }
 
@@ -287,13 +292,31 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
       }
     } catch (err) {
       console.error('Erreur:', err)
-      setError('Une erreur est survenue lors de l\'enregistrement')
+      const parsedError = parseSupabaseError(err)
+      setFormError(parsedError)
     }
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire de devis">
-      <FormAlert type="error" message={error || undefined} aria-label="Erreur de devis" />
+      {/* Erreurs de validation Zod */}
+      {Object.keys(errors).length > 0 && (
+        <FormAlert
+          type="error"
+          message="Erreurs de validation :"
+          messages={Object.entries(errors).map(([key, error]) => `${key}: ${error.message}`)}
+          aria-label="Erreurs de validation du formulaire"
+        />
+      )}
+
+      {/* Erreurs serveur (RLS, métier, techniques) */}
+      {formError && (
+        <FormAlert
+          type={formError.type === 'rls' ? 'warning' : 'error'}
+          message={formError.message}
+          messages={formError.details ? [formError.details] : undefined}
+        />
+      )}
 
       {/* Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">

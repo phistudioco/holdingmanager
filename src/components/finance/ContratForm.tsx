@@ -27,6 +27,7 @@ import {
   typesContrat,
   periodicitesContrat,
 } from '@/lib/validations/contrat'
+import { parseSupabaseError, type FormError } from '@/lib/errors/parse-error'
 
 type Contrat = Tables<'contrats'>
 type Client = Tables<'clients'>
@@ -42,7 +43,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
   const searchParams = useSearchParams()
   const clientIdFromUrl = searchParams.get('client')
 
-  const [error, setError] = useState<string | null>(null)
+  const [formError, setFormError] = useState<FormError | null>(null)
 
   // Utiliser les hooks réutilisables
   const { data: filiales } = useFiliales<Filiale>()
@@ -89,7 +90,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
   }
 
   const onSubmit = async (data: ContratFormData) => {
-    setError(null)
+    setFormError(null)
 
     try {
       const supabase = createUntypedClient()
@@ -120,10 +121,8 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
       router.refresh()
     } catch (err: unknown) {
       console.error('Erreur:', err)
-      const errorMessage = err instanceof Error ? err.message :
-        (typeof err === 'object' && err !== null && 'message' in err) ? String((err as { message: unknown }).message) :
-        'Erreur inconnue'
-      setError(`Erreur: ${errorMessage}`)
+      const parsedError = parseSupabaseError(err)
+      setFormError(parsedError)
     }
   }
 
@@ -136,7 +135,24 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire de contrat">
-      <FormAlert type="error" message={error || undefined} aria-label="Erreur de contrat" />
+      {/* Erreurs de validation Zod */}
+      {Object.keys(errors).length > 0 && (
+        <FormAlert
+          type="error"
+          message="Erreurs de validation :"
+          messages={Object.entries(errors).map(([key, error]) => `${key}: ${error.message}`)}
+          aria-label="Erreurs de validation du formulaire"
+        />
+      )}
+
+      {/* Erreurs serveur (RLS, métier, techniques) */}
+      {formError && (
+        <FormAlert
+          type={formError.type === 'rls' ? 'warning' : 'error'}
+          message={formError.message}
+          messages={formError.details ? [formError.details] : undefined}
+        />
+      )}
 
       {/* Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">

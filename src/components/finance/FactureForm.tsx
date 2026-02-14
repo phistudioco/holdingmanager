@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm, useFieldArray, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -34,6 +34,7 @@ import {
   sumMontants,
   formatCurrency as formatMontant,
 } from '@/lib/utils/currency'
+import { parseSupabaseError, parseApiError, type FormError } from '@/lib/errors/parse-error'
 
 type Facture = Tables<'factures'>
 type Client = Tables<'clients'>
@@ -61,6 +62,8 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
   const router = useRouter()
   const searchParams = useSearchParams()
   const clientIdFromUrl = searchParams.get('client')
+
+  const [formError, setFormError] = useState<FormError | null>(null)
 
   // Utiliser les hooks réutilisables
   const { data: filiales } = useFiliales<Filiale>()
@@ -176,6 +179,8 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
   }
 
   const onSubmit = async (data: FactureFormData) => {
+    setFormError(null)
+
     try {
       const supabase = createUntypedClient()
 
@@ -244,7 +249,9 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
         const result = await response.json()
 
         if (!response.ok) {
-          throw new Error(result.message || result.error || 'Erreur lors de la mise à jour')
+          const parsedError = await parseApiError(response)
+          setFormError(parsedError)
+          return
         }
       }
 
@@ -252,7 +259,8 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
       router.refresh()
     } catch (err: unknown) {
       console.error('Erreur:', err)
-      // L'erreur sera gérée par react-hook-form
+      const parsedError = parseSupabaseError(err)
+      setFormError(parsedError)
     }
   }
 
@@ -271,12 +279,24 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-label="Formulaire de facture">
-      <FormAlert
-        type="error"
-        message={Object.keys(errors).length > 0 ? 'Erreurs de validation :' : undefined}
-        messages={errorMessages}
-        aria-label="Erreurs de validation du formulaire"
-      />
+      {/* Erreurs de validation Zod */}
+      {Object.keys(errors).length > 0 && (
+        <FormAlert
+          type="error"
+          message="Erreurs de validation :"
+          messages={errorMessages}
+          aria-label="Erreurs de validation du formulaire"
+        />
+      )}
+
+      {/* Erreurs serveur (RLS, métier, techniques) */}
+      {formError && (
+        <FormAlert
+          type={formError.type === 'rls' ? 'warning' : 'error'}
+          message={formError.message}
+          messages={formError.details ? [formError.details] : undefined}
+        />
+      )}
 
       {/* Informations générales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
