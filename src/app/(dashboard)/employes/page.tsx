@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { EmployeeGridCard } from '@/components/employes/EmployeeGridCard'
 import { EmployeeTableRow } from '@/components/employes/EmployeeTableRow'
+import { useDebounce } from '@/lib/hooks/useDebounce'
 import {
   Users,
   Plus,
@@ -43,10 +44,13 @@ export default function EmployesPage() {
   const [stats, setStats] = useState({ total: 0, actifs: 0, enConge: 0 })
   const itemsPerPage = 12
 
+  // Debounce de la recherche pour éviter les requêtes trop fréquentes
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
+
   // Charger les données avec pagination côté serveur
   useEffect(() => {
     loadEmployes()
-  }, [currentPage, searchQuery, filterStatus, filterFiliale])
+  }, [currentPage, debouncedSearchQuery, filterStatus, filterFiliale])
 
   // Charger les filiales et stats une seule fois
   useEffect(() => {
@@ -91,10 +95,10 @@ export default function EmployesPage() {
         { count: 'exact' }
       )
 
-    // Appliquer les filtres côté serveur
-    if (searchQuery) {
+    // Appliquer les filtres côté serveur avec la valeur debouncée
+    if (debouncedSearchQuery) {
       query = query.or(
-        `nom.ilike.%${searchQuery}%,prenom.ilike.%${searchQuery}%,matricule.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,poste.ilike.%${searchQuery}%`
+        `nom.ilike.%${debouncedSearchQuery}%,prenom.ilike.%${debouncedSearchQuery}%,matricule.ilike.%${debouncedSearchQuery}%,email.ilike.%${debouncedSearchQuery}%,poste.ilike.%${debouncedSearchQuery}%`
       )
     }
 

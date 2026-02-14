@@ -8,6 +8,7 @@ import { StatsCard } from '@/components/common/StatsCard'
 import { EmptyState } from '@/components/common/EmptyState'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useDebounce } from '@/lib/hooks/useDebounce'
 import {
   Package,
   Search,
@@ -63,6 +64,9 @@ export default function OutsourcingPage() {
     montantTotal: 0,
   })
 
+  // Debounce de la recherche pour éviter les calculs trop fréquents
+  const debouncedSearch = useDebounce(search, 300)
+
   const fetchData = useCallback(async () => {
     setLoading(true)
     const supabase = createClient()
@@ -81,9 +85,9 @@ export default function OutsourcingPage() {
 
     if (fournisseursRes.data) {
       let filtered = fournisseursRes.data as Fournisseur[]
-      if (search) {
+      if (debouncedSearch) {
         filtered = filtered.filter(f =>
-          f.nom.toLowerCase().includes(search.toLowerCase())
+          f.nom.toLowerCase().includes(debouncedSearch.toLowerCase())
         )
       }
       setFournisseurs(filtered)
@@ -98,9 +102,9 @@ export default function OutsourcingPage() {
 
     if (commandesRes.data) {
       let filtered = commandesRes.data as Commande[]
-      if (search && activeTab === 'commandes') {
+      if (debouncedSearch && activeTab === 'commandes') {
         filtered = filtered.filter(c =>
-          c.numero.toLowerCase().includes(search.toLowerCase())
+          c.numero.toLowerCase().includes(debouncedSearch.toLowerCase())
         )
       }
       setCommandes(filtered)
@@ -120,7 +124,7 @@ export default function OutsourcingPage() {
     }
 
     setLoading(false)
-  }, [search, activeTab])
+  }, [debouncedSearch, activeTab])
 
   useEffect(() => {
     fetchData()

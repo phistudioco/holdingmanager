@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useDebounce } from '@/lib/hooks/useDebounce'
 import {
   Select,
   SelectContent,
@@ -68,6 +69,9 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState('')
   const [filterRole, setFilterRole] = useState<string>('all')
   const [updating, setUpdating] = useState<string | null>(null)
+
+  // Debounce de la recherche pour éviter les calculs trop fréquents
+  const debouncedSearch = useDebounce(search, 300)
 
   const supabase = createClient()
 
@@ -133,9 +137,9 @@ export default function AdminUsersPage() {
 
   const filteredUsers = users.filter(user => {
     const matchesSearch =
-      user.nom.toLowerCase().includes(search.toLowerCase()) ||
-      user.prenom.toLowerCase().includes(search.toLowerCase()) ||
-      user.email.toLowerCase().includes(search.toLowerCase())
+      user.nom.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      user.prenom.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      user.email.toLowerCase().includes(debouncedSearch.toLowerCase())
 
     const matchesRole =
       filterRole === 'all' || user.role?.nom === filterRole

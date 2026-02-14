@@ -10,6 +10,7 @@ import { ExportButton } from '@/components/common/ExportButton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { exportTransactions } from '@/lib/export/excel'
+import { useDebounce } from '@/lib/hooks/useDebounce'
 import {
   ArrowUpCircle,
   ArrowDownCircle,
@@ -74,6 +75,9 @@ export default function TransactionsPage() {
     transactionsCount: 0,
   })
 
+  // Debounce de la recherche pour éviter les requêtes trop fréquentes
+  const debouncedSearch = useDebounce(search, 300)
+
   const fetchTransactions = useCallback(async () => {
     setLoading(true)
     const supabase = createClient()
@@ -82,8 +86,8 @@ export default function TransactionsPage() {
       .from('transactions')
       .select('*, client:client_id(nom, code), filiale:filiale_id(nom), facture:facture_id(numero)', { count: 'exact' })
 
-    if (search) {
-      query = query.or(`description.ilike.%${search}%,reference.ilike.%${search}%`)
+    if (debouncedSearch) {
+      query = query.or(`description.ilike.%${debouncedSearch}%,reference.ilike.%${debouncedSearch}%`)
     }
     if (filterType !== 'all') {
       query = query.eq('type', filterType)
@@ -104,7 +108,7 @@ export default function TransactionsPage() {
       setTotalCount(count || 0)
     }
     setLoading(false)
-  }, [search, filterType, filterCategorie, page])
+  }, [debouncedSearch, filterType, filterCategorie, page])
 
   const fetchStats = useCallback(async () => {
     const supabase = createClient()
@@ -153,8 +157,8 @@ export default function TransactionsPage() {
       .from('transactions')
       .select('*, client:client_id(nom, code), filiale:filiale_id(nom), facture:facture_id(numero)')
 
-    if (search) {
-      query = query.or(`description.ilike.%${search}%,reference.ilike.%${search}%`)
+    if (debouncedSearch) {
+      query = query.or(`description.ilike.%${debouncedSearch}%,reference.ilike.%${debouncedSearch}%`)
     }
     if (filterType !== 'all') {
       query = query.eq('type', filterType)

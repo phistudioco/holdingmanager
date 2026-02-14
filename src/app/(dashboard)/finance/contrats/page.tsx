@@ -8,6 +8,7 @@ import { StatsCard } from '@/components/common/StatsCard'
 import { EmptyState } from '@/components/common/EmptyState'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useDebounce } from '@/lib/hooks/useDebounce'
 import {
   ScrollText,
   Search,
@@ -44,6 +45,9 @@ export default function ContratsPage() {
     montantTotal: 0,
   })
 
+  // Debounce de la recherche pour éviter les requêtes trop fréquentes
+  const debouncedSearch = useDebounce(search, 300)
+
   // Fonction combinée pour charger contrats et stats en parallèle
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -56,8 +60,8 @@ export default function ContratsPage() {
       .from('contrats')
       .select('*, client:client_id(nom, code), filiale:filiale_id(nom)', { count: 'exact' })
 
-    if (search) {
-      contratsQuery = contratsQuery.or(`numero.ilike.%${search}%,titre.ilike.%${search}%`)
+    if (debouncedSearch) {
+      contratsQuery = contratsQuery.or(`numero.ilike.%${debouncedSearch}%,titre.ilike.%${debouncedSearch}%`)
     }
     if (filterStatut !== 'all') {
       contratsQuery = contratsQuery.eq('statut', filterStatut)
@@ -108,7 +112,7 @@ export default function ContratsPage() {
     } finally {
       setLoading(false)
     }
-  }, [search, filterStatut, filterType, page])
+  }, [debouncedSearch, filterStatut, filterType, page])
 
   useEffect(() => {
     fetchData()

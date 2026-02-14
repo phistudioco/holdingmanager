@@ -8,6 +8,7 @@ import { StatsCard } from '@/components/common/StatsCard'
 import { EmptyState } from '@/components/common/EmptyState'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useDebounce } from '@/lib/hooks/useDebounce'
 import {
   Monitor,
   Search,
@@ -52,6 +53,9 @@ export default function DigitalPage() {
     sitesWeb: 0,
   })
 
+  // Debounce de la recherche pour éviter les requêtes trop fréquentes
+  const debouncedSearch = useDebounce(search, 300)
+
   const fetchProjets = useCallback(async () => {
     setLoading(true)
     const supabase = createClient()
@@ -61,8 +65,8 @@ export default function DigitalPage() {
       .select('*, client:client_id(nom), filiale:filiale_id(nom)')
       .order('created_at', { ascending: false })
 
-    if (search) {
-      query = query.ilike('nom', `%${search}%`)
+    if (debouncedSearch) {
+      query = query.ilike('nom', `%${debouncedSearch}%`)
     }
     if (filterType !== 'all') {
       query = query.eq('type', filterType)
@@ -87,7 +91,7 @@ export default function DigitalPage() {
       })
     }
     setLoading(false)
-  }, [search, filterType])
+  }, [debouncedSearch, filterType])
 
   useEffect(() => {
     fetchProjets()

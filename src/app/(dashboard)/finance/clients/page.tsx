@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { ClientGridCard } from '@/components/finance/ClientGridCard'
 import { ClientTableRow } from '@/components/finance/ClientTableRow'
 import { exportClients } from '@/lib/export/excel'
+import { useDebounce } from '@/lib/hooks/useDebounce'
 import {
   Users,
   Building2,
@@ -47,6 +48,9 @@ export default function ClientsPage() {
     actifs: 0,
   })
 
+  // Debounce de la recherche pour éviter les requêtes trop fréquentes
+  const debouncedSearch = useDebounce(search, 300)
+
   // Fonction combinée pour charger clients et stats en parallèle
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -57,9 +61,9 @@ export default function ClientsPage() {
       .from('clients')
       .select('*, filiale:filiale_id(nom, code)', { count: 'exact' })
 
-    // Filtres
-    if (search) {
-      clientsQuery = clientsQuery.or(`nom.ilike.%${search}%,code.ilike.%${search}%,email.ilike.%${search}%`)
+    // Filtres avec la valeur debouncée
+    if (debouncedSearch) {
+      clientsQuery = clientsQuery.or(`nom.ilike.%${debouncedSearch}%,code.ilike.%${debouncedSearch}%,email.ilike.%${debouncedSearch}%`)
     }
     if (filterType !== 'all') {
       clientsQuery = clientsQuery.eq('type', filterType)
@@ -104,7 +108,7 @@ export default function ClientsPage() {
     } finally {
       setLoading(false)
     }
-  }, [search, filterType, filterStatut, page])
+  }, [debouncedSearch, filterType, filterStatut, page])
 
   useEffect(() => {
     fetchData()
@@ -117,8 +121,8 @@ export default function ClientsPage() {
       .from('clients')
       .select('*, filiale:filiale_id(nom, code)')
 
-    if (search) {
-      query = query.or(`nom.ilike.%${search}%,code.ilike.%${search}%,email.ilike.%${search}%`)
+    if (debouncedSearch) {
+      query = query.or(`nom.ilike.%${debouncedSearch}%,code.ilike.%${debouncedSearch}%,email.ilike.%${debouncedSearch}%`)
     }
     if (filterType !== 'all') {
       query = query.eq('type', filterType)

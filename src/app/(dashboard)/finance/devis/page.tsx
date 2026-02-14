@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/common/EmptyState'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { downloadDevisPDF } from '@/lib/pdf/devis-pdf'
+import { useDebounce } from '@/lib/hooks/useDebounce'
 import {
   FileText,
   Search,
@@ -49,6 +50,9 @@ export default function DevisPage() {
     totalMontant: 0,
   })
 
+  // Debounce de la recherche pour éviter les requêtes trop fréquentes
+  const debouncedSearch = useDebounce(search, 300)
+
   const fetchDevis = useCallback(async () => {
     setLoading(true)
     const supabase = createClient()
@@ -57,8 +61,8 @@ export default function DevisPage() {
       .from('devis')
       .select('*, client:client_id(nom, code), filiale:filiale_id(nom)', { count: 'exact' })
 
-    if (search) {
-      query = query.or(`numero.ilike.%${search}%,objet.ilike.%${search}%`)
+    if (debouncedSearch) {
+      query = query.or(`numero.ilike.%${debouncedSearch}%,objet.ilike.%${debouncedSearch}%`)
     }
     if (filterStatut !== 'all') {
       query = query.eq('statut', filterStatut)
@@ -76,7 +80,7 @@ export default function DevisPage() {
       setTotalCount(count || 0)
     }
     setLoading(false)
-  }, [search, filterStatut, page])
+  }, [debouncedSearch, filterStatut, page])
 
   const fetchStats = useCallback(async () => {
     const supabase = createClient()

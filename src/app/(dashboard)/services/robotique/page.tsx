@@ -8,6 +8,7 @@ import { StatsCard } from '@/components/common/StatsCard'
 import { EmptyState } from '@/components/common/EmptyState'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useDebounce } from '@/lib/hooks/useDebounce'
 import {
   Bot,
   Search,
@@ -49,6 +50,9 @@ export default function RobotiquePage() {
     budgetTotal: 0,
   })
 
+  // Debounce de la recherche pour éviter les requêtes trop fréquentes
+  const debouncedSearch = useDebounce(search, 300)
+
   const fetchProjets = useCallback(async () => {
     setLoading(true)
     const supabase = createClient()
@@ -58,8 +62,8 @@ export default function RobotiquePage() {
       .select('*, client:client_id(nom), filiale:filiale_id(nom)')
       .order('created_at', { ascending: false })
 
-    if (search) {
-      query = query.ilike('nom', `%${search}%`)
+    if (debouncedSearch) {
+      query = query.ilike('nom', `%${debouncedSearch}%`)
     }
 
     const { data, error } = await query
@@ -81,7 +85,7 @@ export default function RobotiquePage() {
       })
     }
     setLoading(false)
-  }, [search])
+  }, [debouncedSearch])
 
   useEffect(() => {
     fetchProjets()

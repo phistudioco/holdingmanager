@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FactureTableRow } from '@/components/finance/FactureTableRow'
 import { exportFactures } from '@/lib/export/excel'
+import { useDebounce } from '@/lib/hooks/useDebounce'
 import {
   FileText,
   Search,
@@ -55,6 +56,9 @@ export default function FacturesPage() {
   })
   const [downloadingId, setDownloadingId] = useState<number | null>(null)
 
+  // Debounce de la recherche pour éviter les requêtes trop fréquentes
+  const debouncedSearch = useDebounce(search, 300)
+
   // Fonction combinée pour charger factures et stats en parallèle
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -65,8 +69,8 @@ export default function FacturesPage() {
       .from('factures')
       .select('*, client:client_id(nom, code), filiale:filiale_id(nom)', { count: 'exact' })
 
-    if (search) {
-      facturesQuery = facturesQuery.or(`numero.ilike.%${search}%,objet.ilike.%${search}%`)
+    if (debouncedSearch) {
+      facturesQuery = facturesQuery.or(`numero.ilike.%${debouncedSearch}%,objet.ilike.%${debouncedSearch}%`)
     }
     if (filterStatut !== 'all') {
       facturesQuery = facturesQuery.eq('statut', filterStatut)
@@ -129,7 +133,7 @@ export default function FacturesPage() {
     } finally {
       setLoading(false)
     }
-  }, [search, filterStatut, filterType, page])
+  }, [debouncedSearch, filterStatut, filterType, page])
 
   useEffect(() => {
     fetchData()
@@ -142,8 +146,8 @@ export default function FacturesPage() {
       .from('factures')
       .select('*, client:client_id(nom, code), filiale:filiale_id(nom)')
 
-    if (search) {
-      query = query.or(`numero.ilike.%${search}%,objet.ilike.%${search}%`)
+    if (debouncedSearch) {
+      query = query.or(`numero.ilike.%${debouncedSearch}%,objet.ilike.%${debouncedSearch}%`)
     }
     if (filterStatut !== 'all') {
       query = query.eq('statut', filterStatut)

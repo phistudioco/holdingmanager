@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/common/EmptyState'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FilialeCard } from '@/components/filiales/FilialeCard'
+import { useDebounce } from '@/lib/hooks/useDebounce'
 import {
   Building2,
   Plus,
@@ -38,6 +39,9 @@ export default function FilialesPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 9
 
+  // Debounce de la recherche pour éviter les calculs trop fréquents
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
+
   useEffect(() => {
     loadFiliales()
   }, [])
@@ -55,19 +59,19 @@ export default function FilialesPage() {
     setLoading(false)
   }
 
-  // Filtrage
+  // Filtrage avec la valeur debouncée
   const filteredFiliales = useMemo(() =>
     filiales.filter(filiale => {
       const matchesSearch =
-        filiale.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        filiale.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        filiale.ville?.toLowerCase().includes(searchQuery.toLowerCase())
+        filiale.nom.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        filiale.code.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        filiale.ville?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
 
       const matchesStatus = filterStatus === 'all' || filiale.statut === filterStatus
 
       return matchesSearch && matchesStatus
     }),
-    [filiales, searchQuery, filterStatus]
+    [filiales, debouncedSearchQuery, filterStatus]
   )
 
   // Pagination
