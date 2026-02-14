@@ -279,8 +279,8 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
       />
 
       {/* Informations générales */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-phi-primary to-blue-600">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-300 bg-gradient-to-r from-phi-primary to-blue-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
             <FileText className="h-5 w-5" aria-hidden="true" />
             Informations générales
@@ -360,8 +360,8 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
       </div>
 
       {/* Client */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-phi-accent to-pink-600">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-300 bg-gradient-to-r from-phi-accent to-pink-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
             <Users className="h-5 w-5" aria-hidden="true" />
             Client
@@ -390,8 +390,8 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
       </div>
 
       {/* Dates */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-green-500 to-emerald-600">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-300 bg-gradient-to-r from-green-500 to-emerald-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
             <Calendar className="h-5 w-5" aria-hidden="true" />
             Dates
@@ -423,8 +423,8 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
       </div>
 
       {/* Lignes de facture */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-purple-500 to-violet-600 flex items-center justify-between">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-300 bg-gradient-to-r from-purple-500 to-violet-600 flex items-center justify-between">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
             <Calculator className="h-5 w-5" aria-hidden="true" />
             Lignes de facture
@@ -535,8 +535,8 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
       </div>
 
       {/* Notes */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-100">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-300 bg-gray-100">
           <h3 className="font-heading font-semibold text-gray-700 flex items-center gap-2">
             <FileText className="h-5 w-5" aria-hidden="true" />
             Notes

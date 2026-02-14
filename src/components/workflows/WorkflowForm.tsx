@@ -226,7 +226,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
         <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">
           {submitAction === 'soumettre' ? 'Demande soumise !' : 'Brouillon enregistré !'}
         </h2>
-        <p className="text-gray-500">Redirection en cours...</p>
+        <p className="text-gray-600">Redirection en cours...</p>
       </div>
     )
   }
@@ -248,7 +248,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
       <FormAlert type="error" message={error || undefined} aria-label="Erreur de workflow" />
 
       {/* Section: Type de demande */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-phi-primary to-phi-primary/90 text-white">
           <div className="flex items-center gap-3">
             <GitBranch className="h-5 w-5" aria-hidden="true" />
@@ -268,7 +268,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
       </div>
 
       {/* Section: Informations générales */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-phi-accent to-phi-accent/90 text-white">
           <div className="flex items-center gap-3">
             <FileText className="h-5 w-5" aria-hidden="true" />
@@ -298,7 +298,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
                 Filiale <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600" />
                 <select
                   id="filiale_id"
                   name="filiale_id"
@@ -322,7 +322,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
               Demandeur <span className="text-red-500" aria-label="requis">*</span>
             </Label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600" />
               <select
                 id="demandeur_id"
                 name="demandeur_id"
@@ -349,7 +349,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
               onChange={handleChange}
               placeholder="Décrivez votre demande en détail..."
               rows={4}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors resize-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-600 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors resize-none"
             />
           </div>
 
@@ -376,7 +376,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
                   Montant estimé
                 </Label>
                 <div className="relative">
-                  <Euro className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Euro className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600" />
                   <Input
                     id="montant"
                     name="montant"
@@ -396,7 +396,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
 
       {/* Section: Détails spécifiques selon le type */}
       {formData.type === 'achat' && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
           <div className="px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
             <div className="flex items-center gap-3">
               <ShoppingCart className="h-5 w-5" />
@@ -424,7 +424,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
                 onChange={handleChange}
                 placeholder="Justifiez le besoin de cet achat..."
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors resize-none"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-600 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors resize-none"
               />
             </div>
           </div>
@@ -432,7 +432,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
       )}
 
       {formData.type === 'conge' && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
           <div className="px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white">
             <div className="flex items-center gap-3">
               <Calendar className="h-5 w-5" />
@@ -473,7 +473,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
                 onChange={handleChange}
                 placeholder="Raison de la demande de congé..."
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors resize-none"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-600 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors resize-none"
               />
             </div>
           </div>
@@ -481,7 +481,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
       )}
 
       {formData.type === 'formation' && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
           <div className="px-6 py-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white">
             <div className="flex items-center gap-3">
               <GraduationCap className="h-5 w-5" />
@@ -550,7 +550,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
                 onChange={handleChange}
                 placeholder="Pourquoi cette formation est-elle nécessaire..."
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors resize-none"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-600 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors resize-none"
               />
             </div>
           </div>
@@ -558,7 +558,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
       )}
 
       {formData.type === 'autre' && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
           <div className="px-6 py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white">
             <div className="flex items-center gap-3">
               <GitBranch className="h-5 w-5" />
@@ -575,7 +575,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
                 onChange={handleChange}
                 placeholder="Détaillez votre demande..."
                 rows={4}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors resize-none"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-600 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors resize-none"
               />
             </div>
           </div>

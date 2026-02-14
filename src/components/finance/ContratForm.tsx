@@ -139,8 +139,8 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
       <FormAlert type="error" message={error || undefined} aria-label="Erreur de contrat" />
 
       {/* Informations générales */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-phi-primary to-blue-600">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-300 bg-gradient-to-r from-phi-primary to-blue-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
             <ScrollText className="h-5 w-5" aria-hidden="true" />
             Informations générales
@@ -244,8 +244,8 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
       </div>
 
       {/* Client */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-phi-accent to-pink-600">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-300 bg-gradient-to-r from-phi-accent to-pink-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
             <Users className="h-5 w-5" aria-hidden="true" />
             Client
@@ -285,8 +285,8 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
       </div>
 
       {/* Dates et Périodicité */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-green-500 to-emerald-600">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-300 bg-gradient-to-r from-green-500 to-emerald-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
             <Calendar className="h-5 w-5" aria-hidden="true" />
             Durée et Périodicité
@@ -321,7 +321,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
               {...register('date_fin')}
               className="mt-1"
             />
-            <p className="text-xs text-gray-500 mt-1">Laisser vide pour durée indéterminée</p>
+            <p className="text-xs text-gray-600 mt-1">Laisser vide pour durée indéterminée</p>
             {errors.date_fin && <p className="text-sm text-red-600 mt-1">{errors.date_fin.message}</p>}
           </div>
 
@@ -359,8 +359,8 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
       </div>
 
       {/* Montant */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-purple-500 to-violet-600">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-300 bg-gradient-to-r from-purple-500 to-violet-600">
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
             <Euro className="h-5 w-5" aria-hidden="true" />
             Montant
@@ -382,7 +382,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
                 aria-invalid={!!errors.montant}
                 aria-describedby={errors.montant ? 'montant-error' : undefined}
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-600 mt-1">
                 Montant par période ({periodicite})
               </p>
               {errors.montant && (
@@ -396,7 +396,7 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
                 <p className="text-sm text-gray-600 mb-1">Montant affiché</p>
                 <p className="text-2xl font-bold text-phi-primary">
                   {formatCurrency(montant)}
-                  <span className="text-sm font-normal text-gray-500 ml-2">/ {periodicite}</span>
+                  <span className="text-sm font-normal text-gray-600 ml-2">/ {periodicite}</span>
                 </p>
               </div>
             </div>
@@ -405,8 +405,8 @@ export function ContratForm({ contrat, mode }: ContratFormProps) {
       </div>
 
       {/* Description */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-100">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-300 bg-gray-100">
           <h3 className="font-heading font-semibold text-gray-700 flex items-center gap-2">
             <ScrollText className="h-5 w-5" aria-hidden="true" />
             Description

@@ -132,7 +132,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
         <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">
           {mode === 'create' ? 'Filiale créée !' : 'Filiale mise à jour !'}
         </h2>
-        <p className="text-gray-500">Redirection en cours...</p>
+        <p className="text-gray-600">Redirection en cours...</p>
       </div>
     )
   }
@@ -142,7 +142,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
       <FormAlert type="error" message={error || undefined} aria-label="Erreur de filiale" />
 
       {/* Section: Informations générales */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-phi-primary to-phi-primary/90 text-white">
           <div className="flex items-center gap-3">
             <Building2 className="h-5 w-5" aria-hidden="true" />
@@ -156,7 +156,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
                 Code filiale <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <div className="relative">
-                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
+                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600" aria-hidden="true" />
                 <Input
                   id="code"
                   {...register('code')}
@@ -172,7 +172,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
               {errors.code ? (
                 <p id="code-error" className="text-sm text-red-600" role="alert">{errors.code.message}</p>
               ) : (
-                <p id="code-hint" className="text-xs text-gray-500">Identifiant unique de la filiale</p>
+                <p id="code-hint" className="text-xs text-gray-600">Identifiant unique de la filiale</p>
               )}
             </div>
 
@@ -181,7 +181,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
                 Nom <span className="text-red-500" aria-label="requis">*</span>
               </Label>
               <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
+                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600" aria-hidden="true" />
                 <Input
                   id="nom"
                   {...register('nom')}
@@ -219,7 +219,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
       </div>
 
       {/* Section: Adresse */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-phi-accent to-phi-accent/90 text-white">
           <div className="flex items-center gap-3">
             <MapPin className="h-5 w-5" aria-hidden="true" />
@@ -234,7 +234,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
               {...register('adresse')}
               placeholder="123 Avenue de l'Innovation"
               rows={2}
-              className={`w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors resize-none ${
+              className={`w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-600 focus:border-phi-primary focus:ring-2 focus:ring-phi-primary/20 focus:outline-none transition-colors resize-none ${
                 errors.adresse ? 'border-red-500 focus:border-red-500' : ''
               }`}
             />
@@ -289,7 +289,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
       </div>
 
       {/* Section: Contact */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-phi-highlight to-phi-highlight/90 text-gray-900">
           <div className="flex items-center gap-3">
             <Phone className="h-5 w-5" aria-hidden="true" />
@@ -301,7 +301,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
             <div className="space-y-2">
               <Label htmlFor="telephone" className="text-sm font-medium text-gray-700">Téléphone</Label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600" aria-hidden="true" />
                 <Input
                   id="telephone"
                   type="tel"
@@ -318,7 +318,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600" aria-hidden="true" />
                 <Input
                   id="email"
                   type="email"
@@ -336,7 +336,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
           <div className="space-y-2">
             <Label htmlFor="site_web" className="text-sm font-medium text-gray-700">Site web</Label>
             <div className="relative">
-              <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600" />
               <Input
                 id="site_web"
                 type="url"
@@ -353,7 +353,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
       </div>
 
       {/* Section: Direction */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
         <div className="px-6 py-4 bg-gradient-to-r from-gray-700 to-gray-600 text-white">
           <div className="flex items-center gap-3">
             <User className="h-5 w-5" />
@@ -365,7 +365,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
             <div className="space-y-2">
               <Label htmlFor="directeur_nom" className="text-sm font-medium text-gray-700">Nom du directeur</Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600" />
                 <Input
                   id="directeur_nom"
                   {...register('directeur_nom')}
@@ -381,7 +381,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
             <div className="space-y-2">
               <Label htmlFor="directeur_email" className="text-sm font-medium text-gray-700">Email du directeur</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-600" aria-hidden="true" />
                 <Input
                   id="directeur_email"
                   type="email"

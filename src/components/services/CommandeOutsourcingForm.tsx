@@ -157,7 +157,7 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
       <FormAlert type="error" message={error || undefined} aria-label="Erreur de commande" />
 
       {/* Informations générales */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <ShoppingCart className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Informations de la commande
@@ -270,7 +270,7 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
       </div>
 
       {/* Dates */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <Calendar className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Planification
@@ -318,7 +318,7 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
       </div>
 
       {/* Notes */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <Label htmlFor="notes">Notes</Label>
         <textarea
           id="notes"

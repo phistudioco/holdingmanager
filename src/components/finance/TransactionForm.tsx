@@ -131,8 +131,8 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
       <FormAlert type="error" message={error || undefined} aria-label="Erreur de transaction" />
 
       {/* Type de transaction */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-100">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-300 bg-gray-100">
           <h2 className="font-heading font-semibold text-gray-700">Type de transaction</h2>
         </div>
         <div className="p-6">
@@ -169,8 +169,8 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
       </div>
 
       {/* Informations */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className={`px-6 py-4 border-b border-gray-100 bg-gradient-to-r ${
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
+        <div className={`px-6 py-4 border-b border-gray-300 bg-gradient-to-r ${
           type === 'revenu' ? 'from-green-500 to-emerald-600' : 'from-red-500 to-rose-600'
         }`}>
           <h3 className="font-heading font-semibold text-white flex items-center gap-2">
@@ -302,8 +302,8 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
       {/* Montant et Date */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         {/* Montant */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-purple-500 to-violet-600">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-300 bg-gradient-to-r from-purple-500 to-violet-600">
             <h3 className="font-heading font-semibold text-white flex items-center gap-2">
               <Euro className="h-5 w-5" aria-hidden="true" />
               Montant
@@ -344,8 +344,8 @@ export function TransactionForm({ transaction, mode }: TransactionFormProps) {
         </div>
 
         {/* Date */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-blue-500 to-cyan-600">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-300 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-300 bg-gradient-to-r from-blue-500 to-cyan-600">
             <h3 className="font-heading font-semibold text-white flex items-center gap-2">
               <Calendar className="h-5 w-5" aria-hidden="true" />
               Date

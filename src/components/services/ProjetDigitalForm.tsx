@@ -166,7 +166,7 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
       <FormAlert type="error" message={error || undefined} aria-label="Erreur de projet digital" />
 
       {/* Informations générales */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <Monitor className="h-5 w-5" style={{ color: themeDark }} aria-hidden="true" />
           Informations du projet
@@ -284,7 +284,7 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
       </div>
 
       {/* Affectation */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <Building2 className="h-5 w-5" style={{ color: themeDark }} aria-hidden="true" />
           Affectation
@@ -340,7 +340,7 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
       </div>
 
       {/* Dates */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <Calendar className="h-5 w-5" style={{ color: themeDark }} aria-hidden="true" />
           Planification
@@ -388,8 +388,7 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
         <Button
           type="submit"
           disabled={loading}
-          className="text-gray-900 hover:opacity-90"
-          style={{ backgroundColor: themeColor }}
+          className="bg-phi-primary text-white hover:bg-phi-primary/90"
         >
           {loading ? (
             <>

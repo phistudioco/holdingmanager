@@ -296,7 +296,7 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
       <FormAlert type="error" message={error || undefined} aria-label="Erreur de devis" />
 
       {/* Informations générales */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <FileText className="h-5 w-5 text-phi-highlight" aria-hidden="true" />
           Informations du devis
@@ -361,7 +361,7 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
       </div>
 
       {/* Client */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <Users className="h-5 w-5 text-phi-accent" aria-hidden="true" />
           Client
@@ -410,7 +410,7 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
       </div>
 
       {/* Dates */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <Calendar className="h-5 w-5 text-phi-primary" aria-hidden="true" />
           Dates
@@ -450,7 +450,7 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
               aria-invalid={!!errors.date_validite}
               aria-describedby={errors.date_validite ? 'date-validite-error date-validite-hint' : 'date-validite-hint'}
             />
-            <p id="date-validite-hint" className="text-xs text-gray-500 mt-1">
+            <p id="date-validite-hint" className="text-xs text-gray-600 mt-1">
               Par défaut: 30 jours après émission
             </p>
             {errors.date_validite && (
@@ -463,7 +463,7 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
       </div>
 
       {/* Lignes du devis */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
             <Calculator className="h-5 w-5 text-phi-highlight" aria-hidden="true" />
@@ -562,7 +562,7 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
       </div>
 
       {/* Notes et conditions */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6">
           Notes & Conditions
         </h2>
@@ -607,7 +607,7 @@ export function DevisForm({ devis, lignes: initialLignes, mode }: DevisFormProps
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="bg-phi-highlight text-gray-900 hover:bg-phi-highlight/90"
+          className="bg-phi-primary text-white hover:bg-phi-primary/90"
         >
           {isSubmitting ? (
             <>

@@ -148,7 +148,7 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
       <FormAlert type="error" message={error || undefined} aria-label="Erreur de projet robotique" />
 
       {/* Informations générales */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <Bot className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Informations du projet
@@ -229,7 +229,7 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
       </div>
 
       {/* Affectation */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <Building2 className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Affectation
@@ -285,7 +285,7 @@ export function ProjetRobotiqueForm({ projet, mode }: ProjetRobotiqueFormProps) 
       </div>
 
       {/* Dates */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <Calendar className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Planification

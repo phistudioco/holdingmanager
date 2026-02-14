@@ -157,7 +157,7 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
       <FormAlert type="error" message={error || undefined} aria-label="Erreur de fournisseur" />
 
       {/* Informations générales */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <Building className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Informations du fournisseur
@@ -245,7 +245,7 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
       </div>
 
       {/* Contact */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <User className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Contact
@@ -306,7 +306,7 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
       </div>
 
       {/* Adresse */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
           <MapPin className="h-5 w-5" style={{ color: themeColor }} aria-hidden="true" />
           Adresse
@@ -368,7 +368,7 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
       </div>
 
       {/* Notes */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-300 p-6">
         <Label htmlFor="notes">Notes internes</Label>
         <textarea
           id="notes"
