@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
 import { ModuleType, RoleType, ROLE_LEVELS } from '@/lib/auth/permissions'
+import { getBlurDataURL } from '@/lib/utils/image-shimmer'
 import {
   LayoutDashboard,
   Building2,

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { NotificationBell } from './NotificationBell'
+import { getAvatarBlurDataURL } from '@/lib/utils/image-shimmer'
 import {
   Search,
   User,
@@ -80,6 +81,8 @@ export function Header({ user, onMenuClick }: HeaderProps) {
                     width={32}
                     height={32}
                     className="rounded-full object-cover"
+                    placeholder="blur"
+                    blurDataURL={getAvatarBlurDataURL(32)}
                   />
                 ) : (
                   <User className="h-4 w-4 text-phi-primary" />

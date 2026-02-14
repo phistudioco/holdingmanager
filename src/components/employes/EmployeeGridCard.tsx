@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { Building2, Mail } from 'lucide-react'
+import { getAvatarBlurDataURL } from '@/lib/utils/image-shimmer'
 import type { Tables } from '@/types/database'
 
 type Employe = Tables<'employes'> & {
@@ -41,6 +42,8 @@ const EmployeeGridCardComponent = ({ employe, index }: EmployeeGridCardProps) =>
                   alt={`${employe.prenom} ${employe.nom}`}
                   fill
                   className="object-cover"
+                  placeholder="blur"
+                  blurDataURL={getAvatarBlurDataURL(56)}
                 />
               ) : (
                 <>{employe.prenom[0]}{employe.nom[0]}</>

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Camera, Upload, Trash2, Loader2, User } from 'lucide-react'
 import Image from 'next/image'
+import { getAvatarBlurDataURL } from '@/lib/utils/image-shimmer'
 
 type PhotoUploadProps = {
   currentPhotoUrl?: string | null
@@ -125,6 +126,8 @@ export function PhotoUpload({
                 alt="Photo"
                 fill
                 className="object-cover"
+                placeholder="blur"
+                blurDataURL={getAvatarBlurDataURL(128)}
               />
             ) : (
               <User className="w-16 h-16 text-gray-300" />

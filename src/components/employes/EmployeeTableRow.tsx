@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { Button } from '@/components/ui/button'
+import { getAvatarBlurDataURL } from '@/lib/utils/image-shimmer'
 import type { Tables } from '@/types/database'
 
 type Employe = Tables<'employes'> & {
@@ -35,6 +36,8 @@ const EmployeeTableRowComponent = ({ employe, index }: EmployeeTableRowProps) =>
                 alt={`${employe.prenom} ${employe.nom}`}
                 fill
                 className="object-cover"
+                placeholder="blur"
+                blurDataURL={getAvatarBlurDataURL(40)}
               />
             ) : (
               <>{employe.prenom[0]}{employe.nom[0]}</>
