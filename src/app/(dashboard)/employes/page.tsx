@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
@@ -125,7 +125,10 @@ export default function EmployesPage() {
   }
 
   // Calculer totalPages à partir du count serveur
-  const totalPages = Math.ceil(totalCount / itemsPerPage)
+  const totalPages = useMemo(
+    () => Math.ceil(totalCount / itemsPerPage),
+    [totalCount, itemsPerPage]
+  )
 
   if (loading) {
     return (
@@ -459,31 +462,34 @@ export default function EmployesPage() {
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              let page: number
-              if (totalPages <= 5) {
-                page = i + 1
-              } else if (currentPage <= 3) {
-                page = i + 1
-              } else if (currentPage >= totalPages - 2) {
-                page = totalPages - 4 + i
-              } else {
-                page = currentPage - 2 + i
-              }
-              return (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-8 h-8 rounded-lg text-sm font-medium transition-all ${
-                    currentPage === page
-                      ? 'bg-phi-primary text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  {page}
-                </button>
-              )
-            })}
+            {useMemo(
+              () => Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let page: number
+                if (totalPages <= 5) {
+                  page = i + 1
+                } else if (currentPage <= 3) {
+                  page = i + 1
+                } else if (currentPage >= totalPages - 2) {
+                  page = totalPages - 4 + i
+                } else {
+                  page = currentPage - 2 + i
+                }
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-8 h-8 rounded-lg text-sm font-medium transition-all ${
+                      currentPage === page
+                        ? 'bg-phi-primary text-white'
+                        : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              }),
+              [totalPages, currentPage]
+            )}
             <Button
               variant="outline"
               size="sm"

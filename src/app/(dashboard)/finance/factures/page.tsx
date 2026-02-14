@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -153,45 +153,63 @@ export default function FacturesPage() {
     }
   }
 
-  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
+  const totalPages = useMemo(
+    () => Math.ceil(totalCount / ITEMS_PER_PAGE),
+    [totalCount]
+  )
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR',
-    }).format(amount)
-  }
+  const formatCurrency = useMemo(
+    () => (amount: number) => {
+      return new Intl.NumberFormat('fr-FR', {
+        style: 'currency',
+        currency: 'EUR',
+      }).format(amount)
+    },
+    []
+  )
 
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('fr-FR')
-  }
+  const formatDate = useMemo(
+    () => (date: string) => {
+      return new Date(date).toLocaleDateString('fr-FR')
+    },
+    []
+  )
 
-  const getStatutColor = (statut: string) => {
-    const colors: Record<string, string> = {
-      brouillon: 'bg-gray-100 text-gray-700',
-      envoyee: 'bg-blue-100 text-blue-700',
-      partiellement_payee: 'bg-yellow-100 text-yellow-700',
-      payee: 'bg-green-100 text-green-700',
-      annulee: 'bg-red-100 text-red-700',
-    }
-    return colors[statut] || 'bg-gray-100 text-gray-700'
-  }
+  const getStatutColor = useMemo(
+    () => (statut: string) => {
+      const colors: Record<string, string> = {
+        brouillon: 'bg-gray-100 text-gray-700',
+        envoyee: 'bg-blue-100 text-blue-700',
+        partiellement_payee: 'bg-yellow-100 text-yellow-700',
+        payee: 'bg-green-100 text-green-700',
+        annulee: 'bg-red-100 text-red-700',
+      }
+      return colors[statut] || 'bg-gray-100 text-gray-700'
+    },
+    []
+  )
 
-  const getStatutLabel = (statut: string) => {
-    const labels: Record<string, string> = {
-      brouillon: 'Brouillon',
-      envoyee: 'Envoyée',
-      partiellement_payee: 'Partiel',
-      payee: 'Payée',
-      annulee: 'Annulée',
-    }
-    return labels[statut] || statut
-  }
+  const getStatutLabel = useMemo(
+    () => (statut: string) => {
+      const labels: Record<string, string> = {
+        brouillon: 'Brouillon',
+        envoyee: 'Envoyée',
+        partiellement_payee: 'Partiel',
+        payee: 'Payée',
+        annulee: 'Annulée',
+      }
+      return labels[statut] || statut
+    },
+    []
+  )
 
-  const isOverdue = (dateEcheance: string, statut: string) => {
-    if (['payee', 'annulee'].includes(statut)) return false
-    return new Date(dateEcheance) < new Date()
-  }
+  const isOverdue = useMemo(
+    () => (dateEcheance: string, statut: string) => {
+      if (['payee', 'annulee'].includes(statut)) return false
+      return new Date(dateEcheance) < new Date()
+    },
+    []
+  )
 
   const handleDownloadPDF = async (factureId: number) => {
     setDownloadingId(factureId)

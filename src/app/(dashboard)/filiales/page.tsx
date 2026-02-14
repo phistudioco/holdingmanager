@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -56,30 +56,40 @@ export default function FilialesPage() {
   }
 
   // Filtrage
-  const filteredFiliales = filiales.filter(filiale => {
-    const matchesSearch =
-      filiale.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      filiale.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      filiale.ville?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredFiliales = useMemo(() =>
+    filiales.filter(filiale => {
+      const matchesSearch =
+        filiale.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        filiale.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        filiale.ville?.toLowerCase().includes(searchQuery.toLowerCase())
 
-    const matchesStatus = filterStatus === 'all' || filiale.statut === filterStatus
+      const matchesStatus = filterStatus === 'all' || filiale.statut === filterStatus
 
-    return matchesSearch && matchesStatus
-  })
+      return matchesSearch && matchesStatus
+    }),
+    [filiales, searchQuery, filterStatus]
+  )
 
   // Pagination
-  const totalPages = Math.ceil(filteredFiliales.length / itemsPerPage)
-  const paginatedFiliales = filteredFiliales.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+  const totalPages = useMemo(
+    () => Math.ceil(filteredFiliales.length / itemsPerPage),
+    [filteredFiliales.length, itemsPerPage]
+  )
+
+  const paginatedFiliales = useMemo(
+    () => filteredFiliales.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+    ),
+    [filteredFiliales, currentPage, itemsPerPage]
   )
 
   // Stats
-  const stats = {
+  const stats = useMemo(() => ({
     total: filiales.length,
     actives: filiales.filter(f => f.statut === 'actif').length,
     villes: new Set(filiales.map(f => f.ville).filter(Boolean)).size,
-  }
+  }), [filiales])
 
   if (loading) {
     return (
@@ -334,19 +344,22 @@ export default function FilialesPage() {
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`w-8 h-8 rounded-lg text-sm font-medium transition-all ${
-                  currentPage === page
-                    ? 'bg-phi-primary text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+            {useMemo(
+              () => Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-8 h-8 rounded-lg text-sm font-medium transition-all ${
+                    currentPage === page
+                      ? 'bg-phi-primary text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  {page}
+                </button>
+              )),
+              [totalPages, currentPage]
+            )}
             <Button
               variant="outline"
               size="sm"
