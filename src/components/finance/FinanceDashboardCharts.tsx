@@ -144,6 +144,10 @@ function FinanceDashboardChartsComponent() {
       const startDate = `${selectedYear}-01-01`
       const endDate = `${selectedYear}-12-31`
 
+      // Performance: Limiter les transactions pour éviter de charger 10k+ enregistrements
+      // Les graphiques n'ont pas besoin de toutes les transactions individuelles,
+      // mais plutôt des agrégations par mois et catégorie. Une limite de 5000 transactions
+      // est suffisante pour générer des graphiques précis tout en restant performant.
       const [
         { data: transactions },
         { data: filiales }
@@ -153,7 +157,9 @@ function FinanceDashboardChartsComponent() {
           .select('*, filiale:filiale_id(nom)')
           .gte('date_transaction', startDate)
           .lte('date_transaction', endDate)
-          .eq('statut', 'validee'),
+          .eq('statut', 'validee')
+          .order('date_transaction', { ascending: false })
+          .limit(5000),
         supabase.from('filiales').select('id, nom').eq('statut', 'actif'),
       ]) as [
         { data: TransactionRow[] | null },

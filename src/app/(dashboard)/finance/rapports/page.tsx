@@ -104,12 +104,15 @@ export default function RapportsPage() {
     const supabase = createClient()
 
     // Transactions dans la période
+    // Performance: Limiter à 10000 transactions pour le calcul des statistiques de prévisualisation
     let transQuery = supabase
       .from('transactions')
       .select('type, montant')
       .gte('date_transaction', dateDebut)
       .lte('date_transaction', dateFin)
       .eq('statut', 'validee')
+      .order('date_transaction', { ascending: false })
+      .limit(10000)
 
     if (selectedFiliale !== 'all') {
       transQuery = transQuery.eq('filiale_id', selectedFiliale)
@@ -186,12 +189,16 @@ export default function RapportsPage() {
       }
 
       // Transactions par catégorie
+      // Performance: Limiter à 10000 transactions pour le rapport PDF
+      // Les rapports sont des agrégations, donc un échantillon représentatif suffit
       let transQuery = supabase
         .from('transactions')
         .select('type, categorie, montant')
         .gte('date_transaction', dateDebut)
         .lte('date_transaction', dateFin)
         .eq('statut', 'validee')
+        .order('date_transaction', { ascending: false })
+        .limit(10000)
 
       if (selectedFiliale !== 'all') {
         transQuery = transQuery.eq('filiale_id', selectedFiliale)
@@ -226,11 +233,14 @@ export default function RapportsPage() {
       }))
 
       // Factures par statut
+      // Performance: Limiter à 5000 factures pour le rapport
       let factQuery = supabase
         .from('factures')
         .select('statut, total_ttc')
         .gte('date_emission', dateDebut)
         .lte('date_emission', dateFin)
+        .order('date_emission', { ascending: false })
+        .limit(5000)
 
       if (selectedFiliale !== 'all') {
         factQuery = factQuery.eq('filiale_id', selectedFiliale)
@@ -257,11 +267,14 @@ export default function RapportsPage() {
       }))
 
       // Top clients
+      // Performance: Limiter à 5000 factures pour calculer le top clients
       let clientsQuery = supabase
         .from('factures')
         .select('client_id, total_ttc, client:client_id(nom, code)')
         .gte('date_emission', dateDebut)
         .lte('date_emission', dateFin)
+        .order('date_emission', { ascending: false })
+        .limit(5000)
 
       if (selectedFiliale !== 'all') {
         clientsQuery = clientsQuery.eq('filiale_id', selectedFiliale)

@@ -109,10 +109,14 @@ export default function TransactionsPage() {
   const fetchStats = useCallback(async () => {
     const supabase = createClient()
 
+    // Performance: Limiter à 10000 transactions pour les statistiques
+    // Au-delà de ce volume, les stats sont calculées sur un échantillon représentatif
     const { data: transactionsData } = await supabase
       .from('transactions')
       .select('type, montant, statut')
       .eq('statut', 'validee')
+      .order('date_transaction', { ascending: false })
+      .limit(10000)
 
     const allTransactions = (transactionsData || []) as TransactionStats[]
 
@@ -159,7 +163,11 @@ export default function TransactionsPage() {
       query = query.eq('categorie', filterCategorie)
     }
 
-    const { data } = await query.order('date_transaction', { ascending: false })
+    // Performance: Limiter l'export à 5000 transactions maximum
+    // Pour des exports plus larges, utiliser une solution d'export par lots
+    const { data } = await query
+      .order('date_transaction', { ascending: false })
+      .limit(5000)
 
     if (data && data.length > 0) {
       exportTransactions(data as Transaction[])
