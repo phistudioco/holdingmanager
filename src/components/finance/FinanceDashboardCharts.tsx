@@ -1,17 +1,53 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo, memo } from 'react'
+import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase/client'
-import { RevenueChart } from '@/components/charts/RevenueChart'
-import { CategoryPieChart } from '@/components/charts/CategoryPieChart'
-import { BarComparisonChart } from '@/components/charts/BarComparisonChart'
 import {
   TrendingUp,
   PieChart as PieChartIcon,
   BarChart3,
   RefreshCw,
   Building2,
+  Loader2,
 } from 'lucide-react'
+
+// Dynamic imports pour les composants de charts (économie de ~100-150KB)
+const RevenueChart = dynamic(
+  () => import('@/components/charts/RevenueChart').then(mod => ({ default: mod.RevenueChart })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-[300px]">
+        <Loader2 className="h-8 w-8 animate-spin text-phi-primary" />
+      </div>
+    )
+  }
+)
+
+const CategoryPieChart = dynamic(
+  () => import('@/components/charts/CategoryPieChart').then(mod => ({ default: mod.CategoryPieChart })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-[250px]">
+        <Loader2 className="h-8 w-8 animate-spin text-phi-primary" />
+      </div>
+    )
+  }
+)
+
+const BarComparisonChart = dynamic(
+  () => import('@/components/charts/BarComparisonChart').then(mod => ({ default: mod.BarComparisonChart })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-[300px]">
+        <Loader2 className="h-8 w-8 animate-spin text-phi-primary" />
+      </div>
+    )
+  }
+)
 
 type MonthlyData = {
   mois: string

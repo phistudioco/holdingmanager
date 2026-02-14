@@ -1,8 +1,8 @@
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/common/PageHeader'
 import { StatsCard } from '@/components/common/StatsCard'
-import { FinanceDashboardCharts } from '@/components/finance/FinanceDashboardCharts'
 import {
   Users,
   FileText,
@@ -14,7 +14,21 @@ import {
   Clock,
   Euro,
   ArrowRight,
+  Loader2,
 } from 'lucide-react'
+
+// Dynamic import pour le composant des graphiques financiers (économie de ~100-150KB)
+const FinanceDashboardCharts = dynamic(
+  () => import('@/components/finance/FinanceDashboardCharts').then(mod => ({ default: mod.FinanceDashboardCharts })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-phi-primary" />
+      </div>
+    )
+  }
+)
 
 export default async function FinancePage() {
   const supabase = await createClient()
