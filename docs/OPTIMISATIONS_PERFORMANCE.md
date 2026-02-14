@@ -318,29 +318,78 @@ const RevenueChart = dynamic(
 
 ---
 
-## 📈 TIER 3 - Optimisations Polish (À FAIRE)
+## 📈 TIER 3 - Optimisations Polish (✅ COMPLÉTÉ / NON NÉCESSAIRE)
 
-### 9. Optimisation Images
+### 9. Optimisation Images ✅
 
-**Fichier** : `PhotoUpload.tsx`
+**Status** : Déjà implémenté
 
-**Ajouts** :
-- `placeholder="blur"`
-- `blurDataURL`
+**Fichiers optimisés** :
+- `src/lib/utils/image-shimmer.ts` - Helper créé
+- `PhotoUpload.tsx` - placeholder="blur" + blurDataURL
+- `Header.tsx` - Avatars optimisés
+- `EmployeeGridCard.tsx` - Photos employés optimisées
+- `EmployeeTableRow.tsx` - Photos employés optimisées
 
-### 10. Optimisation Requêtes Stats
+**Fonctions disponibles** :
+- `getBlurDataURL(width, height)` - Images rectangulaires
+- `getAvatarBlurDataURL(size)` - Avatars carrés
+- `shimmer(w, h)` - SVG shimmer animé
 
-**Pattern** : Utiliser `head: true` partout pour les counts
+---
 
-### 11. Logique Complexe dans useMemo
+### 10. Optimisation Requêtes Stats ✅
 
-**Cible** : Calculs de pagination
+**Status** : Déjà optimisé où pertinent
 
-### 12. Virtualisation Tableaux
+**Fichiers optimisés** :
+- Toutes les requêtes count-only utilisent déjà `head: true`
+- Les requêtes qui calculent des stats nécessitent les données (pas de head: true possible)
+- Exemple : `factures/page.tsx` charge `statut, total_ttc, montant_paye` pour calculs
 
-**Pour** : Tables avec 100+ lignes
+**Pattern vérifié** :
+```typescript
+// Count seul : head: true ✅
+.select('*', { count: 'exact', head: true })
 
-**Librairie** : react-window ou @tanstack/react-table
+// Count + calculs : head: false (nécessaire) ✅
+.select('statut, total_ttc', { count: 'exact' })
+```
+
+---
+
+### 11. Logique Complexe dans useMemo ✅
+
+**Status** : Déjà mémorisé (TIER 1)
+
+**Fichiers optimisés** :
+- `filiales/page.tsx` - totalPages, paginatedFiliales mémorisés
+- `employes/page.tsx` - totalPages, pagination intelligente mémorisée
+- `factures/page.tsx` - totalPages, fonctions utilitaires mémorisées
+
+**Impact** : Fait lors optimisations TIER 1 (commit `6471a83`)
+
+---
+
+### 12. Virtualisation Tableaux ⏭️
+
+**Status** : Non nécessaire actuellement
+
+**Analyse** :
+- **Pagination serveur** : 6 pages utilisent `.range(from, to)` (10-50 items/page)
+- **Pagination client** : filiales/page.tsx affiche 9 items/page
+- **Aucune table** n'affiche 100+ lignes simultanément
+
+**Conclusion** :
+- Virtualisation non nécessaire avec pagination actuelle
+- À reconsidérer si :
+  - Une page affiche 100+ lignes sans pagination
+  - Besoin d'infinite scroll
+  - Performance dégradée constatée
+
+**Librairies recommandées si nécessaire** :
+- `@tanstack/react-virtual` - Virtualisation légère
+- `react-window` - Alternative mature
 
 ---
 
@@ -438,7 +487,7 @@ const RevenueChart = dynamic(
 
 **TIER 1** (4 optimisations critiques) : ✅ **100% COMPLÉTÉ**
 **TIER 2** (4 optimisations haute priorité) : ✅ **100% COMPLÉTÉ**
-**TIER 3** (4 optimisations polish) : ⏳ À faire (optionnel)
+**TIER 3** (4 optimisations polish) : ✅ **100% COMPLÉTÉ** (3 déjà faits, 1 non nécessaire)
 
 ### Statistiques Globales
 
