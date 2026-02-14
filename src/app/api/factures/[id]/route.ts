@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createUntypedClient } from '@/lib/supabase/client'
 
 /**
  * DELETE /api/factures/[id]
@@ -35,7 +34,7 @@ export async function DELETE(
     }
 
     // Récupérer les informations de l'utilisateur avec son rôle
-    const db = createUntypedClient()
+    const db = await createClient()
     const { data: userProfile, error: profileError } = await db
       .from('users')
       .select(`
@@ -260,7 +259,7 @@ export async function PUT(
     }
 
     // Vérifier les permissions (edit permission)
-    const db = createUntypedClient()
+    const db = await createClient()
     const { data: userProfile, error: profileError } = await db
       .from('users')
       .select(`

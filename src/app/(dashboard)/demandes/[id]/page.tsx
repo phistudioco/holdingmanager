@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient, createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -190,7 +190,7 @@ export default function DemandeGestionPage() {
   useEffect(() => {
     const fetchData = async () => {
       const supabase = createClient()
-      const db = createUntypedClient() // For new portal tables
+      const db = createClient() // For new portal tables
 
       // Vérifier l'authentification
       const { data: { user } } = await supabase.auth.getUser()
@@ -299,7 +299,7 @@ export default function DemandeGestionPage() {
 
     setSaving(true)
     try {
-      const db = createUntypedClient()
+      const db = createClient()
 
       const { error } = await db
         .from('demandes_clients')
@@ -343,7 +343,7 @@ export default function DemandeGestionPage() {
     setSendingMessage(true)
 
     try {
-      const db = createUntypedClient()
+      const db = createClient()
 
       const { data, error } = await db
         .from('demandes_messages')

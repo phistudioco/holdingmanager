@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { createClient, createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -92,14 +92,13 @@ export default function NouvelleDemandePagee() {
   useEffect(() => {
     const fetchClient = async () => {
       const supabase = createClient()
-      const db = createUntypedClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         router.push('/portail/login')
         return
       }
 
-      const { data: client } = await db
+      const { data: client } = await supabase
         .from('clients')
         .select('id')
         .eq('portail_user_id', user.id)
@@ -150,10 +149,9 @@ export default function NouvelleDemandePagee() {
 
     try {
       const supabase = createClient()
-      const db = createUntypedClient()
 
       // Créer la demande
-      const { data: demande, error: demandeError } = await db
+      const { data: demande, error: demandeError } = await supabase
         .from('demandes_clients')
         .insert({
           client_id: clientId,
@@ -183,7 +181,7 @@ export default function NouvelleDemandePagee() {
           }
 
           // Enregistrer le fichier dans la table
-          await db.from('demandes_fichiers').insert({
+          await supabase.from('demandes_fichiers').insert({
             demande_id: demande.id,
             nom_fichier: uploadedFile.name,
             type_fichier: uploadedFile.type,

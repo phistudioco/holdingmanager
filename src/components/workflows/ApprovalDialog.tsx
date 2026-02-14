@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import {
@@ -44,7 +44,7 @@ export function ApprovalDialog({
     }
 
     try {
-      const supabase = createUntypedClient()
+      const supabase = createClient()
 
       // Enregistrer l'approbation
       const { error: approvalError } = await supabase

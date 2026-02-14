@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { useFiliales, useServices } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -86,7 +86,7 @@ export function EmployeForm({ employe, mode }: EmployeFormProps) {
     setFormError(null)
 
     try {
-      const supabase = createUntypedClient()
+      const supabase = createClient()
 
       const employeData = {
         filiale_id: data.filiale_id,

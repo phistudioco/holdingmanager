@@ -1,0 +1,107 @@
+
+> holdingmanager-v2@2.0.0 build
+> next build
+
+  ▲ Next.js 14.2.35
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+Failed to compile.
+
+./src/app/(dashboard)/demandes/[id]/page.tsx
+Error: 
+  [31mx[0m the name `createClient` is defined multiple times
+   ,-[[36;1;4mE:\Fi Studio\Holding Manager\holdingmanager-v2\src\app\(dashboard)\demandes\[id]\page.tsx[0m:3:1]
+ [2m3[0m | import { useEffect, useState } from 'react'
+ [2m4[0m | import { useParams, useRouter } from 'next/navigation'
+ [2m5[0m | import Link from 'next/link'
+ [2m6[0m | import { createClient, createClient } from '@/lib/supabase/client'
+   : [31;1m         ^^^^^^|^^^^^[0m[33;1m  ^^^^^^|^^^^^[0m
+   :                [31;1m|[0m             [33;1m`-- [33;1m`createClient` redefined here[0m[0m
+   :                [31;1m`-- [31;1mprevious definition of `createClient` here[0m[0m
+ [2m7[0m | import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+ [2m8[0m | import { Button } from '@/components/ui/button'
+ [2m9[0m | import { Badge } from '@/components/ui/badge'
+   `----
+
+Import trace for requested module:
+./src/app/(dashboard)/demandes/[id]/page.tsx
+
+./src/app/(dashboard)/finance/devis/[id]/page.tsx
+Error: 
+  [31mx[0m the name `createClient` is defined multiple times
+   ,-[[36;1;4mE:\Fi Studio\Holding Manager\holdingmanager-v2\src\app\(dashboard)\finance\devis\[id]\page.tsx[0m:3:1]
+ [2m3[0m | import { useEffect, useState } from 'react'
+ [2m4[0m | import { useParams, useRouter } from 'next/navigation'
+ [2m5[0m | import Link from 'next/link'
+ [2m6[0m | import { createClient, createClient } from '@/lib/supabase/client'
+   : [31;1m         ^^^^^^|^^^^^[0m[33;1m  ^^^^^^|^^^^^[0m
+   :                [31;1m|[0m             [33;1m`-- [33;1m`createClient` redefined here[0m[0m
+   :                [31;1m`-- [31;1mprevious definition of `createClient` here[0m[0m
+ [2m7[0m | import { PageHeader } from '@/components/common/PageHeader'
+ [2m8[0m | import { Button } from '@/components/ui/button'
+ [2m9[0m | import { downloadDevisPDF } from '@/lib/pdf/devis-pdf'
+   `----
+
+Import trace for requested module:
+./src/app/(dashboard)/finance/devis/[id]/page.tsx
+
+./src/app/(dashboard)/finance/rapports/personnalises/nouveau/page.tsx
+Error: 
+  [31mx[0m the name `createClient` is defined multiple times
+   ,-[[36;1;4mE:\Fi Studio\Holding Manager\holdingmanager-v2\src\app\(dashboard)\finance\rapports\personnalises\nouveau\page.tsx[0m:2:1]
+ [2m2[0m | 
+ [2m3[0m | import { useState, useEffect } from 'react'
+ [2m4[0m | import { useRouter } from 'next/navigation'
+ [2m5[0m | import { createClient, createClient } from '@/lib/supabase/client'
+   : [31;1m         ^^^^^^|^^^^^[0m[33;1m  ^^^^^^|^^^^^[0m
+   :                [31;1m|[0m             [33;1m`-- [33;1m`createClient` redefined here[0m[0m
+   :                [31;1m`-- [31;1mprevious definition of `createClient` here[0m[0m
+ [2m6[0m | import { PageHeader } from '@/components/common/PageHeader'
+ [2m7[0m | import { Button } from '@/components/ui/button'
+ [2m8[0m | import { Input } from '@/components/ui/input'
+   `----
+
+Import trace for requested module:
+./src/app/(dashboard)/finance/rapports/personnalises/nouveau/page.tsx
+
+./src/app/(dashboard)/finance/rapports/personnalises/page.tsx
+Error: 
+  [31mx[0m the name `createClient` is defined multiple times
+   ,-[[36;1;4mE:\Fi Studio\Holding Manager\holdingmanager-v2\src\app\(dashboard)\finance\rapports\personnalises\page.tsx[0m:2:1]
+ [2m2[0m | 
+ [2m3[0m | import { useState, useEffect } from 'react'
+ [2m4[0m | import Link from 'next/link'
+ [2m5[0m | import { createClient, createClient } from '@/lib/supabase/client'
+   : [31;1m         ^^^^^^|^^^^^[0m[33;1m  ^^^^^^|^^^^^[0m
+   :                [31;1m|[0m             [33;1m`-- [33;1m`createClient` redefined here[0m[0m
+   :                [31;1m`-- [31;1mprevious definition of `createClient` here[0m[0m
+ [2m6[0m | import { PageHeader } from '@/components/common/PageHeader'
+ [2m7[0m | import { Button } from '@/components/ui/button'
+ [2m8[0m | import {
+   `----
+
+Import trace for requested module:
+./src/app/(dashboard)/finance/rapports/personnalises/page.tsx
+
+./src/app/(dashboard)/workflows/[id]/page.tsx
+Error: 
+  [31mx[0m the name `createClient` is defined multiple times
+   ,-[[36;1;4mE:\Fi Studio\Holding Manager\holdingmanager-v2\src\app\(dashboard)\workflows\[id]\page.tsx[0m:3:1]
+ [2m3[0m | import { useEffect, useState, useCallback } from 'react'
+ [2m4[0m | import { useRouter, useParams } from 'next/navigation'
+ [2m5[0m | import Link from 'next/link'
+ [2m6[0m | import { createClient, createClient } from '@/lib/supabase/client'
+   : [31;1m         ^^^^^^|^^^^^[0m[33;1m  ^^^^^^|^^^^^[0m
+   :                [31;1m|[0m             [33;1m`-- [33;1m`createClient` redefined here[0m[0m
+   :                [31;1m`-- [31;1mprevious definition of `createClient` here[0m[0m
+ [2m7[0m | import { PageHeader } from '@/components/common/PageHeader'
+ [2m8[0m | import { Button } from '@/components/ui/button'
+ [2m9[0m | import { ApprovalDialog } from '@/components/workflows/ApprovalDialog'
+   `----
+
+Import trace for requested module:
+./src/app/(dashboard)/workflows/[id]/page.tsx
+
+
+> Build failed because of webpack errors

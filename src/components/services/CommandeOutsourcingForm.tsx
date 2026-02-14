@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { useFiliales, useFournisseurs, type Filiale, type Fournisseur } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { FormAlert } from '@/components/ui/form-alert'
@@ -110,7 +110,7 @@ export function CommandeOutsourcingForm({ commande, mode }: CommandeOutsourcingF
     setLoading(true)
 
     try {
-      const supabase = createUntypedClient()
+      const supabase = createClient()
 
       const commandeData = {
         numero: data.numero.trim(),

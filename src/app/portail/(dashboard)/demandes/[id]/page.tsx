@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient, createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -132,7 +132,6 @@ export default function DemandeDetailPage() {
   useEffect(() => {
     const fetchData = async () => {
       const supabase = createClient()
-      const db = createUntypedClient()
 
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
@@ -140,7 +139,7 @@ export default function DemandeDetailPage() {
         return
       }
 
-      const { data: client } = await db
+      const { data: client } = await supabase
         .from('clients')
         .select('id')
         .eq('portail_user_id', user.id)
@@ -154,7 +153,7 @@ export default function DemandeDetailPage() {
       setClientId(client.id)
 
       // Récupérer la demande
-      const { data: demandeData, error } = await db
+      const { data: demandeData, error } = await supabase
         .from('demandes_clients')
         .select(`
           *,
@@ -172,7 +171,7 @@ export default function DemandeDetailPage() {
       setDemande(demandeData as unknown as Demande)
 
       // Récupérer les messages (non internes uniquement)
-      const { data: messagesData } = await db
+      const { data: messagesData } = await supabase
         .from('demandes_messages')
         .select('*')
         .eq('demande_id', demandeId)
@@ -184,7 +183,7 @@ export default function DemandeDetailPage() {
       }
 
       // Récupérer les fichiers
-      const { data: fichiersData } = await db
+      const { data: fichiersData } = await supabase
         .from('demandes_fichiers')
         .select('*')
         .eq('demande_id', demandeId)
@@ -195,7 +194,7 @@ export default function DemandeDetailPage() {
       }
 
       // Récupérer l'historique
-      const { data: historiqueData } = await db
+      const { data: historiqueData } = await supabase
         .from('demandes_historique')
         .select('*')
         .eq('demande_id', demandeId)
@@ -217,9 +216,9 @@ export default function DemandeDetailPage() {
     setSendingMessage(true)
 
     try {
-      const db = createUntypedClient()
+      const supabase = createClient()
 
-      const { data, error } = await db
+      const { data, error } = await supabase
         .from('demandes_messages')
         .insert({
           demande_id: parseInt(demandeId),
@@ -237,7 +236,7 @@ export default function DemandeDetailPage() {
       setNewMessage('')
 
       // Ajouter à l'historique
-      await db.from('demandes_historique').insert({
+      await supabase.from('demandes_historique').insert({
         demande_id: parseInt(demandeId),
         action: 'message',
         description: 'Nouveau message du client',

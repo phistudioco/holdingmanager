@@ -3,7 +3,7 @@
  * that may not have full type support yet
  */
 
-import { createUntypedClient } from './client'
+import { createClient } from './client'
 
 type AnyRecord = Record<string, unknown>
 
@@ -14,7 +14,7 @@ export async function insertIntoTable(
   tableName: string,
   data: AnyRecord | AnyRecord[]
 ) {
-  const supabase = createUntypedClient()
+  const supabase = createClient()
   return supabase.from(tableName).insert(data).select()
 }
 
@@ -26,7 +26,7 @@ export async function updateTable(
   data: AnyRecord,
   filters: { column: string; value: unknown }[]
 ) {
-  const supabase = createUntypedClient()
+  const supabase = createClient()
   let query = supabase.from(tableName).update(data)
   for (const filter of filters) {
     query = query.eq(filter.column, filter.value)
@@ -43,7 +43,7 @@ export async function selectFromTable<T = AnyRecord>(
   filters: { column: string; value: unknown }[] = [],
   options: { order?: { column: string; ascending: boolean }; limit?: number; single?: boolean } = {}
 ) {
-  const supabase = createUntypedClient()
+  const supabase = createClient()
   let query = supabase.from(tableName).select(columns)
 
   for (const filter of filters) {

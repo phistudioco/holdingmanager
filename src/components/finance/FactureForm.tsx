@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm, useFieldArray, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { useFiliales, useClients } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -182,7 +182,7 @@ export function FactureForm({ facture, lignes: initialLignes, mode }: FactureFor
     setFormError(null)
 
     try {
-      const supabase = createUntypedClient()
+      const supabase = createClient()
 
       // Préparer les lignes avec calculs
       const lignesWithMontants = lignesWithCalculations.map((ligne, index) => ({

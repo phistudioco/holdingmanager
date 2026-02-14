@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { createClient, createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -71,7 +71,7 @@ export default function PortailDashboardPage() {
   useEffect(() => {
     const fetchData = async () => {
       const supabase = createClient()
-      const db = createUntypedClient()
+      const db = createClient()
 
       // Récupérer l'utilisateur et le client associé
       const { data: { user } } = await supabase.auth.getUser()

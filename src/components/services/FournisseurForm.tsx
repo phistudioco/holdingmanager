@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FormAlert } from '@/components/ui/form-alert'
@@ -106,7 +106,7 @@ export function FournisseurForm({ fournisseur, mode }: FournisseurFormProps) {
     setLoading(true)
 
     try {
-      const supabase = createUntypedClient()
+      const supabase = createClient()
 
       const fournisseurData = {
         nom: data.nom.trim(),

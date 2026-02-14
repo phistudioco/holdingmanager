@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { useFiliales, useClients, type Filiale, type Client } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { FormAlert } from '@/components/ui/form-alert'
@@ -116,7 +116,7 @@ export function ProjetDigitalForm({ projet, mode }: ProjetDigitalFormProps) {
     setLoading(true)
 
     try {
-      const supabase = createUntypedClient()
+      const supabase = createClient()
 
       const projetData = {
         nom: data.nom.trim(),

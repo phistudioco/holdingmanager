@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -68,7 +68,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
   }, [])
 
   const loadPays = async () => {
-    const supabase = createUntypedClient()
+    const supabase = createClient()
     const { data } = await supabase.from('pays').select('*').order('nom')
     if (data) setPays(data)
   }
@@ -77,7 +77,7 @@ export function FilialeForm({ filiale, mode }: FilialeFormProps) {
     setFormError(null)
 
     try {
-      const supabase = createUntypedClient()
+      const supabase = createClient()
 
       const filialeData = {
         code: data.code,

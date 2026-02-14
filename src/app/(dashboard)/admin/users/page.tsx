@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -69,7 +69,7 @@ export default function AdminUsersPage() {
   const [filterRole, setFilterRole] = useState<string>('all')
   const [updating, setUpdating] = useState<string | null>(null)
 
-  const supabase = createUntypedClient()
+  const supabase = createClient()
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -118,7 +118,8 @@ export default function AdminUsersPage() {
   const updateUserRole = async (userId: string, roleId: number) => {
     setUpdating(userId)
 
-    const { error } = await supabase
+    // Table users pas complètement typée dans database.ts - type assertion temporaire
+    const { error } = await (supabase as any)
       .from('users')
       .update({ role_id: roleId })
       .eq('id', userId)

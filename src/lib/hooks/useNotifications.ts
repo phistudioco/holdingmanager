@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
 export type Notification = {
@@ -24,7 +24,7 @@ export function useNotifications() {
 
   // Récupérer les notifications
   const fetchNotifications = useCallback(async () => {
-    const supabase = createUntypedClient()
+    const supabase = createClient()
 
     const { data, error } = await supabase
       .from('alertes')
@@ -42,7 +42,7 @@ export function useNotifications() {
 
   // Marquer comme lue
   const markAsRead = useCallback(async (id: number) => {
-    const supabase = createUntypedClient()
+    const supabase = createClient()
 
     const { error } = await supabase
       .from('alertes')
@@ -59,7 +59,7 @@ export function useNotifications() {
 
   // Marquer toutes comme lues
   const markAllAsRead = useCallback(async () => {
-    const supabase = createUntypedClient()
+    const supabase = createClient()
 
     // Utiliser la forme fonctionnelle pour éviter la dépendance à notifications
     setNotifications(prev => {
@@ -86,7 +86,7 @@ export function useNotifications() {
 
   // Marquer comme traitée (supprimer de la liste)
   const markAsDone = useCallback(async (id: number) => {
-    const supabase = createUntypedClient()
+    const supabase = createClient()
 
     const { error } = await supabase
       .from('alertes')
@@ -109,7 +109,7 @@ export function useNotifications() {
   useEffect(() => {
     fetchNotifications()
 
-    const supabase = createUntypedClient()
+    const supabase = createClient()
     let channel: RealtimeChannel | null = null
 
     // S'abonner aux changements sur la table alertes

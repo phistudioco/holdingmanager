@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { createClient, createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 
 export type NotificationPreferences = {
   id?: number
@@ -66,7 +66,7 @@ export function useNotificationPreferences() {
 
     try {
       const supabase = createClient()
-      const db = createUntypedClient()
+      const db = createClient()
       const { data: { user } } = await supabase.auth.getUser()
 
       if (!user) {
@@ -109,7 +109,7 @@ export function useNotificationPreferences() {
 
     try {
       const supabase = createClient()
-      const db = createUntypedClient()
+      const db = createClient()
       const { data: { user } } = await supabase.auth.getUser()
 
       if (!user) {

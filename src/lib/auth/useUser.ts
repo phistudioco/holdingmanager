@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { createClient, createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
 import { RoleType, hasPermission, canAccessRoute, getRoleLevel, ModuleType, ActionType } from './permissions'
 
@@ -122,7 +122,7 @@ export function useUser(): UseUserReturn {
 
         // Mettre à jour la dernière connexion
         if (userProfile) {
-          const untypedSupabase = createUntypedClient()
+          const untypedSupabase = createClient()
           await untypedSupabase
             .from('users')
             .update({ derniere_connexion: new Date().toISOString() })

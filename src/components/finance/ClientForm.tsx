@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { useFiliales } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -85,7 +85,7 @@ export function ClientForm({ client, mode }: ClientFormProps) {
 
   useEffect(() => {
     const fetchPays = async () => {
-      const supabase = createUntypedClient()
+      const supabase = createClient()
       const { data: paysData } = await supabase.from('pays').select('*').order('nom')
       if (paysData) setPays(paysData as Pays[])
     }
@@ -109,7 +109,7 @@ export function ClientForm({ client, mode }: ClientFormProps) {
     setFormError(null) // Réinitialiser l'erreur précédente
 
     try {
-      const supabase = createUntypedClient()
+      const supabase = createClient()
 
       const clientData = {
         ...data,

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/common/PageHeader'
 import { StatsCard } from '@/components/common/StatsCard'
 import { EmptyState } from '@/components/common/EmptyState'
@@ -46,7 +46,7 @@ export default function AlertesPage() {
 
   const fetchAlertes = useCallback(async () => {
     setLoading(true)
-    const supabase = createUntypedClient()
+    const supabase = createClient()
 
     let query = supabase
       .from('alertes')
@@ -88,13 +88,13 @@ export default function AlertesPage() {
   }, [fetchAlertes])
 
   const markAsRead = async (id: number) => {
-    const supabase = createUntypedClient()
+    const supabase = createClient()
     await supabase.from('alertes').update({ lue: true }).eq('id', id)
     fetchAlertes()
   }
 
   const markAsHandled = async (id: number) => {
-    const supabase = createUntypedClient()
+    const supabase = createClient()
     await supabase.from('alertes').update({ traitee: true, lue: true }).eq('id', id)
     fetchAlertes()
   }

@@ -7,7 +7,7 @@
  * - Transitions de statut
  */
 
-import { createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 
 // Types
 export type WorkflowType = 'achat' | 'conge' | 'formation' | 'autre'
@@ -97,7 +97,7 @@ export function generateNumero(type: WorkflowType): string {
  * Soumet une demande pour approbation
  */
 export async function submitWorkflow(demandeId: number): Promise<{ success: boolean; error?: string }> {
-  const supabase = createUntypedClient()
+  const supabase = createClient()
 
   try {
     // Mettre à jour le statut de la demande
@@ -130,7 +130,7 @@ export async function approveWorkflowStep(
   approbateurId: number,
   commentaire?: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createUntypedClient()
+  const supabase = createClient()
 
   try {
     // Enregistrer l'approbation
@@ -201,7 +201,7 @@ export async function rejectWorkflow(
   approbateurId: number,
   commentaire: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createUntypedClient()
+  const supabase = createClient()
 
   try {
     // Enregistrer le rejet
@@ -242,7 +242,7 @@ export async function rejectWorkflow(
  * Annule une demande
  */
 export async function cancelWorkflow(demandeId: number): Promise<{ success: boolean; error?: string }> {
-  const supabase = createUntypedClient()
+  const supabase = createClient()
 
   try {
     const { error } = await supabase
@@ -279,7 +279,7 @@ export async function getPendingApprovals(_userId: number): Promise<{
   }>
   error?: string
 }> {
-  const supabase = createUntypedClient()
+  const supabase = createClient()
 
   try {
     // TODO: Implémenter la logique de récupération des demandes

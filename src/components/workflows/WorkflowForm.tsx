@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { useFiliales } from '@/lib/hooks/useEntities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -100,7 +100,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
 
   useEffect(() => {
     const loadEmployes = async () => {
-      const supabase = createUntypedClient()
+      const supabase = createClient()
       const { data: employesData } = await supabase
         .from('employes')
         .select('*')
@@ -147,7 +147,7 @@ export function WorkflowForm({ mode, demande }: WorkflowFormProps) {
     }
 
     try {
-      const supabase = createUntypedClient()
+      const supabase = createClient()
 
       // Construire les données spécifiques au type
       const donnees: Record<string, unknown> = {

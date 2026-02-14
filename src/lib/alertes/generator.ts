@@ -8,7 +8,7 @@
  * - Événements de workflow
  */
 
-import { createClient, createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 
 // Types
 export type AlerteType =
@@ -54,7 +54,7 @@ type ContratAlerte = {
  * Crée une nouvelle alerte
  */
 export async function createAlerte(params: CreateAlerteParams): Promise<{ success: boolean; error?: string }> {
-  const supabase = createUntypedClient()
+  const supabase = createClient()
 
   try {
     const { error } = await supabase

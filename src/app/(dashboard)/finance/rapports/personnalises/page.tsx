@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { createClient, createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Button } from '@/components/ui/button'
 import {
@@ -81,7 +81,7 @@ export default function CustomReportsPage() {
     }
 
     // Use untyped client for report_templates (new table not in generated types)
-    const db = createUntypedClient()
+    const db = createClient()
 
     // Mes templates
     const { data: myTemplates } = await db
@@ -106,7 +106,7 @@ export default function CustomReportsPage() {
   }
 
   const handleDelete = async (id: number) => {
-    const db = createUntypedClient()
+    const db = createClient()
     const { error } = await db
       .from('report_templates')
       .delete()
@@ -124,7 +124,7 @@ export default function CustomReportsPage() {
 
     if (!user) return
 
-    const db = createUntypedClient()
+    const db = createClient()
     const { data } = await db
       .from('report_templates')
       .insert({

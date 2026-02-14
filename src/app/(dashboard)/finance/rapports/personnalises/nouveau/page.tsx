@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient, createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -156,7 +156,7 @@ export default function NewReportTemplatePage() {
       if (!user) throw new Error('Non authentifié')
 
       // Use untyped client for report_templates (new table not in generated types)
-      const db = createUntypedClient()
+      const db = createClient()
       const { data, error: insertError } = await db
         .from('report_templates')
         .insert({

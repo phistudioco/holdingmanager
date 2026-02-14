@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 
 // Types communs simplifiés (pour usage de base)
 export type Filiale = {
@@ -57,7 +57,7 @@ export function useFiliales<T = Filiale>(options?: {
       setLoading(true)
       setError(null)
 
-      const supabase = createUntypedClient()
+      const supabase = createClient()
       const { data: result, error: fetchError } = await supabase
         .from('filiales')
         .select(fields)
@@ -116,7 +116,7 @@ export function useClients<T = Client>(options?: {
       setLoading(true)
       setError(null)
 
-      const supabase = createUntypedClient()
+      const supabase = createClient()
       const { data: result, error: fetchError } = await supabase
         .from('clients')
         .select(fields)
@@ -169,7 +169,7 @@ export function useServices<T = Service>(options?: {
       setLoading(true)
       setError(null)
 
-      const supabase = createUntypedClient()
+      const supabase = createClient()
       const { data: result, error: fetchError } = await supabase
         .from('services')
         .select(fields)
@@ -227,7 +227,7 @@ export function useFournisseurs<T = Fournisseur>(options?: {
       setLoading(true)
       setError(null)
 
-      const supabase = createUntypedClient()
+      const supabase = createClient()
       const { data: result, error: fetchError } = await supabase
         .from('fournisseurs')
         .select(fields)

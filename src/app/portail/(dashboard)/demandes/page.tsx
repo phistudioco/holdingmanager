@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { createClient, createUntypedClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -84,12 +84,11 @@ export default function DemandesListePage() {
   useEffect(() => {
     const fetchDemandes = async () => {
       const supabase = createClient()
-      const db = createUntypedClient()
 
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const { data: client } = await db
+      const { data: client } = await supabase
         .from('clients')
         .select('id')
         .eq('portail_user_id', user.id)
@@ -97,7 +96,7 @@ export default function DemandesListePage() {
 
       if (!client) return
 
-      let query = db
+      let query = supabase
         .from('demandes_clients')
         .select('id, numero, titre, description, service_type, statut, urgence, created_at, date_souhaitee')
         .eq('client_id', client.id)
