@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, memo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
@@ -135,6 +135,102 @@ const getBottomNavigation = (): NavItem[] => [
   },
 ]
 
+type NavItemProps = {
+  item: NavItem
+  isChild?: boolean
+  collapsed: boolean
+  isActive: (href: string) => boolean
+  openMenus: string[]
+  onToggleMenu: (label: string) => void
+  onNavClick: () => void
+}
+
+const NavItemComponent = memo(({
+  item,
+  isChild = false,
+  collapsed,
+  isActive,
+  openMenus,
+  onToggleMenu,
+  onNavClick,
+}: NavItemProps) => {
+  const active = isActive(item.href)
+  const hasChildren = item.children && item.children.length > 0
+  const isMenuOpen = openMenus.includes(item.label)
+
+  if (hasChildren && !collapsed) {
+    return (
+      <div key={item.href}>
+        <button
+          onClick={() => onToggleMenu(item.label)}
+          className={cn(
+            'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+            active
+              ? 'bg-phi-primary/10 text-phi-primary'
+              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+          )}
+        >
+          <item.icon className="h-5 w-5 shrink-0" />
+          <span className="flex-1 text-left">{item.label}</span>
+          <ChevronRight
+            className={cn(
+              'h-4 w-4 transition-transform',
+              isMenuOpen && 'rotate-90'
+            )}
+          />
+        </button>
+        {isMenuOpen && (
+          <div className="ml-4 mt-1 space-y-1 border-l-2 border-gray-200 pl-3">
+            {item.children?.map(child => (
+              <NavItemComponent
+                key={child.href}
+                item={child}
+                isChild={true}
+                collapsed={collapsed}
+                isActive={isActive}
+                openMenus={openMenus}
+                onToggleMenu={onToggleMenu}
+                onNavClick={onNavClick}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <Link
+      key={item.href}
+      href={item.href}
+      onClick={onNavClick}
+      className={cn(
+        'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+        active
+          ? 'bg-phi-primary/10 text-phi-primary'
+          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+        isChild && 'py-2',
+        collapsed && 'justify-center'
+      )}
+      title={collapsed ? item.label : undefined}
+    >
+      <item.icon className={cn('h-5 w-5 shrink-0', isChild && 'h-4 w-4')} />
+      {!collapsed && (
+        <>
+          <span className="flex-1">{item.label}</span>
+          {item.badge && item.badge > 0 && (
+            <span className="px-2 py-0.5 text-xs font-semibold bg-phi-accent text-white rounded-full">
+              {item.badge}
+            </span>
+          )}
+        </>
+      )}
+    </Link>
+  )
+})
+
+NavItemComponent.displayName = 'NavItem'
+
 type SidebarProps = {
   isOpen?: boolean
   onClose?: () => void
@@ -181,90 +277,25 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
     return getBottomNavigation().filter(item => hasAccess(item))
   }, [hasAccess])
 
-  const toggleMenu = (label: string) => {
+  const toggleMenu = useCallback((label: string) => {
     setOpenMenus(prev =>
       prev.includes(label)
         ? prev.filter(item => item !== label)
         : [...prev, label]
     )
-  }
+  }, [])
 
-  const isActive = (href: string) => {
+  const isActive = useCallback((href: string) => {
     if (href === '/') {
       return pathname === '/'
     }
     return pathname.startsWith(href)
-  }
-
-  const renderNavItem = (item: NavItem, isChild = false) => {
-    const active = isActive(item.href)
-    const hasChildren = item.children && item.children.length > 0
-    const isMenuOpen = openMenus.includes(item.label)
-
-    if (hasChildren && !collapsed) {
-      return (
-        <div key={item.href}>
-          <button
-            onClick={() => toggleMenu(item.label)}
-            className={cn(
-              'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-              active
-                ? 'bg-phi-primary/10 text-phi-primary'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-            )}
-          >
-            <item.icon className="h-5 w-5 shrink-0" />
-            <span className="flex-1 text-left">{item.label}</span>
-            <ChevronRight
-              className={cn(
-                'h-4 w-4 transition-transform',
-                isMenuOpen && 'rotate-90'
-              )}
-            />
-          </button>
-          {isMenuOpen && (
-            <div className="ml-4 mt-1 space-y-1 border-l-2 border-gray-200 pl-3">
-              {item.children?.map(child => renderNavItem(child, true))}
-            </div>
-          )}
-        </div>
-      )
-    }
-
-    return (
-      <Link
-        key={item.href}
-        href={item.href}
-        onClick={handleNavClick}
-        className={cn(
-          'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-          active
-            ? 'bg-phi-primary/10 text-phi-primary'
-            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
-          isChild && 'py-2',
-          collapsed && 'justify-center'
-        )}
-        title={collapsed ? item.label : undefined}
-      >
-        <item.icon className={cn('h-5 w-5 shrink-0', isChild && 'h-4 w-4')} />
-        {!collapsed && (
-          <>
-            <span className="flex-1">{item.label}</span>
-            {item.badge && item.badge > 0 && (
-              <span className="px-2 py-0.5 text-xs font-semibold bg-phi-accent text-white rounded-full">
-                {item.badge}
-              </span>
-            )}
-          </>
-        )}
-      </Link>
-    )
-  }
+  }, [pathname])
 
   // Fermer le menu mobile lors de la navigation
-  const handleNavClick = () => {
+  const handleNavClick = useCallback(() => {
     if (onClose) onClose()
-  }
+  }, [onClose])
 
   // Afficher un loader pendant le chargement
   if (loading) {
@@ -379,13 +410,33 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
       {/* Navigation principale */}
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto h-[calc(100vh-10rem)]">
-        {filteredNavigation.map(item => renderNavItem(item))}
+        {filteredNavigation.map(item => (
+          <NavItemComponent
+            key={item.href}
+            item={item}
+            collapsed={collapsed}
+            isActive={isActive}
+            openMenus={openMenus}
+            onToggleMenu={toggleMenu}
+            onNavClick={handleNavClick}
+          />
+        ))}
       </nav>
 
       {/* Navigation bas */}
       {filteredBottomNavigation.length > 0 && (
         <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-gray-200 bg-white">
-          {filteredBottomNavigation.map(item => renderNavItem(item))}
+          {filteredBottomNavigation.map(item => (
+            <NavItemComponent
+              key={item.href}
+              item={item}
+              collapsed={collapsed}
+              isActive={isActive}
+              openMenus={openMenus}
+              onToggleMenu={toggleMenu}
+              onNavClick={handleNavClick}
+            />
+          ))}
         </div>
       )}
     </aside>
