@@ -1,0 +1,271 @@
+
+> holdingmanager-v2@2.0.0 build
+> next build
+
+  ▲ Next.js 14.2.35
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping linting
+   Checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/51) ...
+ ⚠ Unsupported metadata viewport is configured in metadata export in /register. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /register. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_not-found. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_not-found. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /login. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /login. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /forgot-password. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /forgot-password. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /admin/settings. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /admin/settings. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /reset-password. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /reset-password. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+   Generating static pages (12/51) 
+ ⚠ Unsupported metadata viewport is configured in metadata export in /employes. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /employes. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /filiales. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /filiales. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /admin/users. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /admin/users. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/clients/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/clients/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /filiales/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /filiales/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/contrats. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/contrats. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /alertes. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /alertes. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/devis/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/devis/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/contrats/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/contrats/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/factures/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/factures/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/rapports/personnalises/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/rapports/personnalises/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/clients. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/clients. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/rapports. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/rapports. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/rapports/personnalises. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/rapports/personnalises. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+   Generating static pages (25/51) 
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/devis. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/devis. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/transactions/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/transactions/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /employes/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /employes/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /parametres/notifications. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /parametres/notifications. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services/outsourcing. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services/outsourcing. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services/digital. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services/digital. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/transactions. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/transactions. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services/digital/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services/digital/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services/robotique. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services/robotique. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services/outsourcing/commandes/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services/outsourcing/commandes/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services/robotique/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services/robotique/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+   Generating static pages (38/51) 
+ ⚠ Unsupported metadata viewport is configured in metadata export in /workflows. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /workflows. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /workflows/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /workflows/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services/outsourcing/fournisseurs/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services/outsourcing/fournisseurs/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/factures. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /portail/demandes. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /portail/demandes. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /portail/login. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /portail/login. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /services. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /finance/factures. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /portail/demandes/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /portail/demandes/nouveau. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /portail. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /portail. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ✓ Generating static pages (51/51)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                       Size     First Load JS
+┌ ƒ /                                             197 B          96.7 kB
+├ ○ /_not-found                                   880 B          88.7 kB
+├ ƒ /admin/settings                               7.03 kB         112 kB
+├ ƒ /admin/users                                  4.53 kB         201 kB
+├ ƒ /alertes                                      3.39 kB         165 kB
+├ ƒ /api/contrats/[id]                            0 B                0 B
+├ ƒ /api/factures/[id]                            0 B                0 B
+├ ƒ /api/push/send                                0 B                0 B
+├ ○ /apple-icon.png                               0 B                0 B
+├ ƒ /demandes                                     197 B          96.7 kB
+├ ƒ /demandes/[id]                                11.9 kB         210 kB
+├ ƒ /employes                                     6 kB            173 kB
+├ ƒ /employes/[id]                                190 B           102 kB
+├ ƒ /employes/[id]/edit                           208 B           199 kB
+├ ƒ /employes/nouveau                             680 B           200 kB
+├ ƒ /filiales                                     5.45 kB         168 kB
+├ ƒ /filiales/[id]                                197 B          96.7 kB
+├ ƒ /filiales/[id]/edit                           206 B           191 kB
+├ ƒ /filiales/nouveau                             678 B           192 kB
+├ ƒ /finance                                      5.43 kB         157 kB
+├ ƒ /finance/clients                              4.31 kB         262 kB
+├ ƒ /finance/clients/[id]                         197 B          96.7 kB
+├ ƒ /finance/clients/[id]/edit                    206 B           193 kB
+├ ƒ /finance/clients/nouveau                      679 B           193 kB
+├ ƒ /finance/contrats                             4.68 kB         167 kB
+├ ƒ /finance/contrats/[id]                        5.19 kB         221 kB
+├ ƒ /finance/contrats/[id]/edit                   205 B           192 kB
+├ ƒ /finance/contrats/nouveau                     676 B           192 kB
+├ ƒ /finance/devis                                4.39 kB         293 kB
+├ ƒ /finance/devis/[id]                           3.64 kB         292 kB
+├ ƒ /finance/devis/[id]/edit                      206 B           193 kB
+├ ƒ /finance/devis/nouveau                        678 B           193 kB
+├ ƒ /finance/factures                             6.76 kB         387 kB
+├ ƒ /finance/factures/[id]                        4.66 kB         233 kB
+├ ƒ /finance/factures/[id]/edit                   211 B           199 kB
+├ ƒ /finance/factures/nouveau                     682 B           199 kB
+├ ƒ /finance/rapports                             8.76 kB         291 kB
+├ ƒ /finance/rapports/personnalises               2.94 kB         165 kB
+├ ƒ /finance/rapports/personnalises/nouveau       4.76 kB         167 kB
+├ ƒ /finance/transactions                         3.64 kB         261 kB
+├ ƒ /finance/transactions/[id]                    197 B          96.7 kB
+├ ƒ /finance/transactions/[id]/edit               1.28 kB         193 kB
+├ ƒ /finance/transactions/nouveau                 678 B           193 kB
+├ ○ /forgot-password                              4.54 kB         169 kB
+├ ○ /icon.png                                     0 B                0 B
+├ ○ /login                                        4.56 kB         169 kB
+├ ƒ /parametres/notifications                     5.74 kB         168 kB
+├ ○ /portail                                      4.26 kB         169 kB
+├ ○ /portail/demandes                             2.85 kB         201 kB
+├ ƒ /portail/demandes/[id]                        6.73 kB         175 kB
+├ ○ /portail/demandes/nouveau                     4.76 kB         194 kB
+├ ○ /portail/login                                4.98 kB         164 kB
+├ ○ /register                                     5.09 kB         170 kB
+├ ○ /reset-password                               5.23 kB         170 kB
+├ ○ /robots.txt                                   0 B                0 B
+├ ƒ /services                                     197 B          96.7 kB
+├ ƒ /services/digital                             4.18 kB         166 kB
+├ ƒ /services/digital/[id]                        3.74 kB         166 kB
+├ ƒ /services/digital/[id]/edit                   1.57 kB         193 kB
+├ ƒ /services/digital/nouveau                     679 B           192 kB
+├ ƒ /services/outsourcing                         4.63 kB         167 kB
+├ ƒ /services/outsourcing/commandes/[id]          3.34 kB         165 kB
+├ ƒ /services/outsourcing/commandes/[id]/edit     1.59 kB         192 kB
+├ ƒ /services/outsourcing/commandes/nouveau       680 B           191 kB
+├ ƒ /services/outsourcing/fournisseurs/[id]       3.24 kB         165 kB
+├ ƒ /services/outsourcing/fournisseurs/[id]/edit  1.57 kB         192 kB
+├ ƒ /services/outsourcing/fournisseurs/nouveau    680 B           191 kB
+├ ƒ /services/robotique                           4.07 kB         166 kB
+├ ƒ /services/robotique/[id]                      3.31 kB         165 kB
+├ ƒ /services/robotique/[id]/edit                 1.57 kB         192 kB
+├ ƒ /services/robotique/nouveau                   677 B           191 kB
+├ ○ /sitemap.xml                                  0 B                0 B
+├ ƒ /workflows                                    2.85 kB         165 kB
+├ ƒ /workflows/[id]                               5.86 kB         168 kB
+└ ƒ /workflows/nouveau                            6.87 kB         170 kB
++ First Load JS shared by all                     87.8 kB
+  ├ chunks/2117-b3ef893d9ae82b72.js               31.9 kB
+  ├ chunks/fd9d1056-d29e7d003e442815.js           53.6 kB
+  └ other shared chunks (total)                   2.28 kB
+
+
+ƒ Middleware                                      73.8 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
